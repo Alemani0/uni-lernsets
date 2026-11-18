@@ -1,0 +1,146 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Lernsets</title>
+<style>
+:root{
+  --bg:#f3f2f5;
+  --surface:#ffffff;
+  --surface-2:#eceaf0;
+  --fg:#1c1a22;
+  --fg-muted:#5c5868;
+  --border:#ddd9e3;
+  --accent:#5b4b9e;
+  --accent-ink:#ffffff;
+  --accent-tint:#ece8f7;
+  --shadow:0 1px 2px rgba(20,15,30,.06), 0 6px 18px rgba(20,15,30,.07);
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15131a; --surface:#1d1a24; --surface-2:#252130; --fg:#ece9f2; --fg-muted:#a9a3b8;
+    --border:#332e40; --accent:#9d8ce8; --accent-ink:#15101f; --accent-tint:#2a2438;
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.4); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15131a; --surface:#1d1a24; --surface-2:#252130; --fg:#ece9f2; --fg-muted:#a9a3b8;
+  --border:#332e40; --accent:#9d8ce8; --accent-ink:#15101f; --accent-tint:#2a2438;
+  --shadow:0 1px 2px rgba(0,0,0,.35), 0 6px 18px rgba(0,0,0,.4); color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;text-wrap:balance;margin:0}
+.wrap{max-width:780px;margin:0 auto}
+.page-head{padding-block:30px 10px}
+.eyebrow{margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-muted);font-weight:600}
+h1{font-size:clamp(28px,6vw,38px);letter-spacing:-.01em}
+.subtitle{margin:6px 0 0;color:var(--fg-muted);max-width:56ch}
+
+.semester{margin-top:30px}
+.semester > h2{font-size:13px;letter-spacing:.07em;text-transform:uppercase;color:var(--fg-muted);
+  border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:18px}
+
+.module{margin-bottom:26px}
+.module h3{font-size:19px;display:flex;align-items:baseline;gap:9px}
+.module .count{font-family:var(--font-mono);font-size:12px;color:var(--fg-muted);font-weight:400}
+
+.set-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+a.set-link{
+  display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--fg);
+  background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:12px 15px;box-shadow:var(--shadow);transition:border-color .12s,transform .12s;
+}
+a.set-link:hover{border-color:var(--accent);transform:translateY(-1px)}
+a.set-link .tag{
+  font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--accent);
+  background:var(--accent-tint);border-radius:6px;padding:3px 8px;flex:0 0 auto;white-space:nowrap;
+}
+a.set-link .title{font-weight:600;font-size:14.5px;flex:1 1 auto;min-width:0}
+a.set-link .arrow{color:var(--fg-muted);font-size:14px;flex:0 0 auto}
+
+footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:30px 0 30px}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <p class="eyebrow">HTWG Konstanz</p>
+    <h1>Lernsets</h1>
+    <p class="subtitle">Alle Karteikarten-Lernsets, nach Semester und Modul sortiert — neueste Inhalte zuerst. Einfach ein Modul aufklappen und das passende Lernset öffnen.</p>
+  </header>
+
+  <div class="semester">
+    <h2>1. Semester</h2>
+
+    <div class="module">
+      <h3>Rechnerarchitektur <span class="count">1 Lernset</span></h3>
+      <div class="set-list">
+        <a class="set-link" href="1.%20Semester/Rechnerarch/Single-Cycle-MIPS-CPU-Lernset.html">
+          <span class="tag">Kap. 3</span><span class="title">Single Cycle MIPS CPU</span><span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="module">
+      <h3>Programmiertechnik II <span class="count">5 Lernsets</span></h3>
+      <div class="set-list">
+        <a class="set-link" href="1.%20Semester/Prog2/Rekursion-Lernset.html">
+          <span class="tag">Kap. 7</span><span class="title">Rekursion</span><span class="arrow">→</span>
+        </a>
+        <a class="set-link" href="1.%20Semester/Prog2/Java-Collections-Lernset.html">
+          <span class="tag">Kap. 6</span><span class="title">Java Collections – Teil I</span><span class="arrow">→</span>
+        </a>
+        <a class="set-link" href="1.%20Semester/Prog2/Keller-und-Schlange-Lernset.html">
+          <span class="tag">Kap. 3</span><span class="title">Keller und Schlange</span><span class="arrow">→</span>
+        </a>
+        <a class="set-link" href="1.%20Semester/Prog2/Liste-Lernset.html">
+          <span class="tag">Kap. 2</span><span class="title">Datentyp Liste</span><span class="arrow">→</span>
+        </a>
+        <a class="set-link" href="1.%20Semester/Prog2/Datentypen-Lernset.html">
+          <span class="tag">Kap. 1</span><span class="title">Datentypen in Java</span><span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="module">
+      <h3>Programmiertechnik I <span class="count">4 Lernsets</span></h3>
+      <div class="set-list">
+        <a class="set-link" href="1.%20Semester/Prog1/Namespaces-Lernset.html">
+          <span class="tag">V13</span><span class="title">Namespaces &amp; Packages</span><span class="arrow">→</span>
+        </a>
+        <a class="set-link" href="1.%20Semester/Prog1/Scala-Collections-Lernset.html">
+          <span class="tag">V12</span><span class="title">Collections (Scala)</span><span class="arrow">→</span>
+        </a>
+        <a class="set-link" href="1.%20Semester/Prog1/Git-Lernset.html">
+          <span class="tag">V11</span><span class="title">Version Control mit Git</span><span class="arrow">→</span>
+        </a>
+        <a class="set-link" href="1.%20Semester/Prog1/Rekursion-Lernset.html">
+          <span class="tag">V10</span><span class="title">Rekursion</span><span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="module">
+      <h3>Mathe I — Algebra <span class="count">4 Lernsets</span></h3>
+      <div class="set-list">
+        <a class="set-link" href="1.%20Semester/Algebra/Strukturen-Lernset.html">
+          <span class="tag">2.2</span><span class="title">Gruppen, Ringe, Körper &amp; Vektorräume</span><span class="arrow">→</span>
+        </a>
+        <a class="set-link" href="1.%20Semester/Algebra/Relationen-Lernset.html">
+          <span class="tag">2.1</span><span class="title">Relationen</span><span class="arrow">→</span>
+        </a>
+        <a class="set-link" href="1.%20Semester/Algebra/Beweismethoden-Lernset.html">
+          <span class="tag">1.3 / 1.4</span><span class="title">Beweismethoden &amp; Induktion</span><span class="arrow">→</span>
+        </a>
+        <a class="set-link" href="1.%20Semester/Algebra/Mengen-Lernset.html">
+          <span class="tag">1.1 / 1.2</span><span class="title">Mengen &amp; Zahlmengen</span><span class="arrow">→</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="credit">14 Lernsets · zuletzt aktualisiert händisch, diese Seite ist der zentrale Einstieg</footer>
+</div>

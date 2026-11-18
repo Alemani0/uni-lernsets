@@ -1,0 +1,894 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Strukturen-Lernset</title>
+<style>
+/* Layout: nested-rings motif (Gruppe⊂Ring⊂Körper, Vektorraum darüber) in the header, echoing how each
+   structure in this lecture is literally built by adding one more axiom to the previous one. */
+:root{
+  --bg:#f4f5f8;
+  --surface:#ffffff;
+  --surface-2:#e9ecf3;
+  --fg:#1a2035;
+  --fg-muted:#5b6480;
+  --border:#dadfeb;
+  --accent:#1c8a5a;        /* grün = Axiom erfüllt / richtig / primär */
+  --accent-ink:#ffffff;
+  --accent-tint:#e2f3ea;
+  --accent-2:#b43d3d;       /* rot = Axiom verletzt / Gegenbeispiel */
+  --accent-2-ink:#ffffff;
+  --accent-2-tint:#f8e3e1;
+  --incorrect:#b43d3d;
+  --incorrect-tint:#f8e3e1;
+  --shadow:0 1px 2px rgba(20,24,45,.06), 0 6px 18px rgba(20,24,45,.07);
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#11141f;
+    --surface:#191d2c;
+    --surface-2:#20263a;
+    --fg:#e8eaf5;
+    --fg-muted:#9aa3c2;
+    --border:#2b3146;
+    --accent:#34c17e;
+    --accent-ink:#06211a;
+    --accent-tint:#123024;
+    --accent-2:#e2726a;
+    --accent-2-ink:#2a0e0c;
+    --accent-2-tint:#3a1d1a;
+    --incorrect:#e2726a;
+    --incorrect-tint:#3a1d1a;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#11141f;
+  --surface:#191d2c;
+  --surface-2:#20263a;
+  --fg:#e8eaf5;
+  --fg-muted:#9aa3c2;
+  --border:#2b3146;
+  --accent:#34c17e;
+  --accent-ink:#06211a;
+  --accent-tint:#123024;
+  --accent-2:#e2726a;
+  --accent-2-ink:#2a0e0c;
+  --accent-2-tint:#3a1d1a;
+  --incorrect:#e2726a;
+  --incorrect-tint:#3a1d1a;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;text-wrap:balance;margin:0}
+code,pre,.mono{font-family:var(--font-mono)}
+a{color:var(--accent)}
+sup{font-size:.7em}
+
+.wrap{max-width:860px;margin:0 auto}
+
+/* ---------- Header ---------- */
+.page-head{display:flex;align-items:center;gap:20px;padding-block:28px 18px;flex-wrap:wrap}
+.rings{position:relative;width:64px;height:64px;flex:0 0 auto}
+.rings i{position:absolute;border-radius:50%;border:1.5px solid var(--border);top:50%;left:50%;transform:translate(-50%,-50%)}
+.rings i:nth-child(1){width:64px;height:64px;border-color:var(--accent-2);opacity:.6}
+.rings i:nth-child(2){width:47px;height:47px;border-color:var(--accent-2);opacity:.8}
+.rings i:nth-child(3){width:30px;height:30px;border-color:var(--accent)}
+.rings i:nth-child(4){width:13px;height:13px;background:var(--accent);border-color:var(--accent)}
+.head-text{flex:1 1 260px;min-width:0}
+.eyebrow{margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-muted);font-weight:600}
+h1{font-size:clamp(26px,6vw,36px);letter-spacing:-.01em}
+.subtitle{margin:6px 0 0;color:var(--fg-muted);max-width:52ch}
+
+/* ---------- Tabs ---------- */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);margin-bottom:22px;
+  position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;padding-top:4px}
+.tab-btn{font-family:var(--font-body);font-weight:600;font-size:13.5px;background:none;border:none;
+  color:var(--fg-muted);cursor:pointer;padding:10px 14px;border-bottom:2.5px solid transparent;border-radius:6px 6px 0 0}
+.tab-btn:hover{color:var(--fg);background:var(--surface-2)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn:focus-visible,button:focus-visible,[tabindex]:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{padding-bottom:48px}
+.panel > section{margin-bottom:34px}
+.panel h2{font-size:21px;margin-bottom:4px}
+.panel h2 .n{color:var(--accent);font-family:var(--font-mono);font-size:15px;margin-right:8px}
+.lead{color:var(--fg-muted);margin:2px 0 14px;max-width:64ch}
+
+/* ---------- Reusable ---------- */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+
+pre.code{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;
+  overflow-x:auto;font-size:13px;line-height:1.6;margin:8px 0;white-space:pre-wrap}
+
+/* ---------- Flashcards ---------- */
+.cat-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{font-family:var(--font-body);font-size:12.5px;font-weight:600;border-radius:999px;border:1px solid var(--border);
+  background:var(--surface);color:var(--fg-muted);padding:6px 12px;cursor:pointer}
+.chip.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.card-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg-muted);margin-bottom:14px}
+
+.flash-wrap{max-width:500px;margin:0 auto}
+.flashcard{min-height:190px;border-radius:16px;border:1px solid var(--border);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;position:relative}
+.flashcard[hidden]{display:none}
+.flash-cat{position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--fg-muted)}
+.flash-side{font-size:16px;text-align:center}
+.flash-a{color:var(--accent);font-weight:600}
+.flash-hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:var(--fg-muted)}
+.flash-explain-row{display:flex;justify-content:center;margin-top:12px}
+.flash-explain-row[hidden]{display:none}
+.flash-explain{margin-top:10px;font-size:13px;color:var(--fg);border-left:3px solid var(--accent-2);
+  padding:10px 13px;background:var(--accent-2-tint);border-radius:0 8px 8px 0;text-align:left}
+.flash-explain[hidden]{display:none}
+.flash-controls{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.flash-controls[hidden]{display:none}
+.btn{font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:8px;cursor:pointer;border:1px solid var(--border);
+  background:var(--surface);color:var(--fg);padding:9px 14px}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.warn{background:var(--incorrect-tint);border-color:var(--incorrect);color:var(--incorrect)}
+.flash-meta{text-align:center;color:var(--fg-muted);font-size:12.5px;margin-top:12px}
+
+.addcard-form{margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);text-align:left}
+.addcard-form[hidden]{display:none}
+.addcard-form h3{font-size:15px;margin-bottom:2px}
+.addcard-form label{display:block;font-size:12.5px;font-weight:600;color:var(--fg-muted);margin:12px 0 4px}
+.addcard-form select,.addcard-form input[type="text"],.addcard-form textarea{
+  width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:13.5px;resize:vertical}
+.addcard-form .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.addcard-form .hint{font-size:11.5px;color:var(--fg-muted);margin-top:2px}
+
+/* ---------- Verständnis-Check (periodic interrupt card) ---------- */
+.checkcard{min-height:190px;border-radius:16px;border:1px solid var(--accent-2);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px;position:relative;text-align:center}
+.checkcard[hidden]{display:none}
+.check-label{position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent-2)}
+.check-q{font-size:16px;font-weight:600;margin:18px 0 18px}
+.check-bool{display:flex;justify-content:center;gap:10px}
+.check-bool[hidden]{display:none}
+.check-text{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.check-text[hidden]{display:none}
+.check-text input{flex:1 1 220px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px}
+.check-feedback{margin-top:14px;font-size:13.5px;text-align:left;border-radius:0 8px 8px 0;padding:9px 13px;border-left:3px solid var(--border)}
+.check-feedback[hidden]{display:none}
+.check-feedback.correct{color:var(--accent);border-left-color:var(--accent);background:var(--accent-tint)}
+.check-feedback.wrong{color:var(--incorrect);border-left-color:var(--incorrect);background:var(--incorrect-tint)}
+.check-controls{display:flex;justify-content:center;margin-top:14px}
+.check-controls[hidden]{display:none}
+
+/* ---------- Quiz ---------- */
+.quiz-score{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--surface);
+  border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px}
+.quiz-score strong{color:var(--accent);font-family:var(--font-mono)}
+.q-item{margin-bottom:18px}
+.q-item p.q-text{font-weight:600;margin:0 0 9px}
+.q-opts{display:grid;gap:7px}
+.opt{text-align:left;border:1px solid var(--border);background:var(--surface);border-radius:9px;padding:9px 12px;
+  font-family:var(--font-body);font-size:13.5px;cursor:pointer;color:var(--fg)}
+.opt:hover{background:var(--surface-2)}
+.opt.correct{background:var(--accent-tint);border-color:var(--accent)}
+.opt.incorrect{background:var(--incorrect-tint);border-color:var(--incorrect)}
+.opt[disabled]{cursor:default}
+.q-explain{margin-top:7px;font-size:12.5px;color:var(--fg-muted);border-left:3px solid var(--accent);padding:5px 10px;
+  background:var(--surface-2);border-radius:0 8px 8px 0;display:none}
+.q-explain.shown{display:block}
+
+/* ---------- Tasks ---------- */
+details.task{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px 16px;margin-bottom:10px;box-shadow:var(--shadow)}
+details.task summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.task summary::-webkit-details-marker{display:none}
+details.task summary .tnum{font-family:var(--font-mono);color:var(--accent-ink);background:var(--accent);border-radius:6px;padding:1px 7px;font-size:12px;flex:0 0 auto}
+details.task .body{margin-top:10px;font-size:13.5px}
+details.task .tip{margin-top:9px;font-size:12.5px;border-left:3px solid var(--accent-2);padding:6px 10px;background:var(--accent-2-tint);border-radius:0 8px 8px 0}
+details.task .sol summary{font-size:12.5px;font-weight:600;color:var(--fg-muted);margin-top:8px}
+
+footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10px 0 30px}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <div class="rings" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="head-text">
+      <p class="eyebrow">Mathe I · 2.2 Algebraische Strukturen · HTWG Konstanz</p>
+      <h1>Gruppen, Ringe, Körper &amp; Vektorräume</h1>
+      <p class="subtitle">Dein Lernset zum axiomatischen Aufbau algebraischer Strukturen — Axiom für Axiom verstehen, nicht nur Begriffe auswendig lernen.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Lernbereiche">
+    <button class="tab-btn active" data-tab="cards" role="tab" aria-selected="true" id="tabbtn-cards">Karteikarten</button>
+    <button class="tab-btn" data-tab="quiz" role="tab" aria-selected="false" id="tabbtn-quiz">Verständnisfragen</button>
+    <button class="tab-btn" data-tab="tasks" role="tab" aria-selected="false" id="tabbtn-tasks">Übungsaufgaben</button>
+  </nav>
+
+  <main>
+    <!-- ============ FLASHCARDS ============ -->
+    <div class="panel" id="panel-cards" role="tabpanel" aria-labelledby="tabbtn-cards">
+      <section>
+        <h2><span class="n">◆</span>Karteikarten</h2>
+        <p class="lead">Karte anklicken, um die Antwort zu sehen — ehrlich einschätzen, das bringt mehr als nur lesen. Nach dem Umdrehen gibt „🔎 Mehr erklären" bei Bedarf noch mehr Hintergrund. Alle 6–8 Karten kommt ein kurzer Verständnis-Check zwischendurch (Ja/Nein oder kurze Texteingabe). Über „➕ Eigene Karte" kannst du jederzeit eigene Karten ergänzen.</p>
+        <div class="cat-filters" id="catFilters"></div>
+        <label class="card-toggle"><input type="checkbox" id="onlyUnsure"> Nur Karten üben, die ich noch nicht sicher weiß</label>
+        <div class="flash-wrap">
+          <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Karte umdrehen">
+            <span class="flash-cat" id="flashCat"></span>
+            <div class="flash-side" id="flashFront"></div>
+            <div class="flash-side flash-a" id="flashBack" hidden></div>
+            <span class="flash-hint" id="flashHint">Antippen zum Umdrehen</span>
+          </div>
+
+          <div class="checkcard" id="checkCard" hidden>
+            <span class="check-label">Verständnis-Check</span>
+            <p class="check-q" id="checkQ"></p>
+            <div class="check-bool" id="checkBool">
+              <button class="btn" id="checkYes" type="button">Ja</button>
+              <button class="btn" id="checkNo" type="button">Nein</button>
+            </div>
+            <div class="check-text" id="checkTextWrap">
+              <input type="text" id="checkInput" placeholder="Deine Antwort …" autocomplete="off">
+              <button class="btn primary" id="checkSubmit" type="button">Prüfen</button>
+            </div>
+            <div class="check-feedback" id="checkFeedback" hidden></div>
+            <div class="check-controls" id="checkControls" hidden>
+              <button class="btn primary" id="btnCheckDone" type="button">Weiter mit Karteikarten ▶</button>
+            </div>
+          </div>
+
+          <div class="flash-explain-row" id="flashExplainRow" hidden>
+            <button class="btn" id="btnExplain" type="button">🔎 Mehr erklären</button>
+          </div>
+          <div class="flash-explain" id="flashExplain" hidden></div>
+
+          <div class="flash-controls" id="flashControlsMain">
+            <button class="btn" id="btnPrev" type="button">◀ Zurück</button>
+            <button class="btn warn" id="btnUnknown" type="button">↻ Nochmal üben</button>
+            <button class="btn primary" id="btnKnown" type="button">✓ Weiß ich</button>
+            <button class="btn" id="btnNext" type="button">Weiter ▶</button>
+          </div>
+          <div class="flash-controls" id="flashControlsShuffle">
+            <button class="btn" id="btnShuffle" type="button">⤨ Mischen</button>
+            <button class="btn" id="btnAddCard" type="button">➕ Eigene Karte</button>
+          </div>
+          <div class="flash-controls" id="flashControlsManage">
+            <button class="btn" id="btnEditCard" type="button">✏️ Karte bearbeiten</button>
+            <button class="btn" id="btnDeleteCard" type="button" style="border-color:var(--incorrect);color:var(--incorrect)">🗑 Karte entfernen</button>
+            <button class="btn" id="btnRestoreRemoved" type="button" hidden>↺ Entfernte Karten wiederherstellen (<span id="removedCount">0</span>)</button>
+          </div>
+          <p class="flash-meta" id="flashMeta"></p>
+
+          <form class="addcard-form" id="addCardForm" hidden>
+            <h3 id="addCardFormTitle">Eigene Karteikarte hinzufügen</h3>
+            <p class="lead" id="addCardFormLead" style="margin-bottom:0">Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.</p>
+            <label for="addCardCat">Kategorie</label>
+            <select id="addCardCat"></select>
+            <input type="text" id="addCardCatNew" placeholder="Neue Kategorie…" hidden>
+            <label for="addCardQ">Frage (Vorderseite)</label>
+            <textarea id="addCardQ" rows="2" placeholder="Was soll abgefragt werden?"></textarea>
+            <label for="addCardA">Antwort (Rückseite)</label>
+            <textarea id="addCardA" rows="3" placeholder="Die vollständige, gute Antwort"></textarea>
+            <p class="hint">Frage und Antwort sind Pflicht.</p>
+            <div class="row">
+              <button class="btn primary" id="btnSaveCard" type="submit">Karte speichern</button>
+              <button class="btn" id="btnCancelCard" type="button">Abbrechen</button>
+              <button class="btn" id="btnResetCard" type="button" hidden style="border-color:var(--incorrect);color:var(--incorrect)">↺ Original wiederherstellen</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ QUIZ ============ -->
+    <div class="panel" id="panel-quiz" role="tabpanel" aria-labelledby="tabbtn-quiz" hidden>
+      <section>
+        <h2><span class="n">?</span>Verständnisfragen</h2>
+        <p class="lead" id="quizIntro">Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.</p>
+        <div class="quiz-score">
+          <span>Ergebnis: <strong id="quizScore">0</strong> / <span id="quizTotal">0</span> richtig</span>
+          <button class="btn" id="btnQuizReset" type="button">Zurücksetzen</button>
+        </div>
+        <div id="quizList"></div>
+      </section>
+    </div>
+
+    <!-- ============ TASKS ============ -->
+    <div class="panel" id="panel-tasks" role="tabpanel" aria-labelledby="tabbtn-tasks" hidden>
+      <section>
+        <h2><span class="n">▸</span>Übungsaufgaben</h2>
+        <p class="lead">Im Stil der Saalaufgaben aus der Vorlesung, plus ergänzende Übungen — zum echten Rechnen, nicht zum schnellen Abrufen. Erst selbst auf Papier rechnen, dann Tipp bzw. Lösung zum Gegenchecken aufklappen.</p>
+        <div id="taskList"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="credit">Lernset zu Prof. Dr. R. Axthelm, Mathe I — 2.2 Algebraische Strukturen (Gruppen, Ringe, Körper, Vektorräume)</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var tabBtns = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  var panels = {
+    cards: document.getElementById("panel-cards"),
+    quiz: document.getElementById("panel-quiz"),
+    tasks: document.getElementById("panel-tasks")
+  };
+  tabBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabBtns.forEach(function(b){ b.classList.remove("active"); b.setAttribute("aria-selected","false"); });
+      btn.classList.add("active"); btn.setAttribute("aria-selected","true");
+      Object.keys(panels).forEach(function(k){ panels[k].hidden = (k !== btn.dataset.tab); });
+    });
+  });
+
+  function loadJSON(key, fallback){ try{ var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
+  function saveJSON(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+
+  // ======================================================
+  // FLASHCARDS
+  // ======================================================
+  var CARDS = [
+    {cat:"Gruppen", q:"Was braucht es, damit ∘ überhaupt eine Verknüpfung auf G ist?", a:"Abgeschlossenheit: g∘h ∈ G für alle g,h ∈ G."},
+    {cat:"Gruppen", q:"Was besagt G1 (Assoziativgesetz)?", a:"(g∘h)∘f = g∘(h∘f) für alle g,h,f ∈ G."},
+    {cat:"Gruppen", q:"Was besagt G2 (neutrales Element)?", a:"∃𝟙∈G ∀g∈G: 𝟙∘g = g."},
+    {cat:"Gruppen", q:"Was besagt G3 (inverses Element)?", a:"∀g∈G ∃g⁻¹∈G: g⁻¹∘g = 𝟙."},
+    {cat:"Gruppen", q:"Unterschied Halbgruppe / Monoid / Gruppe?", a:"Halbgruppe: nur G1. Monoid: G1+G2. Gruppe: G1+G2+G3. (G4 zusätzlich ⇒ abelsch)"},
+    {cat:"Gruppen", q:"Ist (ℕ,+) eine Gruppe?", a:"Nein — G3 verletzt: es gibt keine negativen Inversen in ℕ."},
+    {cat:"Gruppen", q:"Ist (ℤ,·) eine Gruppe? Was ist es stattdessen?", a:"Keine Gruppe (nur ±1 invertierbar) — aber ein abelsches Monoid."},
+    {cat:"Gruppen", q:"Ist (ℕ₀,+) eine Gruppe?", a:"Nein, abelsches Monoid — 0 ist neutral, aber es fehlen Inverse (G3)."},
+    {cat:"Gruppen", q:"Setze die Kette fort: Gruppe → (+ 2. Verknüpfung, distributiv) → ______ → (+ Division möglich, außer durch 0) → ______ → (als Skalarbereich) → ______", a:"Ring, Körper, Vektorraum. Jede Struktur entsteht, indem der vorigen Struktur genau eine weitere Eigenschaft hinzugefügt wird — der rote Faden des ganzen Kapitels."},
+    {cat:"Gruppen", q:"Ist ({−1,1}, ·) eine Gruppe?", a:"Ja — abgeschlossen (Produkt bleibt in {−1,1}), 𝟙=1, jedes Element ist zu sich selbst invers, und kommutativ (abelsch)."},
+    {cat:"Eigenschaften", q:"Wie dreht sich die Reihenfolge bei (g∘h)⁻¹?", a:"(g∘h)⁻¹ = h⁻¹∘g⁻¹ — nicht g⁻¹∘h⁻¹!"},
+    {cat:"Eigenschaften", q:"Ist das neutrale Element einer Gruppe eindeutig? Beweisidee?", a:"Ja. Indirekt: wären 𝟙 und 𝟙̃ beide neutral, dann 𝟙̃ = 𝟙̃∘𝟙 = 𝟙."},
+    {cat:"Eigenschaften", q:"Was besagen die Kürzungsregeln?", a:"a∘b=a∘c ⇒ b=c, und b∘a=c∘a ⇒ b=c — möglich, weil jedes Element ein Inverses hat."},
+    {cat:"Eigenschaften", q:"Was zeigt die Lösbarkeits-Eigenschaft in Gruppen?", a:"∀a,b∈G ∃!x,y∈G: a∘x=b und y∘a=b — Gleichungen sind eindeutig lösbar."},
+    {cat:"Eigenschaften", q:"Welche Axiome braucht der Beweis g∘g⁻¹=𝟙?", a:"Nur G1, G2, G3 — sonst nichts."},
+    {cat:"Matrizen", q:"Was bedeutet A ∈ 𝕂^(m×n)?", a:"A ist eine Matrix mit m Zeilen, n Spalten, Einträgen aus 𝕂 — insgesamt m·n Einträge."},
+    {cat:"Matrizen", q:"Wann heißt eine Matrix quadratisch?", a:"Wenn m = n gilt."},
+    {cat:"Matrizen", q:"Unterschied ℝ²×ℝ² und ℝ^(2×2)?", a:"ℝ²×ℝ² ist ein kartesisches Produkt (=ℝ⁴, 4-Tupel). ℝ^(2×2) ist die Menge der 2×2-Matrizen — verschieden!"},
+    {cat:"Matrizen", q:"Wie addiert man zwei Matrizen A und B? Formel für (A+B)_ij?", a:"(A+B)_ij = A_ij + B_ij — komponentenweise, Eintrag für Eintrag."},
+    {cat:"Matrizen", q:"Ist die Matrizenmultiplikation kommutativ?", a:"Nein, i. A. gilt A·B ≠ B·A."},
+    {cat:"Matrizen", q:"Wie lautet die Formel für (A·B)_ij (\"Zeile mal Spalte\")?", a:"(A·B)_ij = Σ_k A_ik·B_kj — die Summe der paarweisen Produkte aus Zeile i von A und Spalte j von B."},
+    {cat:"Matrizen", q:"Wie ist das Kronecker-Symbol δ_ij definiert, und wofür braucht man es?", a:"δ_ij=1 für i=j, sonst 0. Damit schreibt man die Einheitsmatrix kompakt als E_n=(δ_ij)."},
+    {cat:"Matrizen", q:"Welche Struktur bilden (𝕂^(2×2),+) bzw. (𝕂^(2×2),·)?", a:"(+) abelsche Gruppe. (·) nur Monoid — nicht jede Matrix invertierbar, nicht kommutativ."},
+    {cat:"Ringe & Körper", q:"Welche drei Axiome muss (R,+,∘) erfüllen, um ein Ring zu sein?", a:"R1: (R,+) abelsche Gruppe. R2: ∘ assoziativ. R3: Distributivgesetze (beidseitig)."},
+    {cat:"Ringe & Körper", q:"Wann heißt ein Ring „mit Einselement\"?", a:"Wenn ein neutrales Element n bzgl. ∘ existiert mit n∘a=a für alle a∈R."},
+    {cat:"Ringe & Körper", q:"Merksatz für Ring mit Einselement?", a:"(R,+) abelsche Gruppe, (R,∘) Monoid, Distributivgesetz für beide Verknüpfungen."},
+    {cat:"Ringe & Körper", q:"Ist (ℝ^(2×2),+,·) ein kommutativer Ring?", a:"Nein — Ring mit Eins, aber nicht kommutativ (Matrixmultiplikation vertauscht nicht)."},
+    {cat:"Ringe & Körper", q:"Unterschied Schiefkörper / Körper?", a:"Schiefkörper: K\\{0} ist Gruppe bzgl. ∘. Körper: diese Gruppe ist zusätzlich kommutativ."},
+    {cat:"Ringe & Körper", q:"Warum ist (ℤ,+,·) kein Körper?", a:"Es fehlen multiplikative Inverse (z. B. hat 2 kein Inverses in ℤ)."},
+    {cat:"Ringe & Körper", q:"Warum ist ({0,1,2,3},+,∘) mod 4 kein Körper?", a:"Die 2 hat kein multiplikatives Inverses — 2∘x ist für kein x gleich 1."},
+    {cat:"Ringe & Körper", q:"Beispiel für einen Körper mit nur 2 Elementen?", a:"({0,1},+,·) mit Addition/Multiplikation modulo 2."},
+    {cat:"Ringe & Körper", q:"Bilden die invertierbaren 2×2-Matrizen (Determinante ≠0) einen Körper?", a:"Nein, nur einen Schiefkörper — sie bilden bzgl. · eine Gruppe, aber Matrixmultiplikation ist nicht kommutativ."},
+    {cat:"Vektorräume", q:"Worauf baut ein Vektorraum (V,(𝕂,+,·),⊕,⊙) auf?", a:"Auf einem Körper 𝕂 — V ist die Menge der Vektoren über 𝕂."},
+    {cat:"Vektorräume", q:"Was besagt V1?", a:"(V,⊕) ist eine abelsche Gruppe."},
+    {cat:"Vektorräume", q:"Was besagt V2?", a:"∃1∈𝕂 ∀a∈V: 1⊙a = a (neutrales Element der Multiplikation)."},
+    {cat:"Vektorräume", q:"Wie heißt das neutrale Element von (V,⊕)?", a:"Nullvektor."},
+    {cat:"Vektorräume", q:"Ist ℝ über ℂ ein Vektorraum?", a:"Nein — die Skalare passen nicht zum zugrundeliegenden Körper."},
+    {cat:"Vektorräume", q:"Ist (ℙ₃,ℂ) (reelle Polynome, komplex skaliert) ein Vektorraum?", a:"Nein — λp(x) hat dann keine reellen Koeffizienten mehr, verlässt ℙ₃ (Abgeschlossenheit verletzt)."}
+  ].map(function(c, i){ c.id = i; return c; });
+
+  var BASE_CATS = ["Gruppen","Eigenschaften","Matrizen","Ringe & Körper","Vektorräume"];
+  var STORE_KEY = "algebra-strukturen";
+  var knownIds = new Set(loadJSON(STORE_KEY + "-known", []));
+  var removedIds = new Set(loadJSON(STORE_KEY + "-removed", []));
+  var customCards = loadJSON(STORE_KEY + "-custom", []);
+  var overrides = loadJSON(STORE_KEY + "-overrides", {});
+  var ALL = [];
+  function refreshAll(){
+    customCards.forEach(function(c, i){ c.id = CARDS.length + i; });
+    ALL = CARDS.concat(customCards).map(function(c){
+      var o = overrides[c.id];
+      if(!o) return c;
+      return {id:c.id, cat:o.cat, q:o.q, a:o.a, expl:(o.expl !== undefined ? o.expl : c.expl)};
+    });
+  }
+  refreshAll();
+
+  function activeTotal(){ return ALL.length - removedIds.size; }
+  var activeCat = "Alle";
+  var onlyUnsure = false;
+  var order = []; var pos = 0; var flipped = false;
+
+  var catFiltersEl = document.getElementById("catFilters");
+  function currentCats(){
+    var extra = [];
+    ALL.forEach(function(c){ if(BASE_CATS.indexOf(c.cat) === -1 && extra.indexOf(c.cat) === -1) extra.push(c.cat); });
+    return ["Alle"].concat(BASE_CATS, extra);
+  }
+  function renderCatFilters(){
+    catFiltersEl.innerHTML = "";
+    currentCats().forEach(function(cat){
+      var b = document.createElement("button");
+      b.className = "chip" + (cat === activeCat ? " active" : "");
+      b.type = "button"; b.textContent = cat; b.dataset.cat = cat;
+      b.addEventListener("click", function(){
+        activeCat = cat;
+        Array.prototype.forEach.call(catFiltersEl.children, function(c){ c.classList.toggle("active", c.dataset.cat === cat); });
+        rebuildOrder();
+      });
+      catFiltersEl.appendChild(b);
+    });
+  }
+  renderCatFilters();
+  document.getElementById("onlyUnsure").addEventListener("change", function(e){ onlyUnsure = e.target.checked; rebuildOrder(); });
+
+  function shuffle(arr){
+    for(var i = arr.length - 1; i > 0; i--){ var j = Math.floor(Math.random()*(i+1)); var t=arr[i]; arr[i]=arr[j]; arr[j]=t; }
+    return arr;
+  }
+  function rebuildOrder(){
+    var pool = ALL.filter(function(c){
+      if(removedIds.has(c.id)) return false;
+      if(activeCat !== "Alle" && c.cat !== activeCat) return false;
+      if(onlyUnsure && knownIds.has(c.id)) return false;
+      return true;
+    });
+    order = pool.map(function(c){ return c.id; });
+    pos = 0; flipped = false; renderCard();
+  }
+
+  var flashcardEl = document.getElementById("flashcard");
+  var flashCat = document.getElementById("flashCat");
+  var flashFront = document.getElementById("flashFront");
+  var flashBack = document.getElementById("flashBack");
+  var flashHint = document.getElementById("flashHint");
+  var flashMeta = document.getElementById("flashMeta");
+  var flashExplainRow = document.getElementById("flashExplainRow");
+  var flashExplain = document.getElementById("flashExplain");
+  var btnExplain = document.getElementById("btnExplain");
+
+  function cardAt(id){ for(var i=0;i<ALL.length;i++){ if(ALL[i].id===id) return ALL[i]; } return null; }
+  function resetExplain(){ flashExplain.hidden = true; btnExplain.textContent = "🔎 Mehr erklären"; }
+
+  function renderCard(){
+    resetExplain();
+    if(order.length === 0){
+      flashCat.textContent = "";
+      flashFront.textContent = onlyUnsure ? "Alles in dieser Kategorie sitzt schon. 🎉" : "Keine Karten in dieser Auswahl.";
+      flashBack.hidden = true; flashFront.hidden = false;
+      flashExplainRow.hidden = true;
+      flashHint.textContent = "";
+      flashMeta.textContent = "Gewusst: " + knownIds.size + " / " + activeTotal();
+      return;
+    }
+    var card = cardAt(order[pos]);
+    flashCat.textContent = card.cat;
+    flashFront.textContent = card.q;
+    flashBack.textContent = card.a;
+    flashFront.hidden = flipped; flashBack.hidden = !flipped;
+    flashExplainRow.hidden = !(flipped && card.expl);
+    flashHint.textContent = flipped ? "Antippen für die Frage" : "Antippen zum Umdrehen";
+    flashMeta.textContent = "Karte " + (pos+1) + " / " + order.length + " · Gewusst gesamt: " + knownIds.size + " / " + activeTotal();
+  }
+
+  btnExplain.addEventListener("click", function(){
+    var card = order.length ? cardAt(order[pos]) : null;
+    if(!card) return;
+    flashExplain.textContent = card.expl || "";
+    flashExplain.hidden = !flashExplain.hidden;
+    btnExplain.textContent = flashExplain.hidden ? "🔎 Mehr erklären" : "🔽 Erklärung ausblenden";
+  });
+
+  flashcardEl.addEventListener("click", function(){ if(order.length===0) return; flipped=!flipped; renderCard(); });
+  flashcardEl.addEventListener("keydown", function(e){
+    if(e.key==="Enter"||e.key===" "){ e.preventDefault(); flashcardEl.click(); }
+  });
+  function advance(delta){ if(order.length===0) return; pos=(pos+delta+order.length)%order.length; flipped=false; renderCard(); }
+  document.getElementById("btnPrev").addEventListener("click", function(){ advance(-1); });
+  document.getElementById("btnNext").addEventListener("click", function(){ advance(1); });
+  document.getElementById("btnShuffle").addEventListener("click", function(){ shuffle(order); pos=0; flipped=false; renderCard(); });
+  document.getElementById("btnKnown").addEventListener("click", function(){
+    if(order.length===0) return;
+    knownIds.add(cardAt(order[pos]).id); saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    if(onlyUnsure){ rebuildOrder(); } else { advance(1); }
+    maybeShowCheck();
+  });
+  document.getElementById("btnUnknown").addEventListener("click", function(){
+    if(order.length===0) return;
+    knownIds.delete(cardAt(order[pos]).id); saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    advance(1);
+    maybeShowCheck();
+  });
+
+  function updateRestoreBtn(){
+    var btn = document.getElementById("btnRestoreRemoved");
+    var countEl = document.getElementById("removedCount");
+    if(countEl) countEl.textContent = removedIds.size;
+    btn.hidden = removedIds.size === 0;
+  }
+  document.getElementById("btnDeleteCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    if(!confirm("Diese Karte wirklich dauerhaft aus dem Lernset entfernen?\n\n„" + card.q + "“")) return;
+    removedIds.add(card.id);
+    knownIds.delete(card.id);
+    saveJSON(STORE_KEY + "-removed", Array.from(removedIds));
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  document.getElementById("btnRestoreRemoved").addEventListener("click", function(){
+    if(removedIds.size === 0) return;
+    if(!confirm("Alle " + removedIds.size + " entfernten Karten wiederherstellen?")) return;
+    removedIds.clear();
+    saveJSON(STORE_KEY + "-removed", []);
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  updateRestoreBtn();
+
+  // ---------- Add / edit own card ----------
+  var addCardForm = document.getElementById("addCardForm");
+  var addCardCat = document.getElementById("addCardCat");
+  var addCardCatNew = document.getElementById("addCardCatNew");
+  var addCardFormTitle = document.getElementById("addCardFormTitle");
+  var addCardFormLead = document.getElementById("addCardFormLead");
+  var btnSaveCard = document.getElementById("btnSaveCard");
+  var btnResetCard = document.getElementById("btnResetCard");
+  var NEW_CAT_VALUE = "__new__";
+  var editingId = null;
+
+  function populateAddCardCats(){
+    addCardCat.innerHTML = "";
+    BASE_CATS.concat(currentCats().filter(function(c){ return c !== "Alle" && BASE_CATS.indexOf(c) === -1; })).forEach(function(cat){
+      var o = document.createElement("option"); o.value = cat; o.textContent = cat;
+      addCardCat.appendChild(o);
+    });
+    var o2 = document.createElement("option"); o2.value = NEW_CAT_VALUE; o2.textContent = "Neue Kategorie…";
+    addCardCat.appendChild(o2);
+  }
+  addCardCat.addEventListener("change", function(){ addCardCatNew.hidden = addCardCat.value !== NEW_CAT_VALUE; });
+
+  function closeAddCardForm(){
+    addCardForm.reset(); addCardCatNew.hidden = true; addCardForm.hidden = true;
+    editingId = null;
+  }
+
+  document.getElementById("btnAddCard").addEventListener("click", function(){
+    if(!addCardForm.hidden && editingId === null){ closeAddCardForm(); return; }
+    editingId = null;
+    populateAddCardCats();
+    document.getElementById("addCardQ").value = "";
+    document.getElementById("addCardA").value = "";
+    addCardFormTitle.textContent = "Eigene Karteikarte hinzufügen";
+    addCardFormLead.textContent = "Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.";
+    btnSaveCard.textContent = "Karte speichern";
+    btnResetCard.hidden = true;
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnEditCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    editingId = card.id;
+    populateAddCardCats();
+    addCardCat.value = card.cat;
+    addCardCatNew.hidden = true;
+    document.getElementById("addCardQ").value = card.q;
+    document.getElementById("addCardA").value = card.a;
+    addCardFormTitle.textContent = "Karte bearbeiten";
+    addCardFormLead.textContent = "Änderungen werden dauerhaft in diesem Lernset gespeichert (im Browser).";
+    btnSaveCard.textContent = "Änderungen speichern";
+    btnResetCard.hidden = !overrides[card.id];
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnCancelCard").addEventListener("click", closeAddCardForm);
+
+  btnResetCard.addEventListener("click", function(){
+    if(editingId === null) return;
+    if(!confirm("Diese Karte wirklich auf die ursprüngliche Version zurücksetzen?")) return;
+    delete overrides[editingId];
+    saveJSON(STORE_KEY + "-overrides", overrides);
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  addCardForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var q = document.getElementById("addCardQ").value.trim();
+    var a = document.getElementById("addCardA").value.trim();
+    var cat = addCardCat.value === NEW_CAT_VALUE ? addCardCatNew.value.trim() : addCardCat.value;
+    if(!q || !a || !cat){ alert("Bitte Kategorie, Frage und Antwort ausfüllen."); return; }
+    if(editingId !== null){
+      overrides[editingId] = {cat:cat, q:q, a:a};
+      saveJSON(STORE_KEY + "-overrides", overrides);
+    } else {
+      customCards.push({cat:cat, q:q, a:a, expl:""});
+      saveJSON(STORE_KEY + "-custom", customCards);
+    }
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  rebuildOrder();
+
+  // ======================================================
+  // VERSTÄNDNIS-CHECK — alle 6-8 Karten ein kurzer, geprüfter
+  // Ja/Nein- oder Kurztext-Check zu einem Thema, das gerade geübt wurde.
+  // ======================================================
+  var ABFRAGE = [
+    {type:"bool", q:"Ja oder Nein: g∘h ∈ G für alle g,h∈G muss gelten, damit ∘ überhaupt eine Verknüpfung auf G ist.", correct:true,
+     explain:"Richtig — ohne diese Abgeschlossenheit wäre ∘ gar keine Verknüpfung AUF G, das Ergebnis könnte aus G herausfallen."},
+    {type:"bool", q:"Ist (ℕ,+) eine Gruppe?", correct:false,
+     explain:"Nein — G3 ist verletzt: es gibt keine negativen Zahlen in ℕ, also keine additiven Inversen."},
+    {type:"bool", q:"Ist ({−1,1}, ·) eine Gruppe?", correct:true,
+     explain:"Ja — abgeschlossen, 𝟙=1, jedes Element ist zu sich selbst invers ((−1)·(−1)=1), und kommutativ."},
+    {type:"bool", q:"Ja oder Nein: Das neutrale Element einer Gruppe ist eindeutig.", correct:true,
+     explain:"Richtig — Beweis indirekt: wären 𝟙 und 𝟙̃ beide neutral, dann 𝟙̃=𝟙̃∘𝟙=𝟙, also sind sie gleich."},
+    {type:"bool", q:"Ja oder Nein: Jedes Gruppenelement hat genau ein Inverses.", correct:true,
+     explain:"Richtig — wären a und b beide invers zu g, zeigt a=a∘𝟙=a∘(g∘b)=(a∘g)∘b=𝟙∘b=b, dass a=b gilt."},
+    {type:"bool", q:"Ja oder Nein: In einer Gruppe ist jede Gleichung a∘x=b eindeutig lösbar.", correct:true,
+     explain:"Richtig — x=a⁻¹∘b ist die eindeutige Lösung, direkte Folge aus Existenz und Eindeutigkeit der Inversen."},
+    {type:"bool", q:"Ja oder Nein: ℝ²×ℝ² ist dasselbe wie ℝ^(2×2).", correct:false,
+     explain:"Falsch — ℝ²×ℝ² ist ein kartesisches Produkt (=ℝ⁴, 4-Tupel), ℝ^(2×2) ist die Menge der 2×2-Matrizen — zwei verschiedene Strukturen."},
+    {type:"bool", q:"Ja oder Nein: Matrizenmultiplikation ist kommutativ.", correct:false,
+     explain:"Falsch — i. A. gilt A·B ≠ B·A, da Zeile-mal-Spalte richtungsabhängig ist."},
+    {type:"bool", q:"Ja oder Nein: (ℤ,+,·) ist ein Körper.", correct:false,
+     explain:"Falsch — ℤ ist ein kommutativer Ring mit Eins, aber z. B. 2 hat kein multiplikatives Inverses in ℤ."},
+    {type:"bool", q:"Ja oder Nein: Die invertierbaren 2×2-Matrizen bilden einen Schiefkörper, aber keinen Körper.", correct:true,
+     explain:"Richtig — sie bilden bzgl. · eine Gruppe, aber Matrixmultiplikation ist nicht kommutativ, deshalb Schiefkörper statt Körper."},
+    {type:"bool", q:"Ja oder Nein: (ℝ, ℂ) — reelle Vektoren, komplexe Skalare — ist ein Vektorraum.", correct:false,
+     explain:"Falsch — ein komplexer Skalar kann einen reellen Vektor ins Komplexe befördern, Abgeschlossenheit ist verletzt."},
+    {type:"bool", q:"Ja oder Nein: (ℙ₃, ℝ) ist ein Vektorraum.", correct:true,
+     explain:"Richtig — Summe und reelle Vielfache von Polynomen vom Grad≤3 bleiben vom Grad≤3, alle Axiome übertragen sich komponentenweise."},
+    {type:"text", q:"Gilt nur G1 (Assoziativgesetz) — wie heißt die Struktur? (ein Wort)", answer:"Halbgruppe",
+     explain:"Eine Halbgruppe braucht nur Abgeschlossenheit und Assoziativität."},
+    {type:"text", q:"Gelten G1 und G2 — wie heißt die Struktur? (ein Wort)", answer:"Monoid",
+     explain:"Ein Monoid ist eine Halbgruppe mit neutralem Element — es fehlen nur noch die Inversen (G3) zur Gruppe."},
+    {type:"text", q:"A ∈ 𝕂^(m×n): wie viele Einträge hat A, wenn m=3 und n=4? (nur die Zahl)", answer:"12",
+     explain:"m·n = 3·4 = 12 Einträge."},
+    {type:"text", q:"Wie heißt das neutrale Element von (V,⊕) in einem Vektorraum? (ein Wort)", answer:"Nullvektor",
+     explain:"Der Nullvektor spielt für die Vektoraddition dieselbe Rolle wie 0 für die gewöhnliche Addition."}
+  ];
+
+  var checkCardEl = document.getElementById("checkCard");
+  var checkQEl = document.getElementById("checkQ");
+  var checkBoolEl = document.getElementById("checkBool");
+  var checkTextWrapEl = document.getElementById("checkTextWrap");
+  var checkInputEl = document.getElementById("checkInput");
+  var checkFeedbackEl = document.getElementById("checkFeedback");
+  var checkControlsEl = document.getElementById("checkControls");
+  var checkYesEl = document.getElementById("checkYes");
+  var checkNoEl = document.getElementById("checkNo");
+  var checkSubmitEl = document.getElementById("checkSubmit");
+  var flashControlsMain = document.getElementById("flashControlsMain");
+  var flashControlsShuffle = document.getElementById("flashControlsShuffle");
+  var flashControlsManage = document.getElementById("flashControlsManage");
+  var abfrageBag = [];
+  var currentCheckItem = null;
+
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  var cardsUntilCheck = randInt(6, 8);
+
+  function drawAbfrage(){
+    if(ABFRAGE.length === 0) return null;
+    if(abfrageBag.length === 0){ abfrageBag = shuffle(ABFRAGE.map(function(_, i){ return i; })); }
+    return ABFRAGE[abfrageBag.pop()];
+  }
+  function normalize(s){ return (s || "").toString().trim().toLowerCase().replace(/\s+/g, " "); }
+
+  function maybeShowCheck(){
+    cardsUntilCheck--;
+    if(cardsUntilCheck > 0) return;
+    cardsUntilCheck = randInt(6, 8);
+    var item = drawAbfrage();
+    if(!item) return;
+    currentCheckItem = item;
+    checkQEl.textContent = item.q;
+    checkBoolEl.hidden = item.type !== "bool";
+    checkTextWrapEl.hidden = item.type !== "text";
+    checkInputEl.value = "";
+    checkYesEl.disabled = checkNoEl.disabled = false;
+    checkSubmitEl.disabled = false;
+    checkFeedbackEl.hidden = true;
+    checkFeedbackEl.className = "check-feedback";
+    checkControlsEl.hidden = true;
+
+    flashcardEl.hidden = true;
+    flashControlsMain.hidden = true;
+    flashControlsShuffle.hidden = true;
+    flashControlsManage.hidden = true;
+    flashExplainRow.hidden = true;
+    flashExplain.hidden = true;
+    checkCardEl.hidden = false;
+  }
+
+  function finishCheck(isCorrect){
+    checkFeedbackEl.textContent = (isCorrect ? "✓ Richtig. " : "✗ Nicht ganz. ") + (currentCheckItem.explain || "");
+    checkFeedbackEl.className = "check-feedback " + (isCorrect ? "correct" : "wrong");
+    checkFeedbackEl.hidden = false;
+    checkYesEl.disabled = checkNoEl.disabled = true;
+    checkSubmitEl.disabled = true;
+    checkControlsEl.hidden = false;
+  }
+  checkYesEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === true); });
+  checkNoEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === false); });
+  checkSubmitEl.addEventListener("click", function(){
+    var val = normalize(checkInputEl.value);
+    var candidates = [currentCheckItem.answer].concat(currentCheckItem.accept || []).map(normalize);
+    finishCheck(candidates.indexOf(val) !== -1);
+  });
+  checkInputEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); checkSubmitEl.click(); }
+  });
+  document.getElementById("btnCheckDone").addEventListener("click", function(){
+    checkCardEl.hidden = true;
+    flashcardEl.hidden = false;
+    flashControlsMain.hidden = false;
+    flashControlsShuffle.hidden = false;
+    flashControlsManage.hidden = false;
+    renderCard();
+  });
+
+  // ======================================================
+  // QUIZ
+  // ======================================================
+  var QUIZ = [
+    {q:"Welche drei Axiome muss (G,∘) mindestens erfüllen, um eine Gruppe zu sein?",
+     opts:["Nur Assoziativität","Assoziativität, neutrales Element, inverse Elemente","Assoziativität, Kommutativität, neutrales Element","Abgeschlossenheit und Kommutativität"],
+     correct:1, explain:"G1 (assoziativ) + G2 (neutrales Element) + G3 (Inverse) — Kommutativität (G4) ist optional und definiert nur „abelsch\"."},
+    {q:"(ℕ₀,+) ist...",
+     opts:["eine Gruppe","ein abelsches Monoid, aber keine Gruppe","nur eine Halbgruppe","gar keine algebraische Struktur"],
+     correct:1, explain:"G1, G2 erfüllt (assoziativ, neutrales Element 0), aber G3 verletzt — es gibt keine negativen Zahlen als Inverse."},
+    {q:"Für welche Gruppen gilt (g∘h)⁻¹ = h⁻¹∘g⁻¹?",
+     opts:["Nur für abelsche Gruppen","Für jede Gruppe, auch nicht-abelsche","Nur für Matrizen","Das gilt nie"],
+     correct:1, explain:"Das ist eine allgemeine Eigenschaft jeder Gruppe — gerade bei nicht-abelschen Gruppen (z. B. Matrizen) wichtig, da man die Reihenfolge nicht vertauschen darf."},
+    {q:"Warum ist ℝ²×ℝ² ≠ ℝ^(2×2), obwohl beide „4 reelle Zahlen\" enthalten?",
+     opts:["Es ist dasselbe, nur anders geschrieben","Links ein 4-Tupel, rechts eine 2×2-Matrix mit eigener Struktur (Zeilen/Spalten, Matrixmultiplikation)","ℝ^(2×2) hat nur 2 Einträge","ℝ²×ℝ² ist nicht wohldefiniert"],
+     correct:1, explain:"Gleiche Anzahl Zahlen, aber unterschiedliche Struktur und unterschiedliche Verknüpfungen — zwei verschiedene Mengen."},
+    {q:"Warum ist die Matrizenmultiplikation i. A. nicht kommutativ?",
+     opts:["Weil Matrizen keine Zahlen sind","Weil beim Matrixprodukt Zeilen mit Spalten kombiniert werden und die Reihenfolge die Kombination ändert","Weil nur quadratische Matrizen multipliziert werden dürfen","Sie ist doch kommutativ"],
+     correct:1, explain:"Zeile-mal-Spalte ist richtungsabhängig: A·B kombiniert die Zeilen von A mit den Spalten von B, B·A genau andersherum — i. A. unterschiedliche Ergebnisse."},
+    {q:"(ℝ^(2×2), ·) mit der üblichen Matrixmultiplikation ist...",
+     opts:["eine Gruppe","ein Monoid, aber keine Gruppe","ein Körper","gar keine Struktur"],
+     correct:1, explain:"Assoziativ, neutrales Element E — aber nicht jede Matrix hat ein Inverses (z. B. die Nullmatrix) und es ist nicht kommutativ."},
+    {q:"Was unterscheidet einen Ring von einer Gruppe?",
+     opts:["Ein Ring hat zwei Verknüpfungen (+ und ∘) mit Distributivgesetz, eine Gruppe nur eine","Ein Ring ist immer kommutativ","Ein Ring hat keine neutralen Elemente","Es gibt keinen Unterschied"],
+     correct:0, explain:"Ein Ring kombiniert zwei Gruppen-/Monoid-artige Strukturen über das Distributivgesetz — eine Gruppe hat nur eine Verknüpfung."},
+    {q:"Warum ist (ℤ,+,·) kein Körper?",
+     opts:["ℤ ist unendlich","Es fehlen multiplikative Inverse für die meisten Elemente (z. B. 2)","+ ist auf ℤ nicht assoziativ","ℤ hat kein neutrales Element"],
+     correct:1, explain:"ℤ ist ein kommutativer Ring mit Eins, aber z. B. 2 hat kein x mit 2·x=1 in ℤ — also kein Körper."},
+    {q:"Was ist der entscheidende Unterschied zwischen Schiefkörper und Körper?",
+     opts:["Schiefkörper haben kein neutrales Element","Beim Körper ist K\\{0} bzgl. · zusätzlich kommutativ","Schiefkörper sind endlich, Körper unendlich","Es gibt keinen Unterschied"],
+     correct:1, explain:"Schiefkörper verlangt nur, dass K\\{0} eine Gruppe bzgl. · bildet. Körper verlangt zusätzlich, dass diese Gruppe kommutativ ist."},
+    {q:"In ({0,1,2,3},+,∘) mod 4 hat die 2 kein multiplikatives Inverses. Was bedeutet das konkret?",
+     opts:["2∘0 = 2","Es gibt kein x mit 2∘x = 1","2 ist negativ","2 hat kein additives Inverses"],
+     correct:1, explain:"Ein multiplikatives Inverses von 2 müsste 2∘x=1 erfüllen — das klappt in diesem Ring für kein x."},
+    {q:"Ein Vektorraum (V,(𝕂,+,·),⊕,⊙) setzt voraus, dass...",
+     opts:["V eine Gruppe ist","𝕂 ein Körper ist","V und 𝕂 dieselbe Menge sind","V endlich ist"],
+     correct:1, explain:"Die Skalare müssen aus einem Körper 𝕂 kommen — das ist Teil der Definition."},
+    {q:"Ist (ℝ²,ℂ) (reelle Paare, mit komplexen Zahlen skaliert) ein Vektorraum?",
+     opts:["Ja, immer","Nein — λ·(a1,a2) mit komplexem λ verlässt ℝ²","Ja, weil ℝ⊂ℂ","Nur wenn λ reell ist"],
+     correct:1, explain:"Skalarmultiplikation muss in V bleiben (Abgeschlossenheit). Ein komplexer Skalar erzeugt im Allgemeinen keinen reellen Vektor mehr."},
+    {q:"Welche Eigenschaft fehlt (ℙ₃,ℂ) (reelle Polynome ≤ Grad 3, komplex skaliert), um ein Vektorraum zu sein?",
+     opts:["V1 (abelsche Gruppe bzgl. Addition)","Abgeschlossenheit bzgl. der Skalarmultiplikation","Keine, es ist ein VR","Das neutrale Element fehlt"],
+     correct:1, explain:"λp(x) hat für komplexes λ keine reellen Koeffizienten mehr und liegt damit nicht mehr in ℙ₃."}
+  ];
+
+  var quizListEl = document.getElementById("quizList");
+  var quizScoreEl = document.getElementById("quizScore");
+  var quizTotalEl = document.getElementById("quizTotal");
+  document.getElementById("quizIntro").textContent = QUIZ.length + " Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.";
+  quizTotalEl.textContent = String(QUIZ.length);
+  var score = 0;
+  function renderQuiz(){
+    quizListEl.innerHTML = ""; score = 0; quizScoreEl.textContent = "0";
+    QUIZ.forEach(function(item, qi){
+      var wrap = document.createElement("div"); wrap.className = "q-item card";
+      var qText = document.createElement("p"); qText.className = "q-text"; qText.textContent = (qi+1) + ". " + item.q;
+      wrap.appendChild(qText);
+      var optsWrap = document.createElement("div"); optsWrap.className = "q-opts";
+      var explainEl = document.createElement("div"); explainEl.className = "q-explain"; explainEl.textContent = item.explain;
+      item.opts.forEach(function(optText, oi){
+        var b = document.createElement("button"); b.className = "opt"; b.type = "button"; b.textContent = optText;
+        b.addEventListener("click", function(){
+          if(wrap.dataset.answered) return;
+          wrap.dataset.answered = "1";
+          Array.prototype.forEach.call(optsWrap.children, function(o, idx){
+            o.disabled = true;
+            if(idx === item.correct) o.classList.add("correct");
+            else if(idx === oi) o.classList.add("incorrect");
+          });
+          explainEl.classList.add("shown");
+          if(oi === item.correct){ score++; quizScoreEl.textContent = String(score); }
+        });
+        optsWrap.appendChild(b);
+      });
+      wrap.appendChild(optsWrap); wrap.appendChild(explainEl); quizListEl.appendChild(wrap);
+    });
+  }
+  document.getElementById("btnQuizReset").addEventListener("click", renderQuiz);
+  renderQuiz();
+
+  // ======================================================
+  // TASKS (Saalaufgaben + ergänzende Übungen, inkl. der früher bei den
+  // Karteikarten eingestreuten Zwischenübungen — gehören inhaltlich hierher)
+  // ======================================================
+  var TASKS = [
+    {t:"Matrizen rechnen", d:"Berechne für A = (2 1; 0 3) und B = (1 −1; 2 0): A+B, A·B und B·A.",
+     tip:"Addition komponentenweise. Bei der Multiplikation: Zeile von A mal Spalte von B. Rechne A·B und B·A getrennt — erwarte KEIN gleiches Ergebnis.",
+     sol:"A+B = (3 0; 2 3)\nA·B = (2·1+1·2  2·(−1)+1·0; 0·1+3·2  0·(−1)+3·0) = (4 −2; 6 0)\nB·A = (1·2+(−1)·0  1·1+(−1)·3; 2·2+0·0  2·1+0·3) = (2 −2; 4 2)\n→ A·B ≠ B·A, Matrixmultiplikation ist nicht kommutativ."},
+    {t:"Gruppenaxiome prüfen: gerade Zahlen", d:"Ist (2ℤ, +) — die Menge aller geraden ganzen Zahlen mit Addition — eine Gruppe? Begründe mit den Axiomen.",
+     tip:"Prüfe der Reihe nach: Abgeschlossenheit, G1, G2 (welches Element?), G3 (was ist das Inverse von 2k?).",
+     sol:"Ja, sogar abelsche Gruppe. Abgeschlossen: gerade+gerade=gerade. G1: assoziativ (geerbt von ℤ). G2: neutrales Element 0∈2ℤ. G3: zu 2k ist −2k∈2ℤ invers. G4: + ist kommutativ."},
+    {t:"Gruppenaxiome prüfen: Brüche ohne Null", d:"Ist (ℚ\\{0}, ·) eine Gruppe?",
+     tip:"Was passiert, wenn du zwei Brüche ≠0 multiplizierst? Was ist das neutrale Element? Was ist das Inverse von a/b?",
+     sol:"Ja, abelsche Gruppe. Abgeschlossen (Produkt zweier Nicht-Null-Brüche ist ≠0). G1 assoziativ. G2 neutral: 1. G3: zu a/b (a,b≠0) ist b/a invers. G4: · ist kommutativ."},
+    {t:"Obere Dreiecksmatrizen", d:"Sei M = {A ∈ ℝ^(2×2) | A ist obere Dreiecksmatrix}. Bildet M bzgl. der Matrixaddition eine Gruppe? Bildet M bzgl. der Matrixmultiplikation eine Gruppe?",
+     tip:"Addition: bleibt die Summe zweier oberer Dreiecksmatrizen eine obere Dreiecksmatrix? Multiplikation: ist jede obere Dreiecksmatrix invertierbar (Tipp: was ist, wenn ein Diagonaleintrag 0 ist)?",
+     sol:"Bzgl. + : Ja, abelsche Gruppe (Summe bleibt obere Dreiecksmatrix, neutral = Nullmatrix, Inverses −A bleibt obere Dreiecksmatrix).\nBzgl. · : Nein, nur ein Monoid — M ist zwar abgeschlossen und hat mit E ein neutrales Element, aber z. B. (0 1; 0 0) hat keine inverse Matrix (Determinante 0)."},
+    {t:"Körper-Check", d:"Ist (ℝ,+,·) ein Körper? Welche Eigenschaft würde fehlen, wenn man ℝ durch ℤ ersetzt?",
+     tip:"Erinnere dich an die Definition: Ring, bei dem zusätzlich K\\{0} bzgl. · eine kommutative Gruppe ist.",
+     sol:"Ja, ℝ ist ein Körper (Standardbeispiel). Bei ℤ würden die multiplikativen Inversen fehlen — außer für ±1 hat kein Element in ℤ ein Inverses bzgl. ·, also nur kommutativer Ring mit Eins, kein Körper."},
+    {t:"Vektorraum mit 3 Komponenten", d:"Ist (ℝ³, ℝ) mit komponentenweiser Addition und Skalarmultiplikation ein Vektorraum?",
+     tip:"Genau wie (ℝ²,ℝ) aus der Vorlesung, nur mit einer Komponente mehr — prüfe V1–V5 komponentenweise.",
+     sol:"Ja. V1–V5 übertragen sich komponentenweise aus den Eigenschaften von (ℝ,+,·): Addition und Skalierung bleiben in ℝ³, alle Axiome gelten Komponente für Komponente."},
+    {t:"Vektorraum-Check: ℂ über ℝ", d:"Ist (ℂ, ℝ) — komplexe Zahlen als Vektoren, reelle Zahlen als Skalare — ein Vektorraum?",
+     tip:"Bleibt eine komplexe Zahl nach Addition zweier komplexer Zahlen komplex? Bleibt sie komplex, wenn man sie mit einer reellen Zahl skaliert?",
+     sol:"Ja. (ℂ,⊕) ist eine abelsche Gruppe, und reelle Skalare λ·(a+bi)=λa+λbi bleiben in ℂ. Alle Vektorraumaxiome gelten — vgl. Beispiel (a) aus der Vorlesung."},
+    {t:"Gegenbeispiel selbst finden", d:"Ist ({0,1,2}, +) mit Addition modulo 3 eine Gruppe? Und ({0,1,2}, ·) mit Multiplikation modulo 3?",
+     tip:"Stelle dir beide Verknüpfungstafeln auf (wie in der Vorlesung bei mod 2 und mod 4). Prüfe für jedes Element, ob es ein Inverses gibt.",
+     sol:"(+) mod 3: Ja, abelsche Gruppe (neutral 0; Inverse: 1↔2, 0↔0).\n(·) mod 3: Nein, keine Gruppe — die 0 hat nie ein multiplikatives Inverses (0·x=0 für jedes x). Auf {0,1,2}\\{0}={1,2} dagegen ist (·) mod 3 sogar eine Gruppe, denn 2·2=1 mod 3 — darum ist ({0,1,2},+,·) ein Körper (ℤ/3ℤ, Primzahl!)."},
+    {t:"Beweise: (g∘h)⁻¹ = h⁻¹∘g⁻¹", d:"Zeige in einer beliebigen Gruppe (G,∘): das Inverse von g∘h ist h⁻¹∘g⁻¹ (und NICHT g⁻¹∘h⁻¹).",
+     tip:"Zeige (g∘h)∘(h⁻¹∘g⁻¹) = 𝟙 durch schrittweises Anwenden von Assoziativität (G1) und der Inversen-Eigenschaft (G3).",
+     sol:"(g∘h)∘(h⁻¹∘g⁻¹)\n= g∘(h∘h⁻¹)∘g⁻¹   [G1, Assoziativität]\n= g∘𝟙∘g⁻¹        [G3: h∘h⁻¹=𝟙]\n= g∘g⁻¹          [G2: 𝟙 neutral]\n= 𝟙              [G3]\n\nAlso ist h⁻¹∘g⁻¹ tatsächlich das Inverse von g∘h. ∎"},
+    {t:"Beweise: Das Inverse eines Gruppenelements ist eindeutig", d:"Zeige: In einer Gruppe (G,∘) hat jedes Element g genau ein Inverses (nicht nur mindestens eines wie G3 behauptet).",
+     tip:"Nimm an, a und b seien BEIDE Inverse von g (a∘g=𝟙 und g∘b=𝟙). Zeige a=b, indem du b von links mit 𝟙=a∘g erweiterst und Assoziativität nutzt.",
+     sol:"Annahme: a und b sind beide Inverse von g, d.h. a∘g=𝟙 und g∘b=𝟙.\n\na = a∘𝟙 = a∘(g∘b) = (a∘g)∘b = 𝟙∘b = b\n\nAlso a=b — das Inverse ist eindeutig. ∎"},
+    {t:"Ist (ℝ\\{0}, ·) eine Gruppe?", d:"Prüfe alle Gruppenaxiome für die reellen Zahlen ohne 0 mit der Multiplikation.",
+     tip:"G1 (Assoziativität) und G2 (neutrales Element 1) sind klar. Für G3: hat jede reelle Zahl ≠0 ein multiplikatives Inverses in ℝ\\{0}?",
+     sol:"G1: Multiplikation reeller Zahlen ist assoziativ. ✓\nG2: 1 ist neutral (1·a=a) und 1∈ℝ\\{0}. ✓\nG3: jedes a≠0 hat das Inverse 1/a, und 1/a ist ebenfalls ≠0. ✓\n\n(ℝ\\{0}, ·) ist eine Gruppe — sogar abelsch, da Multiplikation kommutativ ist."},
+    {t:"Welche 2×2-Matrizen sind bezüglich · invertierbar?", d:"Gegeben A = (1 2; 2 4). Finde heraus (ohne Determinantenformel, nur durch Ausprobieren), ob es eine Matrix B gibt mit A·B = E₂ (Einheitsmatrix).",
+     tip:"Setze B=(a b; c d) an, multipliziere A·B aus und vergleiche mit E₂ komponentenweise — welches Gleichungssystem entsteht, und ist es lösbar?",
+     sol:"A·B = (a+2c  b+2d; 2a+4c  2b+4d).\nVergleich mit E₂ verlangt u.a.: a+2c=1 und 2a+4c=0 ⇒ 2(a+2c)=0 ⇒ 2·1=0 — Widerspruch!\n\nEs gibt kein solches B — A ist NICHT invertierbar (die zweite Zeile von A ist das Doppelte der ersten). Das bestätigt: (𝕂^(2×2),·) ist nur ein Monoid, nicht jede Matrix hat ein Inverses."},
+    {t:"Ist ({0,1,2,3,4}, +, ·) mod 5 ein Körper?", d:"Prüfe, ob jedes Element ≠0 in {0,1,2,3,4} mit Addition/Multiplikation modulo 5 ein multiplikatives Inverses besitzt — ist das also ein Körper?",
+     tip:"Finde für jedes a∈{1,2,3,4} ein x∈{1,2,3,4} mit a·x ≡ 1 (mod 5). Probiere systematisch durch.",
+     sol:"1·1=1 ✓ (1⁻¹=1)\n2·3=6≡1(mod 5) ✓ (2⁻¹=3)\n3·2=6≡1(mod 5) ✓ (3⁻¹=2)\n4·4=16≡1(mod 5) ✓ (4⁻¹=4)\n\nJedes Element ≠0 hat ein Inverses ⇒ es IST ein Körper (anders als mod 4, wo 2 kein Inverses hat — 5 ist prim, 4 nicht, das ist der entscheidende Unterschied)."},
+    {t:"Ist die Menge der Polynome vom Grad ≤ 2 ein Vektorraum über ℝ?", d:"Sei P₂ = {a₀+a₁x+a₂x² | a₀,a₁,a₂∈ℝ} mit üblicher Addition und Skalarmultiplikation. Ist (P₂,ℝ) ein Vektorraum?",
+     tip:"Prüfe V1 (abelsche Gruppe bzgl. Addition — liegt die Summe zweier solcher Polynome wieder in P₂?) und V2 (1⊙p=p für Skalar 1).",
+     sol:"V1: Summe zweier Polynome vom Grad≤2 hat wieder Grad≤2, Addition ist abelsch (Nullpolynom als neutrales Element, −p als Inverses). ✓\nV2: 1·p(x)=p(x) für jedes Polynom p. ✓\n\n(P₂,ℝ) ist ein Vektorraum — Polynome lassen sich genau wie Tupel (a₀,a₁,a₂)∈ℝ³ behandeln."},
+    {t:"Kürzungsregel anwenden: eindeutige Lösung finden", d:"In einer Gruppe (G,∘) gelte a∘x = a∘c für ein festes a. Zeige mit der Kürzungsregel, dass x=c die einzige Lösung ist — und wende das Prinzip auf 5+x=5+12 in (ℤ,+) an.",
+     tip:"Verknüpfe beide Seiten von links mit a⁻¹ und nutze G1-G3, um a wegzukürzen.",
+     sol:"a∘x = a∘c\na⁻¹∘(a∘x) = a⁻¹∘(a∘c)   [a⁻¹ existiert nach G3]\n(a⁻¹∘a)∘x = (a⁻¹∘a)∘c   [G1]\n𝟙∘x = 𝟙∘c             [G3]\nx = c                  [G2]\n\nKonkret in (ℤ,+): 5+x=5+12 ⇒ x=12 (hier ist a⁻¹=−5 das 'Wegkürzen' von 5)."}
+  ];
+  var taskListEl = document.getElementById("taskList");
+  function taskBodyHtml(task){
+    return "<p>" + task.d + "</p>" +
+      '<div class="tip">💡 Tipp: ' + task.tip + "</div>" +
+      '<details class="sol"><summary>✅ Lösung zum Gegenchecken</summary><pre class="code">' + task.sol + "</pre></details>";
+  }
+  TASKS.forEach(function(task, i){
+    var det = document.createElement("details"); det.className = "task";
+    var summary = document.createElement("summary");
+    summary.innerHTML = '<span class="tnum">' + (i+1) + '</span> ' + task.t;
+    det.appendChild(summary);
+    var body = document.createElement("div"); body.className = "body";
+    body.innerHTML = taskBodyHtml(task);
+    det.appendChild(body);
+    taskListEl.appendChild(det);
+  });
+
+})();
+</script>

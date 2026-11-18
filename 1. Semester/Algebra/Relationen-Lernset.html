@@ -1,0 +1,887 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Relationen-Lernset</title>
+<style>
+/* Layout: sticky header with a relation-graph motif (nodes + arrows, literally what a Relation is);
+   tab bar below; two accent colors trace the lecture's own fork: reflexiv+symmetrisch+transitiv
+   (Äquivalenzrelation, teal) vs. reflexiv+antisymmetrisch+transitiv (Ordnung, amber). */
+:root{
+  --bg:#f2f5f3;
+  --surface:#ffffff;
+  --surface-2:#e8ede9;
+  --fg:#162220;
+  --fg-muted:#52635d;
+  --border:#d7e0da;
+  --accent:#0f8f7c;      /* teal = Äquivalenzrelation-Zweig / richtig */
+  --accent-ink:#ffffff;
+  --accent-tint:#e3f3ef;
+  --accent-2:#b85c12;    /* amber = Ordnung-Zweig / sekundär */
+  --accent-2-ink:#ffffff;
+  --accent-2-tint:#f8ead9;
+  --incorrect:#b23b3b;
+  --incorrect-tint:#fbe6e6;
+  --shadow:0 1px 2px rgba(15,30,25,.06), 0 6px 18px rgba(15,30,25,.07);
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1615; --surface:#161f1e; --surface-2:#1d2928;
+    --fg:#e7efec; --fg-muted:#9db0aa; --border:#2a3836;
+    --accent:#2bbfa3; --accent-ink:#06211c; --accent-tint:#133430;
+    --accent-2:#e2984c; --accent-2-ink:#2a1703; --accent-2-tint:#3a2a16;
+    --incorrect:#e2766e; --incorrect-tint:#3a1f1d;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1615; --surface:#161f1e; --surface-2:#1d2928;
+  --fg:#e7efec; --fg-muted:#9db0aa; --border:#2a3836;
+  --accent:#2bbfa3; --accent-ink:#06211c; --accent-tint:#133430;
+  --accent-2:#e2984c; --accent-2-ink:#2a1703; --accent-2-tint:#3a2a16;
+  --incorrect:#e2766e; --incorrect-tint:#3a1f1d;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--fg); font-family:var(--font-body);
+  font-size:15px; line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;text-wrap:balance;margin:0}
+code,pre,.mono{font-family:var(--font-mono)}
+a{color:var(--accent)}
+.wrap{max-width:860px;margin:0 auto}
+
+/* Header */
+.page-head{display:flex;align-items:center;gap:20px;padding-block:28px 18px;flex-wrap:wrap}
+.rel-glyph{flex:0 0 auto}
+.head-text{flex:1 1 260px;min-width:0}
+.eyebrow{margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-muted);font-weight:600}
+h1{font-size:clamp(28px,6vw,38px);letter-spacing:-.01em}
+.subtitle{margin:6px 0 0;color:var(--fg-muted);max-width:54ch}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border);margin-bottom:22px;
+  position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;padding-top:4px}
+.tab-btn{font-family:var(--font-body);font-weight:600;font-size:13.5px;background:none;border:none;
+  color:var(--fg-muted);cursor:pointer;padding:10px 14px;border-bottom:2.5px solid transparent;border-radius:6px 6px 0 0}
+.tab-btn:hover{color:var(--fg);background:var(--surface-2)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{padding-bottom:48px}
+.panel > section{margin-bottom:34px}
+.panel h2{font-size:21px;margin-bottom:4px}
+.panel h2 .n{color:var(--accent);font-family:var(--font-mono);font-size:15px;margin-right:8px}
+.lead{color:var(--fg-muted);margin:2px 0 14px;max-width:64ch}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+.defbox{background:var(--surface-2);border:1px solid var(--border);border-left:4px solid var(--fg-muted);
+  border-radius:0 10px 10px 0;padding:12px 16px;margin:10px 0;font-size:13.5px}
+.defbox .dt{font-weight:700;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--fg-muted);display:block;margin-bottom:4px}
+
+pre.code{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:11px 13px;
+  overflow-x:auto;font-size:12.5px;line-height:1.6;margin:8px 0}
+
+table.ruleof{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+table.ruleof th,table.ruleof td{border:1px solid var(--border);padding:7px 9px;text-align:left;vertical-align:top}
+table.ruleof th{background:var(--surface-2);font-size:11.5px;letter-spacing:.03em;text-transform:uppercase}
+table.ruleof td code{font-size:12px}
+
+/* Flashcards */
+.cat-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{font-family:var(--font-body);font-size:12.5px;font-weight:600;border-radius:999px;border:1px solid var(--border);
+  background:var(--surface);color:var(--fg-muted);padding:6px 12px;cursor:pointer}
+.chip.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.card-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg-muted);margin-bottom:14px}
+.flash-wrap{max-width:500px;margin:0 auto}
+.flashcard{min-height:190px;border-radius:16px;border:1px solid var(--border);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px;display:flex;flex-direction:column;justify-content:center;
+  cursor:pointer;position:relative}
+.flashcard[hidden]{display:none}
+.flash-cat{position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--fg-muted)}
+.flash-side{font-size:15.5px;text-align:center}
+.flash-a{color:var(--accent);font-weight:600}
+.flash-hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:var(--fg-muted)}
+.flash-explain-row{display:flex;justify-content:center;margin-top:12px}
+.flash-explain-row[hidden]{display:none}
+.flash-explain{
+  margin-top:10px;font-size:13px;color:var(--fg);border-left:3px solid var(--accent-2);
+  padding:10px 13px;background:var(--accent-2-tint);border-radius:0 8px 8px 0;text-align:left;
+}
+.flash-explain[hidden]{display:none}
+.flash-controls{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.flash-controls[hidden]{display:none}
+.btn{font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg);padding:9px 14px}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.warn{background:var(--incorrect-tint);border-color:var(--incorrect);color:var(--incorrect)}
+.flash-meta{text-align:center;color:var(--fg-muted);font-size:12.5px;margin-top:12px}
+
+.addcard-form{
+  margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);text-align:left;
+}
+.addcard-form[hidden]{display:none}
+.addcard-form h3{font-size:15px;margin-bottom:2px}
+.addcard-form label{display:block;font-size:12.5px;font-weight:600;color:var(--fg-muted);margin:12px 0 4px}
+.addcard-form select,.addcard-form input[type="text"],.addcard-form textarea{
+  width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:13.5px;resize:vertical;
+}
+.addcard-form .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.addcard-form .hint{font-size:11.5px;color:var(--fg-muted);margin-top:2px}
+
+/* Verständnis-Check (periodic interrupt card) */
+.checkcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--accent-2);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;position:relative;text-align:center;
+}
+.checkcard[hidden]{display:none}
+.check-label{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--accent-2);
+}
+.check-q{font-size:16px;font-weight:600;margin:18px 0 18px}
+.check-bool{display:flex;justify-content:center;gap:10px}
+.check-bool[hidden]{display:none}
+.check-text{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.check-text[hidden]{display:none}
+.check-text input{
+  flex:1 1 220px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;
+}
+.check-feedback{margin-top:14px;font-size:13.5px;text-align:left;border-radius:0 8px 8px 0;padding:9px 13px;border-left:3px solid var(--border)}
+.check-feedback[hidden]{display:none}
+.check-feedback.correct{color:var(--accent);border-left-color:var(--accent);background:var(--accent-tint)}
+.check-feedback.wrong{color:var(--incorrect);border-left-color:var(--incorrect);background:var(--incorrect-tint)}
+.check-controls{display:flex;justify-content:center;margin-top:14px}
+.check-controls[hidden]{display:none}
+
+/* Quiz */
+.quiz-score{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px}
+.quiz-score strong{color:var(--accent);font-family:var(--font-mono)}
+.q-item{margin-bottom:18px}
+.q-item p.q-text{font-weight:600;margin:0 0 9px}
+.q-opts{display:grid;gap:7px}
+.opt{text-align:left;border:1px solid var(--border);background:var(--surface);border-radius:9px;
+  padding:9px 12px;font-family:var(--font-body);font-size:13.5px;cursor:pointer;color:var(--fg)}
+.opt:hover{background:var(--surface-2)}
+.opt.correct{background:var(--accent-tint);border-color:var(--accent)}
+.opt.incorrect{background:var(--incorrect-tint);border-color:var(--incorrect)}
+.opt[disabled]{cursor:default}
+.q-explain{margin-top:7px;font-size:12.5px;color:var(--fg-muted);border-left:3px solid var(--accent);
+  padding:5px 10px;background:var(--surface-2);border-radius:0 8px 8px 0;display:none}
+.q-explain.shown{display:block}
+
+/* Tasks */
+details.task{background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:13px 16px;margin-bottom:10px;box-shadow:var(--shadow)}
+details.task summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.task summary::-webkit-details-marker{display:none}
+details.task summary .tnum{font-family:var(--font-mono);color:var(--accent-ink);background:var(--accent);
+  border-radius:6px;padding:1px 7px;font-size:12px;flex:0 0 auto}
+details.task .body{margin-top:10px;font-size:13.5px}
+details.task .tip{margin-top:9px;font-size:12.5px;border-left:3px solid var(--accent-2);padding:6px 10px;
+  background:var(--accent-2-tint);border-radius:0 8px 8px 0}
+details.task .sol summary{font-size:12.5px;font-weight:600;color:var(--fg-muted);margin-top:8px}
+details.task .sol pre.code{white-space:pre-wrap}
+.task-footnote{color:var(--fg-muted);font-size:12.5px;margin-top:14px}
+footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10px 0 30px}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <svg class="rel-glyph" width="64" height="64" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="12" cy="48" r="6" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="2"/>
+      <circle cx="32" cy="12" r="6" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="2"/>
+      <circle cx="52" cy="48" r="6" fill="var(--accent-2-tint)" stroke="var(--accent-2)" stroke-width="2"/>
+      <path d="M17,45 C22,34 26,26 29,18" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#arrT)"/>
+      <path d="M35,17 C41,26 45,34 48,42" fill="none" stroke="var(--accent-2)" stroke-width="2" marker-end="url(#arrA)"/>
+      <path d="M18,50 C28,58 36,58 46,50" fill="none" stroke="var(--fg-muted)" stroke-width="1.5" stroke-dasharray="2 3" marker-end="url(#arrM)"/>
+      <defs>
+        <marker id="arrT" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L6,3.5 L0,7 Z" fill="var(--accent)"/></marker>
+        <marker id="arrA" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L6,3.5 L0,7 Z" fill="var(--accent-2)"/></marker>
+        <marker id="arrM" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L6,3.5 L0,7 Z" fill="var(--fg-muted)"/></marker>
+      </defs>
+    </svg>
+    <div class="head-text">
+      <p class="eyebrow">Mathe I · 2.1 Relationen &amp; Äquivalenzklassen · HTWG Konstanz</p>
+      <h1>Relationen</h1>
+      <p class="subtitle">Dein Lernset zu Relationen, Äquivalenzrelationen &amp; Ordnungen, Äquivalenzklassen und Modulo/Kongruenz — zum Verstehen, Behalten und Anwenden.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Lernbereiche">
+    <button class="tab-btn active" data-tab="cards" role="tab" aria-selected="true" id="tabbtn-cards">Karteikarten</button>
+    <button class="tab-btn" data-tab="quiz" role="tab" aria-selected="false" id="tabbtn-quiz">Verständnisfragen</button>
+    <button class="tab-btn" data-tab="tasks" role="tab" aria-selected="false" id="tabbtn-tasks">Übungsaufgaben</button>
+  </nav>
+
+  <main>
+    <!-- ============ FLASHCARDS ============ -->
+    <div class="panel" id="panel-cards" role="tabpanel" aria-labelledby="tabbtn-cards">
+      <section>
+        <h2><span class="n">◆</span>Karteikarten</h2>
+        <p class="lead">Karte anklicken, um die Antwort zu sehen — ehrlich einschätzen, das bringt mehr als nur lesen. Nach dem Umdrehen gibt „🔎 Mehr erklären" bei Bedarf noch mehr Hintergrund. Alle 6–8 Karten kommt ein kurzer Verständnis-Check zwischendurch (Ja/Nein oder kurze Texteingabe). Über „➕ Eigene Karte" kannst du jederzeit eigene Karten ergänzen.</p>
+        <div class="cat-filters" id="catFilters"></div>
+        <label class="card-toggle"><input type="checkbox" id="onlyUnsure"> Nur Karten üben, die ich noch nicht sicher weiß</label>
+        <div class="flash-wrap">
+          <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Karte umdrehen">
+            <span class="flash-cat" id="flashCat"></span>
+            <div class="flash-side" id="flashFront"></div>
+            <div class="flash-side flash-a" id="flashBack" hidden></div>
+            <span class="flash-hint" id="flashHint">Antippen zum Umdrehen</span>
+          </div>
+
+          <div class="checkcard" id="checkCard" hidden>
+            <span class="check-label">Verständnis-Check</span>
+            <p class="check-q" id="checkQ"></p>
+            <div class="check-bool" id="checkBool">
+              <button class="btn" id="checkYes" type="button">Ja</button>
+              <button class="btn" id="checkNo" type="button">Nein</button>
+            </div>
+            <div class="check-text" id="checkTextWrap">
+              <input type="text" id="checkInput" placeholder="Deine Antwort …" autocomplete="off">
+              <button class="btn primary" id="checkSubmit" type="button">Prüfen</button>
+            </div>
+            <div class="check-feedback" id="checkFeedback" hidden></div>
+            <div class="check-controls" id="checkControls" hidden>
+              <button class="btn primary" id="btnCheckDone" type="button">Weiter mit Karteikarten ▶</button>
+            </div>
+          </div>
+
+          <div class="flash-explain-row" id="flashExplainRow" hidden>
+            <button class="btn" id="btnExplain" type="button">🔎 Mehr erklären</button>
+          </div>
+          <div class="flash-explain" id="flashExplain" hidden></div>
+
+          <div class="flash-controls" id="flashControlsMain">
+            <button class="btn" id="btnPrev" type="button">◀ Zurück</button>
+            <button class="btn warn" id="btnUnknown" type="button">↻ Nochmal üben</button>
+            <button class="btn primary" id="btnKnown" type="button">✓ Weiß ich</button>
+            <button class="btn" id="btnNext" type="button">Weiter ▶</button>
+          </div>
+          <div class="flash-controls" id="flashControlsShuffle">
+            <button class="btn" id="btnShuffle" type="button">⤨ Mischen</button>
+            <button class="btn" id="btnAddCard" type="button">➕ Eigene Karte</button>
+          </div>
+          <div class="flash-controls" id="flashControlsManage">
+            <button class="btn" id="btnEditCard" type="button">✏️ Karte bearbeiten</button>
+            <button class="btn" id="btnDeleteCard" type="button" style="border-color:var(--incorrect);color:var(--incorrect)">🗑 Karte entfernen</button>
+            <button class="btn" id="btnRestoreRemoved" type="button" hidden>↺ Entfernte Karten wiederherstellen (<span id="removedCount">0</span>)</button>
+          </div>
+          <p class="flash-meta" id="flashMeta"></p>
+
+          <form class="addcard-form" id="addCardForm" hidden>
+            <h3 id="addCardFormTitle">Eigene Karteikarte hinzufügen</h3>
+            <p class="lead" id="addCardFormLead" style="margin-bottom:0">Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.</p>
+            <label for="addCardCat">Kategorie</label>
+            <select id="addCardCat"></select>
+            <input type="text" id="addCardCatNew" placeholder="Neue Kategorie…" hidden>
+            <label for="addCardQ">Frage (Vorderseite)</label>
+            <textarea id="addCardQ" rows="2" placeholder="Was soll abgefragt werden?"></textarea>
+            <label for="addCardA">Antwort (Rückseite)</label>
+            <textarea id="addCardA" rows="3" placeholder="Die vollständige, gute Antwort"></textarea>
+            <p class="hint">Frage und Antwort sind Pflicht.</p>
+            <div class="row">
+              <button class="btn primary" id="btnSaveCard" type="submit">Karte speichern</button>
+              <button class="btn" id="btnCancelCard" type="button">Abbrechen</button>
+              <button class="btn" id="btnResetCard" type="button" hidden style="border-color:var(--incorrect);color:var(--incorrect)">↺ Original wiederherstellen</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ QUIZ ============ -->
+    <div class="panel" id="panel-quiz" role="tabpanel" aria-labelledby="tabbtn-quiz" hidden>
+      <section>
+        <h2><span class="n">?</span>Verständnisfragen</h2>
+        <p class="lead">13 Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.</p>
+        <div class="quiz-score"><span>Ergebnis: <strong id="quizScore">0</strong> / 13 richtig</span>
+          <button class="btn" id="btnQuizReset" type="button">Zurücksetzen</button>
+        </div>
+        <div id="quizList"></div>
+      </section>
+    </div>
+
+    <!-- ============ TASKS ============ -->
+    <div class="panel" id="panel-tasks" role="tabpanel" aria-labelledby="tabbtn-tasks" hidden>
+      <section>
+        <h2><span class="n">▸</span>Übungsaufgaben</h2>
+        <p class="lead">Saalaufgaben aus der Vorlesung plus ergänzende Übungen im selben Schwierigkeitsgrad — zum echten Rechnen, nicht zum schnellen Abrufen. Erst selbst rechnen, dann Tipp bzw. Lösung zum Gegenchecken aufklappen.</p>
+        <div id="taskList"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="credit">Lernset zu Prof. Dr. R. Axthelm, Mathe I — 2.1 Relationen &amp; Äquivalenzklassen</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var tabBtns = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  var panels = {
+    cards: document.getElementById("panel-cards"),
+    quiz: document.getElementById("panel-quiz"),
+    tasks: document.getElementById("panel-tasks")
+  };
+  tabBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabBtns.forEach(function(b){ b.classList.remove("active"); b.setAttribute("aria-selected","false"); });
+      btn.classList.add("active"); btn.setAttribute("aria-selected","true");
+      Object.keys(panels).forEach(function(k){ panels[k].hidden = (k !== btn.dataset.tab); });
+    });
+  });
+
+  function loadJSON(key, fallback){ try{ var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
+  function saveJSON(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+
+  // ======================================================
+  // FLASHCARDS — Frage vorne, vollständige gute Antwort hinten.
+  // ======================================================
+  var CARDS = [
+    {cat:"Relationen", q:"Wie ist eine n-stellige Relation definiert?", a:"R ⊆ A₁×⋯×Aₙ heißt (n-stellige) Relation auf das kartesische Produkt A₁×⋯×Aₙ."},
+    {cat:"Relationen", q:"Was ist eine binäre Relation?", a:"Eine 2-stellige Relation, R ⊆ A×A (bzw. A×B)."},
+    {cat:"Relationen", q:"Vier gleichwertige Schreibweisen für binäre Relationen?", a:"(x,y) ∈ R, xRy, R(x,y), x ∼ y."},
+    {cat:"Relationen", q:"Wie hängt der Graph einer Funktion f mit Relationen zusammen?", a:"Er ist selbst eine binäre Relation: x G_f y :⟺ y = f(x)."},
+    {cat:"Äquivalenzrelation", q:"Welche drei Axiome definieren eine Äquivalenzrelation?", a:"(A1) reflexiv: ∀x: xRx. (A2) symmetrisch: xRy⇒yRx. (A3) transitiv: xRy∧yRz⇒xRz."},
+    {cat:"Äquivalenzrelation", q:"Formuliere 'reflexiv' in Worten.", a:"Jedes Element steht zu sich selbst in Relation."},
+    {cat:"Äquivalenzrelation", q:"Formuliere 'symmetrisch' in Worten.", a:"Steht a zu b in Relation, dann auch b zu a."},
+    {cat:"Äquivalenzrelation", q:"Formuliere 'transitiv' in Worten.", a:"Steht a zu b und b zu c in Relation, dann auch a zu c."},
+    {cat:"Äquivalenzrelation", q:"Ist 'hat die gleiche Farbe wie' auf Bügelperlchen eine Äquivalenzrelation?", a:"Ja — reflexiv, symmetrisch und transitiv sind alle erfüllt."},
+    {cat:"Äquivalenzrelation", q:"Ist R={(x,y)∈ℕ₀²|(x−y)/3∈ℤ} eine Äquivalenzrelation?", a:"Ja. Alle drei Axiome lassen sich algebraisch nachrechnen (x−x=0 teilbar; Vorzeichenwechsel bleibt teilbar; Summe zweier Teilbarkeiten bleibt teilbar)."},
+    {cat:"Ordnung", q:"Welche Eigenschaften definieren eine Ordnung?", a:"(A1) reflexiv, (A3) transitiv, (A4) antisymmetrisch: xRy∧yRx⇒x=y."},
+    {cat:"Ordnung", q:"Unterschied symmetrisch (A2) vs. antisymmetrisch (A4)?", a:"Symmetrisch: aus aRb folgt immer auch bRa. Antisymmetrisch: aRb und bRa dürfen nur gleichzeitig gelten, wenn a=b ist."},
+    {cat:"Ordnung", q:"Warum ist 'g(a)≤g(b)' bei verschieden großen Erdmännchen keine Äquivalenzrelation, sondern eine Ordnung?", a:"A2 ist verletzt (aus a≤b folgt nicht b≤a). Stattdessen gilt A4 — zusammen mit A1, A3 ergibt das eine Ordnung."},
+    {cat:"Ordnung", q:"Kann eine Relation gleichzeitig Äquivalenzrelation und Ordnung sein?", a:"Ja, im Sonderfall: die Gleichheitsrelation '=' ist reflexiv, symmetrisch UND antisymmetrisch zugleich."},
+    {cat:"Ordnung", q:"Was bedeutet 'irreflexiv'?", a:"∀a∈A: ¬aRa — kein Element steht zu sich selbst in Relation (nicht dasselbe wie 'nicht reflexiv')."},
+    {cat:"Ordnung", q:"Was bedeutet 'asymmetrisch'?", a:"∀a,b: aRb⇒¬bRa — gilt auch für a=b, daher impliziert asymmetrisch automatisch irreflexiv."},
+    {cat:"Äquivalenzklassen", q:"Wie ist die Äquivalenzklasse [a]_R definiert?", a:"[a]_R := {b∈A | aRb} ⊆ A — alle Elemente, die zu a in Relation R stehen."},
+    {cat:"Äquivalenzklassen", q:"Wie nennt man a in [a]_R?", a:"Repräsentant der Äquivalenzklasse."},
+    {cat:"Äquivalenzklassen", q:"Nenne die vier Grundeigenschaften von Äquivalenzklassen.", a:"(a) ∀a: [a]_R≠∅. (b) ∀b∈[a]_R: [b]_R=[a]_R. (c) ¬(bRa) ⇒ [b]_R∩[a]_R=∅. (d) A=⋃[a]_R."},
+    {cat:"Äquivalenzklassen", q:"Was bedeutet A=⋃[a]_R anschaulich?", a:"Die Äquivalenzklassen partitionieren A — zerlegen es lückenlos und überschneidungsfrei in disjunkte Teilmengen."},
+    {cat:"Äquivalenzklassen", q:"Für R={(x,y)∈ℕ₀²|(x−y)/3∈ℤ}: was ist [0]_R?", a:"{0,3,6,9,12,…} — alle Zahlen mit Rest 0 bei Division durch 3."},
+    {cat:"Äquivalenzklassen", q:"Wie viele verschiedene Äquivalenzklassen hat diese Relation insgesamt?", a:"Drei: [0]_R, [1]_R, [2]_R — für die Reste 0, 1, 2 bei Division durch 3."},
+    {cat:"Modulo & Kongruenz", q:"Wie ist die Gaußklammer ⌊x⌋ definiert?", a:"⌊x⌋ := max{k∈ℤ | k≤x} — die größte ganze Zahl ≤ x."},
+    {cat:"Modulo & Kongruenz", q:"Was ist ⌊−2.5⌋?", a:"−3 (nicht −2! Bei negativen Zahlen wird immer weiter nach unten gerundet)."},
+    {cat:"Modulo & Kongruenz", q:"Wie ist a mod m definiert?", a:"r = a mod m :⇔ r = a − m·⌊a/m⌋."},
+    {cat:"Modulo & Kongruenz", q:"Was besagen die Homomorphieregeln für Modulo?", a:"Zwischenergebnisse dürfen schon modulo gerechnet werden, ohne dass sich das Ergebnis ändert — für + und · gleichermaßen."},
+    {cat:"Modulo & Kongruenz", q:"Wie ist Kongruenz definiert?", a:"a ≡_m b :⇔ a mod m = b mod m — gleicher Rest bei Division durch m."},
+    {cat:"Modulo & Kongruenz", q:"Welche Äquivalenzrelation steckt hinter der Kongruenz ≡_m auf ℤ?", a:"aMb :⇔ a≡_m b ist eine Äquivalenzrelation; ihre Klassen bestehen aus allen Zahlen mit demselben Rest bei Division durch m."},
+    {cat:"Modulo & Kongruenz", q:"Warum helfen die Homomorphieregeln beim schnellen Potenzieren modulo m?", a:"Man rechnet mit kleinen Zwischenresten statt mit riesigen Zahlen, z.B. 10≡₇3 ⇒ 10²≡₇3²=9≡₇2 ⇒ 10⁴≡₇2²=4."},
+    {cat:"Modulo & Kongruenz", q:"Ist 12 ≡₂ 10 wahr?", a:"Ja — beide sind durch 2 teilbar, Rest 0 = Rest 0."},
+    {cat:"Modulo & Kongruenz", q:"Ist 13 ≡₄ 18 wahr?", a:"Nein — 13 mod 4 = 1, aber 18 mod 4 = 2."},
+    {cat:"Modulo & Kongruenz", q:"Was bedeutet z.B. '21 ≡₅ 1' im Mathe-Olympiade-Beispiel?", a:"21 hat bei Division durch 5 den Rest 1, also 21 = 5·4 + 1."},
+    {cat:"Modulo & Kongruenz", q:"Wie zeigt man Teilbarkeit durch 45=9·5?", a:"Man zeigt Teilbarkeit durch die Faktoren 9 und 5 getrennt — da 9 und 5 teilerfremd sind, folgt daraus Teilbarkeit durch 45."},
+    {cat:"Modulo & Kongruenz", q:"Warum rechnet man bei der Uhrzeit nach 1000 Stunden mit 'mod 24'?", a:"Weil ein Tag 24 Stunden hat — nach jeweils 24 Stunden beginnt die Uhrzeit wieder von vorn."}
+  ].map(function(c, i){ c.id = i; return c; });
+
+  var BASE_CATS = ["Relationen","Äquivalenzrelation","Ordnung","Äquivalenzklassen","Modulo & Kongruenz"];
+  var STORE_KEY = "algebra-relationen";
+  var knownIds = new Set(loadJSON(STORE_KEY + "-known", []));
+  var removedIds = new Set(loadJSON(STORE_KEY + "-removed", []));
+  var customCards = loadJSON(STORE_KEY + "-custom", []);
+  var overrides = loadJSON(STORE_KEY + "-overrides", {});
+  var ALL = [];
+  function refreshAll(){
+    customCards.forEach(function(c, i){ c.id = CARDS.length + i; });
+    ALL = CARDS.concat(customCards).map(function(c){
+      var o = overrides[c.id];
+      if(!o) return c;
+      return {id:c.id, cat:o.cat, q:o.q, a:o.a, expl:(o.expl !== undefined ? o.expl : c.expl)};
+    });
+  }
+  refreshAll();
+
+  function activeTotal(){ return ALL.length - removedIds.size; }
+  var activeCat = "Alle";
+  var onlyUnsure = false;
+  var order = []; var pos = 0; var flipped = false;
+
+  var catFiltersEl = document.getElementById("catFilters");
+  function currentCats(){
+    var extra = [];
+    ALL.forEach(function(c){ if(BASE_CATS.indexOf(c.cat) === -1 && extra.indexOf(c.cat) === -1) extra.push(c.cat); });
+    return ["Alle"].concat(BASE_CATS, extra);
+  }
+  function renderCatFilters(){
+    catFiltersEl.innerHTML = "";
+    currentCats().forEach(function(cat){
+      var b = document.createElement("button");
+      b.className = "chip" + (cat === activeCat ? " active" : "");
+      b.type = "button"; b.textContent = cat; b.dataset.cat = cat;
+      b.addEventListener("click", function(){
+        activeCat = cat;
+        Array.prototype.forEach.call(catFiltersEl.children, function(c){ c.classList.toggle("active", c.dataset.cat === cat); });
+        rebuildOrder();
+      });
+      catFiltersEl.appendChild(b);
+    });
+  }
+  renderCatFilters();
+  document.getElementById("onlyUnsure").addEventListener("change", function(e){ onlyUnsure = e.target.checked; rebuildOrder(); });
+
+  function shuffle(arr){
+    for(var i = arr.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)); var t = arr[i]; arr[i] = arr[j]; arr[j] = t; }
+    return arr;
+  }
+  function rebuildOrder(){
+    var pool = ALL.filter(function(c){
+      if(removedIds.has(c.id)) return false;
+      if(activeCat !== "Alle" && c.cat !== activeCat) return false;
+      if(onlyUnsure && knownIds.has(c.id)) return false;
+      return true;
+    });
+    order = pool.map(function(c){ return c.id; });
+    pos = 0; flipped = false; renderCard();
+  }
+
+  var flashcardEl = document.getElementById("flashcard");
+  var flashCat = document.getElementById("flashCat");
+  var flashFront = document.getElementById("flashFront");
+  var flashBack = document.getElementById("flashBack");
+  var flashHint = document.getElementById("flashHint");
+  var flashMeta = document.getElementById("flashMeta");
+  var flashExplainRow = document.getElementById("flashExplainRow");
+  var flashExplain = document.getElementById("flashExplain");
+  var btnExplain = document.getElementById("btnExplain");
+
+  function cardAt(id){
+    for(var i = 0; i < ALL.length; i++){ if(ALL[i].id === id) return ALL[i]; }
+    return null;
+  }
+  function resetExplain(){ flashExplain.hidden = true; btnExplain.textContent = "🔎 Mehr erklären"; }
+
+  function renderCard(){
+    resetExplain();
+    if(order.length === 0){
+      flashCat.textContent = "";
+      flashFront.textContent = onlyUnsure ? "Alles in dieser Kategorie sitzt schon. 🎉" : "Keine Karten in dieser Auswahl.";
+      flashBack.hidden = true; flashFront.hidden = false;
+      flashExplainRow.hidden = true;
+      flashHint.textContent = "";
+      flashMeta.textContent = "Gewusst: " + knownIds.size + " / " + activeTotal();
+      return;
+    }
+    var card = cardAt(order[pos]);
+    flashCat.textContent = card.cat;
+    flashFront.textContent = card.q;
+    flashBack.textContent = card.a;
+    flashFront.hidden = flipped; flashBack.hidden = !flipped;
+    flashExplainRow.hidden = !(flipped && card.expl);
+    flashHint.textContent = flipped ? "Antippen für die Frage" : "Antippen zum Umdrehen";
+    flashMeta.textContent = "Karte " + (pos+1) + " / " + order.length + " · Gewusst gesamt: " + knownIds.size + " / " + activeTotal();
+  }
+
+  btnExplain.addEventListener("click", function(){
+    var card = order.length ? cardAt(order[pos]) : null;
+    if(!card) return;
+    flashExplain.textContent = card.expl || "";
+    flashExplain.hidden = !flashExplain.hidden;
+    btnExplain.textContent = flashExplain.hidden ? "🔎 Mehr erklären" : "🔽 Erklärung ausblenden";
+  });
+
+  flashcardEl.addEventListener("click", function(){ if(order.length === 0) return; flipped = !flipped; renderCard(); });
+  flashcardEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flashcardEl.click(); }
+  });
+  function advance(delta){ if(order.length === 0) return; pos = (pos + delta + order.length) % order.length; flipped = false; renderCard(); }
+  document.getElementById("btnPrev").addEventListener("click", function(){ advance(-1); });
+  document.getElementById("btnNext").addEventListener("click", function(){ advance(1); });
+  document.getElementById("btnShuffle").addEventListener("click", function(){ shuffle(order); pos = 0; flipped = false; renderCard(); });
+  document.getElementById("btnKnown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.add(cardAt(order[pos]).id); saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    if(onlyUnsure){ rebuildOrder(); } else { advance(1); }
+    maybeShowCheck();
+  });
+  document.getElementById("btnUnknown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.delete(cardAt(order[pos]).id); saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    advance(1);
+    maybeShowCheck();
+  });
+
+  function updateRestoreBtn(){
+    var btn = document.getElementById("btnRestoreRemoved");
+    var countEl = document.getElementById("removedCount");
+    if(countEl) countEl.textContent = removedIds.size;
+    btn.hidden = removedIds.size === 0;
+  }
+  document.getElementById("btnDeleteCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    if(!confirm("Diese Karte wirklich dauerhaft aus dem Lernset entfernen?\n\n„" + card.q + "“")) return;
+    removedIds.add(card.id);
+    knownIds.delete(card.id);
+    saveJSON(STORE_KEY + "-removed", Array.from(removedIds));
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  document.getElementById("btnRestoreRemoved").addEventListener("click", function(){
+    if(removedIds.size === 0) return;
+    if(!confirm("Alle " + removedIds.size + " entfernten Karten wiederherstellen?")) return;
+    removedIds.clear();
+    saveJSON(STORE_KEY + "-removed", []);
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  updateRestoreBtn();
+
+  // ---------- Add / edit own card ----------
+  var addCardForm = document.getElementById("addCardForm");
+  var addCardCat = document.getElementById("addCardCat");
+  var addCardCatNew = document.getElementById("addCardCatNew");
+  var addCardFormTitle = document.getElementById("addCardFormTitle");
+  var addCardFormLead = document.getElementById("addCardFormLead");
+  var btnSaveCard = document.getElementById("btnSaveCard");
+  var btnResetCard = document.getElementById("btnResetCard");
+  var NEW_CAT_VALUE = "__new__";
+  var editingId = null;
+  function populateAddCardCats(){
+    addCardCat.innerHTML = "";
+    BASE_CATS.concat(currentCats().filter(function(c){ return c !== "Alle" && BASE_CATS.indexOf(c) === -1; })).forEach(function(cat){
+      var o = document.createElement("option"); o.value = cat; o.textContent = cat;
+      addCardCat.appendChild(o);
+    });
+    var o2 = document.createElement("option"); o2.value = NEW_CAT_VALUE; o2.textContent = "Neue Kategorie…";
+    addCardCat.appendChild(o2);
+  }
+  addCardCat.addEventListener("change", function(){ addCardCatNew.hidden = addCardCat.value !== NEW_CAT_VALUE; });
+
+  function closeAddCardForm(){
+    addCardForm.reset(); addCardCatNew.hidden = true; addCardForm.hidden = true;
+    editingId = null;
+  }
+
+  document.getElementById("btnAddCard").addEventListener("click", function(){
+    if(!addCardForm.hidden && editingId === null){ closeAddCardForm(); return; }
+    editingId = null;
+    populateAddCardCats();
+    document.getElementById("addCardQ").value = "";
+    document.getElementById("addCardA").value = "";
+    addCardFormTitle.textContent = "Eigene Karteikarte hinzufügen";
+    addCardFormLead.textContent = "Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.";
+    btnSaveCard.textContent = "Karte speichern";
+    btnResetCard.hidden = true;
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnEditCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    editingId = card.id;
+    populateAddCardCats();
+    addCardCat.value = card.cat;
+    addCardCatNew.hidden = true;
+    document.getElementById("addCardQ").value = card.q;
+    document.getElementById("addCardA").value = card.a;
+    addCardFormTitle.textContent = "Karte bearbeiten";
+    addCardFormLead.textContent = "Änderungen werden dauerhaft in diesem Lernset gespeichert (im Browser).";
+    btnSaveCard.textContent = "Änderungen speichern";
+    btnResetCard.hidden = !overrides[card.id];
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnCancelCard").addEventListener("click", closeAddCardForm);
+
+  btnResetCard.addEventListener("click", function(){
+    if(editingId === null) return;
+    if(!confirm("Diese Karte wirklich auf die ursprüngliche Version zurücksetzen?")) return;
+    delete overrides[editingId];
+    saveJSON(STORE_KEY + "-overrides", overrides);
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  addCardForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var q = document.getElementById("addCardQ").value.trim();
+    var a = document.getElementById("addCardA").value.trim();
+    var cat = addCardCat.value === NEW_CAT_VALUE ? addCardCatNew.value.trim() : addCardCat.value;
+    if(!q || !a || !cat){ alert("Bitte Kategorie, Frage und Antwort ausfüllen."); return; }
+    if(editingId !== null){
+      overrides[editingId] = {cat:cat, q:q, a:a};
+      saveJSON(STORE_KEY + "-overrides", overrides);
+    } else {
+      customCards.push({cat:cat, q:q, a:a, expl:""});
+      saveJSON(STORE_KEY + "-custom", customCards);
+    }
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  rebuildOrder();
+
+  // ======================================================
+  // VERSTÄNDNIS-CHECK — alle 6-8 Karten ein kurzer, geprüfter
+  // Ja/Nein- oder Kurztext-Check zu einem Thema, das gerade geübt wurde.
+  // ======================================================
+  var ABFRAGE = [
+    {type:"bool", q:"Ja oder Nein: Der Graph einer Funktion f ist selbst eine binäre Relation.", correct:true,
+     explain:"Richtig — x G_f y :⟺ y=f(x) definiert genau eine binäre Relation."},
+    {type:"bool", q:"Ja oder Nein: „Hat die gleiche Farbe wie“ auf einer Menge von Bügelperlen ist eine Äquivalenzrelation.", correct:true,
+     explain:"Richtig — reflexiv, symmetrisch und transitiv sind alle offensichtlich erfüllt."},
+    {type:"bool", q:"Ja oder Nein: Eine Relation kann gleichzeitig Äquivalenzrelation und Ordnung sein.", correct:true,
+     explain:"Richtig — die Gleichheitsrelation „=“ ist reflexiv, symmetrisch UND antisymmetrisch zugleich, ein Sonderfall."},
+    {type:"bool", q:"Ja oder Nein: „g(a)≤g(b)“ (Größenvergleich bei unterschiedlich großen Objekten) ist eine Äquivalenzrelation.", correct:false,
+     explain:"Falsch — Symmetrie ist verletzt (aus a≤b folgt nicht b≤a). Stattdessen gilt Antisymmetrie, das macht es zu einer Ordnung."},
+    {type:"bool", q:"Ja oder Nein: „irreflexiv“ ist dasselbe wie „nicht reflexiv“.", correct:false,
+     explain:"Falsch — „nicht reflexiv“ heißt nur: mindestens ein Element erfüllt aRa nicht. „Irreflexiv“ verlangt, dass KEIN Element aRa erfüllt."},
+    {type:"bool", q:"Ja oder Nein: Asymmetrisch impliziert automatisch irreflexiv.", correct:true,
+     explain:"Richtig — gäbe es ein a mit aRa, wäre (mit a=b) aRb∧bRa erfüllt, was Asymmetrie verbietet."},
+    {type:"bool", q:"Ja oder Nein: [a]_R ist für eine Äquivalenzrelation auf A≠∅ niemals leer.", correct:true,
+     explain:"Richtig — wegen Reflexivität gilt a∈[a]_R immer, die Klasse enthält mindestens sich selbst."},
+    {type:"bool", q:"Ja oder Nein: Zwei Äquivalenzklassen können sich teilweise überlappen, ohne identisch zu sein.", correct:false,
+     explain:"Falsch — zwei Klassen sind entweder identisch oder komplett disjunkt, ein Teilüberlapp ist unmöglich."},
+    {type:"text", q:"Wie viele verschiedene Äquivalenzklassen hat R={(x,y)∈ℕ₀²|(x−y)/3∈ℤ} insgesamt? (nur die Zahl)", answer:"3",
+     explain:"Es gibt genau 3 mögliche Reste bei Division durch 3 (0, 1, 2) — jeder definiert eine Klasse."},
+    {type:"bool", q:"Ja oder Nein: (a+b) mod m = ((a mod m)+(b mod m)) mod m gilt immer (Homomorphieregel).", correct:true,
+     explain:"Richtig — deshalb darf man bei großen Rechnungen schon zwischendurch modulo rechnen, statt erst am Ende."},
+    {type:"bool", q:"Ja oder Nein: Kongruenz modulo m ist eine Äquivalenzrelation auf ℤ.", correct:true,
+     explain:"Richtig — reflexiv, symmetrisch und transitiv folgen direkt aus den Eigenschaften der Gleichheit von Resten."},
+    {type:"bool", q:"Ist 12 ≡₂ 10 wahr? (Ja/Nein)", correct:true,
+     explain:"Richtig — beide Zahlen sind gerade, beide haben Rest 0 bei Division durch 2."},
+    {type:"bool", q:"Ist 13 ≡₄ 18 wahr? (Ja/Nein)", correct:false,
+     explain:"Falsch — 13 mod 4 = 1, aber 18 mod 4 = 2, unterschiedliche Reste."},
+    {type:"text", q:"⌊−2.5⌋ = ? (nur die Zahl, mit Vorzeichen)", answer:"-3", accept:["−3"],
+     explain:"−3, nicht −2 — bei negativen Zahlen wird immer weiter nach unten (Richtung −∞) gerundet."}
+  ];
+
+  var checkCardEl = document.getElementById("checkCard");
+  var checkQEl = document.getElementById("checkQ");
+  var checkBoolEl = document.getElementById("checkBool");
+  var checkTextWrapEl = document.getElementById("checkTextWrap");
+  var checkInputEl = document.getElementById("checkInput");
+  var checkFeedbackEl = document.getElementById("checkFeedback");
+  var checkControlsEl = document.getElementById("checkControls");
+  var checkYesEl = document.getElementById("checkYes");
+  var checkNoEl = document.getElementById("checkNo");
+  var checkSubmitEl = document.getElementById("checkSubmit");
+  var flashControlsMain = document.getElementById("flashControlsMain");
+  var flashControlsShuffle = document.getElementById("flashControlsShuffle");
+  var flashControlsManage = document.getElementById("flashControlsManage");
+  var abfrageBag = [];
+  var currentCheckItem = null;
+
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  var cardsUntilCheck = randInt(6, 8);
+
+  function drawAbfrage(){
+    if(ABFRAGE.length === 0) return null;
+    if(abfrageBag.length === 0){ abfrageBag = shuffle(ABFRAGE.map(function(_, i){ return i; })); }
+    return ABFRAGE[abfrageBag.pop()];
+  }
+  function normalize(s){ return (s || "").toString().trim().toLowerCase().replace(/\s+/g, " "); }
+
+  function maybeShowCheck(){
+    cardsUntilCheck--;
+    if(cardsUntilCheck > 0) return;
+    cardsUntilCheck = randInt(6, 8);
+    var item = drawAbfrage();
+    if(!item) return;
+    currentCheckItem = item;
+    checkQEl.textContent = item.q;
+    checkBoolEl.hidden = item.type !== "bool";
+    checkTextWrapEl.hidden = item.type !== "text";
+    checkInputEl.value = "";
+    checkYesEl.disabled = checkNoEl.disabled = false;
+    checkSubmitEl.disabled = false;
+    checkFeedbackEl.hidden = true;
+    checkFeedbackEl.className = "check-feedback";
+    checkControlsEl.hidden = true;
+
+    flashcardEl.hidden = true;
+    flashControlsMain.hidden = true;
+    flashControlsShuffle.hidden = true;
+    flashControlsManage.hidden = true;
+    flashExplainRow.hidden = true;
+    flashExplain.hidden = true;
+    checkCardEl.hidden = false;
+  }
+
+  function finishCheck(isCorrect){
+    checkFeedbackEl.textContent = (isCorrect ? "✓ Richtig. " : "✗ Nicht ganz. ") + (currentCheckItem.explain || "");
+    checkFeedbackEl.className = "check-feedback " + (isCorrect ? "correct" : "wrong");
+    checkFeedbackEl.hidden = false;
+    checkYesEl.disabled = checkNoEl.disabled = true;
+    checkSubmitEl.disabled = true;
+    checkControlsEl.hidden = false;
+  }
+  checkYesEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === true); });
+  checkNoEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === false); });
+  checkSubmitEl.addEventListener("click", function(){
+    var val = normalize(checkInputEl.value);
+    var candidates = [currentCheckItem.answer].concat(currentCheckItem.accept || []).map(normalize);
+    finishCheck(candidates.indexOf(val) !== -1);
+  });
+  checkInputEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); checkSubmitEl.click(); }
+  });
+  document.getElementById("btnCheckDone").addEventListener("click", function(){
+    checkCardEl.hidden = true;
+    flashcardEl.hidden = false;
+    flashControlsMain.hidden = false;
+    flashControlsShuffle.hidden = false;
+    flashControlsManage.hidden = false;
+    renderCard();
+  });
+
+  // ======================================================
+  // QUIZ
+  // ======================================================
+  var QUIZ = [
+    {q:"Welche Eigenschaft unterscheidet eine Äquivalenzrelation von einer Ordnung?",
+     opts:["Reflexivität","Transitivität","Symmetrisch (ÄR) vs. antisymmetrisch (Ordnung)","Es gibt keinen Unterschied"],
+     correct:2, explain:"Beide teilen sich reflexiv (A1) und transitiv (A3). Der Unterschied ist A2 (symmetrisch) vs. A4 (antisymmetrisch)."},
+    {q:"R₁={(2,2),(2,4),(4,2),(4,4)} auf A={1,2,3,4}: ist R₁ reflexiv?",
+     opts:["Ja, weil (2,2) und (4,4) enthalten sind","Nein, weil (1,1) und (3,3) fehlen","Ja, jede nichtleere Relation ist reflexiv","Das lässt sich ohne Skizze nicht entscheiden"],
+     correct:1, explain:"Reflexiv verlangt (a,a) für ALLE a∈A. (1,1) und (3,3) fehlen, also ist R₁ nicht reflexiv."},
+    {q:"Dieselbe Relation R₁: ist sie symmetrisch?",
+     opts:["Nein","Ja — zu jedem (a,b) ist auch (b,a) enthalten","Nur für (2,2) und (4,4)","Symmetrie gilt nur bei Äquivalenzrelationen"],
+     correct:1, explain:"(2,4) und (4,2) sind beide enthalten, (2,2) und (4,4) sind selbstsymmetrisch — also symmetrisch."},
+    {q:"Was unterscheidet 'asymmetrisch' von 'antisymmetrisch'?",
+     opts:["Nichts, beide Begriffe meinen dasselbe","Asymmetrisch verbietet aRb∧bRa komplett (auch für a=b); antisymmetrisch erlaubt es nur für a=b","Antisymmetrisch ist strenger als asymmetrisch","Asymmetrisch gilt nur bei Ordnungen"],
+     correct:1, explain:"Asymmetrisch lässt nicht einmal (a,a) zu — es impliziert irreflexiv. Antisymmetrisch toleriert (a,a)-Paare."},
+    {q:"Warum ist 'g(a)≤g(b)' bei unterschiedlich großen Erdmännchen keine Äquivalenzrelation?",
+     opts:["Weil A1 (reflexiv) verletzt ist","Weil A2 (symmetrisch) verletzt ist — aus a≤b folgt nicht b≤a","Weil A3 (transitiv) verletzt ist","Weil g keine Funktion ist"],
+     correct:1, explain:"g(a)≤g(b) erzwingt bei a≠b nicht automatisch g(b)≤g(a) — Symmetrie scheitert, Antisymmetrie (A4) gilt dagegen."},
+    {q:"Was ist [0]_R für R={(x,y)∈ℕ₀²|(x−y)/3∈ℤ}?",
+     opts:["{0}","{0,3,6,9,…}","{0,1,2}","ganz ℕ₀"],
+     correct:1, explain:"[0]_R enthält alle y mit (0−y)/3∈ℤ, also alle Vielfachen von 3."},
+    {q:"Wie viele Äquivalenzklassen erzeugt dieselbe Relation insgesamt?",
+     opts:["Unendlich viele","Genau 3","Genau 1","Hängt vom gewählten Repräsentanten ab"],
+     correct:1, explain:"Es gibt genau 3 Reste bei Division durch 3 (0, 1, 2) — also genau 3 Klassen, unabhängig vom Repräsentanten."},
+    {q:"Welche Eigenschaften der Äquivalenzklassen garantieren, dass sie A partitionieren?",
+     opts:["(a) und (d) zusammen: jede Klasse ist nichtleer, und die Vereinigung aller Klassen ergibt A","Nur (b)","Nur (c)","Keine davon"],
+     correct:0, explain:"(a) sorgt dafür, dass keine Klasse leer ist, (d), dass die Vereinigung aller Klassen ganz A ergibt — zusammen mit (c) (disjunkt) ergibt das eine Partition."},
+    {q:"⌊−2.5⌋ = ?",
+     opts:["−2","−3","2","3"],
+     correct:1, explain:"Die größte ganze Zahl ≤ −2.5 ist −3, nicht −2 (das wäre Aufrunden)."},
+    {q:"Ist 113 ≡₅ 58 wahr?",
+     opts:["Ja, beide haben Rest 3 bei Division durch 5","Nein","Nur wenn man runden darf","Das lässt sich ohne Taschenrechner nicht sagen"],
+     correct:0, explain:"113 = 22·5+3 und 58 = 11·5+3 — beide haben Rest 3, also kongruent modulo 5."},
+    {q:"Warum darf man bei (9−17) mod 5 Zwischenergebnisse schon modulo rechnen?",
+     opts:["Das darf man generell bei allen Rechenarten","Wegen der Homomorphieregeln für Modulo (für + und ·)","Nur bei positiven Zahlen","Nur bei Primzahlen m"],
+     correct:1, explain:"Die Homomorphieregeln garantieren genau das: (a±b) mod m = ((a mod m)±(b mod m)) mod m."},
+    {q:"Die Relation aMb :⇔ a≡_m b auf ℤ ist laut Vorlesung eine …",
+     opts:["Ordnung","Äquivalenzrelation","weder noch","nur für m=1 eine Äquivalenzrelation"],
+     correct:1, explain:"Der Satz aus der Vorlesung besagt genau das: Kongruenz modulo m ist eine Äquivalenzrelation auf ℤ."},
+    {q:"Zwei Zahlen sind genau dann kongruent modulo m, wenn …",
+     opts:["sie gleich groß sind","sie bei Division durch m denselben Rest lassen","ihre Summe durch m teilbar ist","ihre Differenz negativ ist"],
+     correct:1, explain:"Das ist exakt die Definition: a≡_m b :⇔ a mod m = b mod m."}
+  ];
+
+  var quizListEl = document.getElementById("quizList");
+  var quizScoreEl = document.getElementById("quizScore");
+  var score = 0;
+  function renderQuiz(){
+    quizListEl.innerHTML = ""; score = 0; quizScoreEl.textContent = "0";
+    QUIZ.forEach(function(item, qi){
+      var wrap = document.createElement("div"); wrap.className = "q-item card";
+      var qText = document.createElement("p"); qText.className = "q-text"; qText.textContent = (qi+1) + ". " + item.q;
+      wrap.appendChild(qText);
+      var optsWrap = document.createElement("div"); optsWrap.className = "q-opts";
+      var explainEl = document.createElement("div"); explainEl.className = "q-explain"; explainEl.textContent = item.explain;
+      item.opts.forEach(function(optText, oi){
+        var b = document.createElement("button"); b.className = "opt"; b.type = "button"; b.textContent = optText;
+        b.addEventListener("click", function(){
+          if(wrap.dataset.answered) return;
+          wrap.dataset.answered = "1";
+          Array.prototype.forEach.call(optsWrap.children, function(o, idx){
+            o.disabled = true;
+            if(idx === item.correct) o.classList.add("correct");
+            else if(idx === oi) o.classList.add("incorrect");
+          });
+          explainEl.classList.add("shown");
+          if(oi === item.correct){ score++; quizScoreEl.textContent = String(score); }
+        });
+        optsWrap.appendChild(b);
+      });
+      wrap.appendChild(optsWrap); wrap.appendChild(explainEl); quizListEl.appendChild(wrap);
+    });
+  }
+  document.getElementById("btnQuizReset").addEventListener("click", renderQuiz);
+  renderQuiz();
+
+  // ======================================================
+  // TASKS (Saalaufgaben + ergänzende Übungen, inkl. der früher bei den
+  // Karteikarten eingestreuten Zwischenübungen — gehören inhaltlich hierher)
+  // ======================================================
+  var TASKS = [
+    {t:"Saalaufgabe: Eigenschaften von R₁–R₄", d:"Zur Grundmenge A={1,2,3,4}: R₁={(2,2),(2,4),(4,2),(4,4)}, R₂={(1,1),(2,1),(2,2),(3,1),(3,3),(4,2),(4,4)}, R₃={(1,2),(1,3),(1,4),(2,3),(2,4)}, R₄={(2,2),(2,4),(3,3),(3,4),(4,2),(4,3)}. Welche sind reflexiv, irreflexiv, symmetrisch, asymmetrisch, antisymmetrisch, transitiv?",
+     tip:"Mach dir für jede Relation eine Skizze (Pfeildiagramm oder Gitter) — das macht Symmetrie und Transitivität auf einen Blick sichtbar.",
+     sol:"reflexiv: R₂ (enthält (1,1),(2,2),(3,3),(4,4))\nirreflexiv: R₃ (kein (a,a) enthalten)\nsymmetrisch: R₁, R₄ (zu jedem Paar ist auch das gespiegelte enthalten)\nasymmetrisch: R₃ (keine (a,a) und kein Paar mit Rückrichtung)\nantisymmetrisch: R₂, R₃ (keine zwei verschiedenen a≠b mit aRb und bRa gleichzeitig)\ntransitiv: R₁, R₃ (alle Verkettungen aRb∧bRc⇒aRc geprüft, z.B. bei R₂ scheitert (4,2)∧(2,1) ⇒ (4,1) fehlt)"},
+    {t:"Hausaufgabe: Kongruenz ≡₄ komplett durchrechnen", d:"Rechne für m=4 durch: Grundmenge und Relation definieren, auf Äquivalenzrelation prüfen, Äquivalenzklassen angeben, Situation skizzieren.",
+     tip:"Grundmenge ist ℤ, die Relation ist aRb :⇔ a≡₄b. Die drei Axiome A1–A3 beweist du genauso wie im (x−y)/3-Beispiel, nur mit 4 statt 3.",
+     sol:"Grundmenge: ℤ. Relation: aRb :⇔ a≡₄b, d.h. (a−b)/4 ∈ ℤ.\n\n(A1) reflexiv: (a−a)/4 = 0 ∈ ℤ ✓\n(A2) symmetrisch: (a−b)/4 ∈ ℤ ⇒ (b−a)/4 = −(a−b)/4 ∈ ℤ ✓\n(A3) transitiv: (a−b)/4∈ℤ ∧ (b−c)/4∈ℤ ⇒ (a−c)/4 = (a−b)/4+(b−c)/4 ∈ ℤ ✓\n⇒ Äquivalenzrelation.\n\nÄquivalenzklassen (4 Stück, nach Rest bei Division durch 4):\n[0]≡4 = {…,−8,−4,0,4,8,…}\n[1]≡4 = {…,−7,−3,1,5,9,…}\n[2]≡4 = {…,−6,−2,2,6,10,…}\n[3]≡4 = {…,−5,−1,3,7,11,…}\n\nSkizze: im Gitter ℤ×ℤ liegen die Punkte jeder Klasse auf einer von 4 parallelen Diagonalen (Steigung 1, Achsenabstand 4), genau wie beim (x−y)/3-Beispiel, nur mit 4 statt 3 Diagonalen."},
+    {t:"Saalaufgabe: Kongruenz-Aussagen wahr oder falsch?", d:"Welche der folgenden Aussagen sind richtig? 13≡₄18 · 12≡₂10 · 113≡₅58 · 13≡₋₄29 · −13≡₋₄30 · −13≡₄15",
+     tip:"Nutze r = a − m·⌊a/m⌋. Bei negativem m lohnt es sich, genau zu rechnen statt zu raten.",
+     sol:"13≡₄18: FALSCH (13 mod 4 = 1, 18 mod 4 = 2)\n12≡₂10: WAHR (beide mod 2 = 0)\n113≡₅58: WAHR (beide mod 5 = 3)\n13≡₋₄29: WAHR (13 mod −4 = 13−(−4)·⌊13/−4⌋ = 13−(−4)·(−4) = −3; 29 mod −4 = 29−(−4)·⌊29/−4⌋ = 29−(−4)·(−8) = −3 — gleich)\n−13≡₋₄30: FALSCH (−13 mod −4 = −1; 30 mod −4 = −2 — verschieden)\n−13≡₄15: WAHR (−13 mod 4 = 3; 15 mod 4 = 3 — gleich)"},
+    {t:"Eigene Aufgabe: R={(x,y)∈ℝ² | x²=y²}", d:"Ist R eine Äquivalenzrelation auf ℝ? Falls ja: wie sieht die Äquivalenzklasse [a]_R für ein beliebiges a∈ℝ aus?",
+     tip:"Du musst nicht neu rechnen: x²=y² ist letztlich eine Gleichheit zwischen den Zahlen x² und y² — und Gleichheit selbst ist immer reflexiv, symmetrisch und transitiv.",
+     sol:"(A1) reflexiv: x²=x² gilt immer ✓\n(A2) symmetrisch: x²=y² ⇒ y²=x² ✓ (Gleichheit ist symmetrisch)\n(A3) transitiv: x²=y² ∧ y²=z² ⇒ x²=z² ✓ (Gleichheit ist transitiv)\n⇒ R ist eine Äquivalenzrelation.\n\nÄquivalenzklasse: [a]_R = {x∈ℝ | x²=a²} = {a, −a} für a≠0, und [0]_R = {0}.\nAllgemeines Prinzip: jede Relation der Form a∼b :⇔ f(a)=f(b) ist automatisch eine Äquivalenzrelation, egal welche Funktion f ist."},
+    {t:"Eigene Aufgabe: 7¹⁰⁰ mod 10 mit den Homomorphieregeln", d:"Berechne 7¹⁰⁰ mod 10, ohne die riesige Zahl 7¹⁰⁰ auszurechnen.",
+     tip:"Rechne die ersten Zehnerreste von 7¹, 7², 7³, 7⁴ aus. Wiederholt sich ein Muster?",
+     sol:"7¹ ≡₁₀ 7\n7² ≡₁₀ 49 ≡₁₀ 9\n7³ ≡₁₀ 7·9 = 63 ≡₁₀ 3\n7⁴ ≡₁₀ 7·3 = 21 ≡₁₀ 1\n\nAb hier wiederholt sich der Zyklus (Periode 4): 7,9,3,1,7,9,3,1,…\n100 ist durch 4 teilbar (100 = 4·25), also liegt 7¹⁰⁰ an derselben Stelle im Zyklus wie 7⁴.\n⇒ 7¹⁰⁰ ≡₁₀ 1."},
+    {t:"Zum Nachdenken: 'ist Geschwister von'", d:"Ist die Relation 'ist Geschwister von' auf der Menge aller Menschen eine Äquivalenzrelation? Begründe mit den drei Axiomen.",
+     tip:"Prüfe zuerst ganz genau die Definition von reflexiv — ist jemand sein eigenes Geschwister? Und überlege bei Transitivität bewusst den Halbgeschwister-Fall.",
+     sol:"(A1) reflexiv: NEIN — niemand ist sein eigenes Geschwister, also gilt ¬aRa, nicht aRa. Schon hier scheitert die Äquivalenzrelation streng genommen.\n(A2) symmetrisch: JA — wenn a Geschwister von b ist, ist b auch Geschwister von a.\n(A3) transitiv: NICHT GARANTIERT — Gegenbeispiel mit Halbgeschwistern: A und B teilen den Vater, B und C teilen die Mutter (aber nicht denselben Vater wie A) ⇒ A ist kein Geschwister von C.\n\nFazit: 'ist Geschwister von' ist weder reflexiv noch zwingend transitiv — also keine Äquivalenzrelation. Lehre daraus: bei Alltagsbeziehungen lohnt es sich, jedes Axiom einzeln und wörtlich zu prüfen, statt es 'gefühlt' anzunehmen."},
+    {t:"Teilbarkeitsrelation auf {1,2,3,4,6,12}", d:"Sei A={1,2,3,4,6,12} und R={(a,b)∈A² | a teilt b}. Ist R reflexiv, antisymmetrisch, transitiv? Ist R eine Ordnung?",
+     tip:"Reflexiv: teilt jede Zahl sich selbst? Antisymmetrisch: wenn a|b und b|a, muss a=b sein? Transitiv: wenn a|b und b|c, folgt a|c?",
+     sol:"Reflexiv: ja, jede Zahl teilt sich selbst (a|a).\nAntisymmetrisch: ja — wenn a|b und b|a, dann muss a=b sein.\nTransitiv: ja — wenn a|b und b|c, dann a|c.\n\nAlle drei Eigenschaften erfüllt (A1, A3, A4) ⇒ R ist eine Ordnung (keine Äquivalenzrelation, da nicht symmetrisch: 2|4 aber 4∤2)."},
+    {t:"Ist aRb :⇔ a+b gerade eine Äquivalenzrelation auf ℤ?", d:"Prüfe die Relation R auf ℤ, definiert durch aRb :⇔ a+b ist gerade, auf alle drei Axiome. Wie viele Äquivalenzklassen gibt es, und welche?",
+     tip:"Reflexiv: ist a+a immer gerade? Symmetrisch: ändert sich a+b, wenn man a und b vertauscht? Transitiv: wenn a+b und b+c gerade sind, was folgt für a+c?",
+     sol:"Reflexiv: a+a=2a, immer gerade ⇒ aRa. ✓\nSymmetrisch: a+b=b+a, also folgt aus aRb sofort bRa. ✓\nTransitiv: a+b gerade und b+c gerade ⇒ (a+b)+(b+c)=a+c+2b gerade ⇒ a+c gerade. ✓\n\nR ist eine Äquivalenzrelation. Es gibt genau 2 Äquivalenzklassen: die geraden Zahlen [0]_R und die ungeraden Zahlen [1]_R."},
+    {t:"Ist ⊆ auf der Potenzmenge von {1,2,3} eine Ordnung?", d:"Betrachte A = Potenzmenge von {1,2,3}, mit N R M :⇔ N⊆M. Ist das eine Ordnung? Ist sie eine Totalordnung (sind je zwei Elemente vergleichbar)?",
+     tip:"Prüfe A1 (reflexiv), A3 (transitiv), A4 (antisymmetrisch) für ⊆. Für die Totalordnung: finde zwei Teilmengen, bei denen WEDER N⊆M NOCH M⊆N gilt.",
+     sol:"Reflexiv: N⊆N immer wahr. ✓\nTransitiv: N⊆M und M⊆K ⇒ N⊆K. ✓\nAntisymmetrisch: N⊆M und M⊆N ⇒ N=M. ✓\n⇒ ⊆ ist eine Ordnung.\n\nKeine Totalordnung: z.B. {1} und {2} sind unvergleichbar — weder {1}⊆{2} noch {2}⊆{1} gilt. Man nennt das eine partielle (Halb-)Ordnung."},
+    {t:"Äquivalenzklassen von ≡₅ auf {0,...,14} bestimmen", d:"Sei A={0,1,2,...,14} und R die Kongruenz ≡₅ (gleicher Rest bei Division durch 5). Liste alle Äquivalenzklassen auf und prüfe: partitionieren sie A wirklich lückenlos und überschneidungsfrei?",
+     tip:"Es gibt genau 5 mögliche Reste (0 bis 4) — jeder Rest liefert eine Klasse. Zähle nach, ob jedes der 15 Elemente in genau einer Klasse landet.",
+     sol:"[0] = {0,5,10}\n[1] = {1,6,11}\n[2] = {2,7,12}\n[3] = {3,8,13}\n[4] = {4,9,14}\n\nJedes der 15 Elemente kommt in genau einer Klasse vor (3 Elemente × 5 Klassen = 15) — die Klassen sind disjunkt und ihre Vereinigung ist ganz A."},
+    {t:"3⁵⁰ mod 7 mit den Homomorphieregeln berechnen", d:"Berechne 3⁵⁰ mod 7, ohne die riesige Zahl 3⁵⁰ auszurechnen.",
+     tip:"Finde zuerst eine kleine Potenz von 3, die mod 7 besonders einfach wird (z.B. 3³ mod 7). Nutze dann, dass sich Potenzen bei Kongruenz multiplizieren lassen.",
+     sol:"3¹≡₇3, 3²≡₇2, 3³≡₇6, 3⁴≡₇4, 3⁵≡₇5, 3⁶≡₇1 — ab hier wiederholt sich der Zyklus (Periode 6).\n\n50 = 6·8 + 2, also 3⁵⁰ = (3⁶)⁸ · 3² ≡₇ 1⁸ · 3² ≡₇ 9 ≡₇ 2.\n\nAlso 3⁵⁰ mod 7 = 2."},
+    {t:"Wann ist eine Relation R⊆A×B eine Funktion?", d:"Gegeben A={1,2,3}, B={x,y}. Welche der folgenden Relationen R⊆A×B sind Graphen einer Funktion f:A→B? (a) R₁={(1,x),(2,y),(3,x)} (b) R₂={(1,x),(1,y),(2,x),(3,y)} (c) R₃={(1,x),(2,y)}",
+     tip:"Eine Relation ist genau dann eine Funktion A→B, wenn JEDES a∈A in GENAU EINEM Paar als erste Komponente vorkommt.",
+     sol:"(a) R₁: ja — jedes der 3 Elemente aus A kommt genau einmal vor (f(1)=x, f(2)=y, f(3)=x). Gültige Funktion.\n(b) R₂: nein — 1 kommt zweimal vor, das wäre nicht eindeutig.\n(c) R₃: nein — 3 kommt gar nicht vor, nicht für ganz A definiert.\n\nNur (a) ist der Graph einer Funktion."},
+    {t:"Irreflexiv oder asymmetrisch? Die Relation < auf ℝ", d:"Ist die Relation < (echt kleiner) auf ℝ reflexiv, irreflexiv, symmetrisch, asymmetrisch? Ist sie eine Ordnung im Sinne der Vorlesung (A1,A3,A4)?",
+     tip:"Reflexiv würde bedeuten a<a — stimmt das je? Asymmetrisch bedeutet: aus a<b folgt, dass b<a NIEMALS gilt.",
+     sol:"Reflexiv: nein, a<a ist nie wahr ⇒ < ist stattdessen irreflexiv.\nSymmetrisch: nein. Asymmetrisch: ja — aus a<b folgt zwingend ¬(b<a).\n\nDa < nicht reflexiv ist, ist sie KEINE Ordnung im Sinne der Vorlesungsdefinition (die A1 voraussetzt) — man nennt das eine strikte/strenge Ordnung, ein verwandtes, aber eigenes Konzept."}
+  ];
+  var taskListEl = document.getElementById("taskList");
+  function taskBodyHtml(task){
+    return "<p>" + task.d + "</p>" +
+      '<div class="tip">💡 Tipp: ' + task.tip + "</div>" +
+      '<details class="sol"><summary>✅ Lösung zum Gegenchecken</summary><pre class="code">' + task.sol + "</pre></details>";
+  }
+  TASKS.forEach(function(task, i){
+    var det = document.createElement("details"); det.className = "task";
+    var summary = document.createElement("summary");
+    summary.innerHTML = '<span class="tnum">' + (i+1) + '</span> ' + task.t;
+    det.appendChild(summary);
+    var body = document.createElement("div"); body.className = "body";
+    body.innerHTML = taskBodyHtml(task);
+    det.appendChild(body);
+    taskListEl.appendChild(det);
+  });
+
+})();
+</script>

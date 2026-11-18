@@ -1,0 +1,1065 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Namespaces-Lernset</title>
+<style>
+:root{
+  --bg:#f2f5f3;
+  --surface:#ffffff;
+  --surface-2:#e8ede9;
+  --fg:#162220;
+  --fg-muted:#52635d;
+  --border:#d7e0da;
+  --accent:#0f8f7c;
+  --accent-ink:#ffffff;
+  --accent-tint:#e3f3ef;
+  --accent-2:#b85c12;
+  --accent-2-ink:#ffffff;
+  --accent-2-tint:#f8ead9;
+  --incorrect:#b23b3b;
+  --incorrect-tint:#fbe6e6;
+  --shadow:0 1px 2px rgba(15,30,25,.06), 0 6px 18px rgba(15,30,25,.07);
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1615;
+    --surface:#161f1e;
+    --surface-2:#1d2928;
+    --fg:#e7efec;
+    --fg-muted:#9db0aa;
+    --border:#2a3836;
+    --accent:#2bbfa3;
+    --accent-ink:#06211c;
+    --accent-tint:#133430;
+    --accent-2:#e2984c;
+    --accent-2-ink:#2a1703;
+    --accent-2-tint:#3a2a16;
+    --incorrect:#e2766e;
+    --incorrect-tint:#3a1f1d;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1615;
+  --surface:#161f1e;
+  --surface-2:#1d2928;
+  --fg:#e7efec;
+  --fg-muted:#9db0aa;
+  --border:#2a3836;
+  --accent:#2bbfa3;
+  --accent-ink:#06211c;
+  --accent-tint:#133430;
+  --accent-2:#e2984c;
+  --accent-2-ink:#2a1703;
+  --accent-2-tint:#3a2a16;
+  --incorrect:#e2766e;
+  --incorrect-tint:#3a1f1d;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;text-wrap:balance;margin:0}
+code,pre,.mono{font-family:var(--font-mono)}
+a{color:var(--accent)}
+
+.wrap{max-width:860px;margin:0 auto}
+
+/* ---------- Header ---------- */
+.page-head{
+  display:flex;align-items:center;gap:20px;
+  padding-block:28px 18px;
+  flex-wrap:wrap;
+}
+.ns-deco{position:relative;width:64px;height:64px;flex:0 0 auto}
+.ns-deco svg{position:absolute;inset:0}
+.ns-deco .dot{position:absolute;border-radius:50%;width:12px;height:12px;transform:translate(-50%,-50%)}
+.ns-deco .dot.pkg{background:var(--surface);border:1.5px solid var(--fg-muted)}
+.ns-deco .dot.cls{border:1.5px solid var(--accent);background:var(--accent-tint)}
+.ns-deco .dot.priv{border:1.5px solid var(--accent-2);background:var(--accent-2-tint)}
+.head-text{flex:1 1 260px;min-width:0}
+.eyebrow{
+  margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--fg-muted);font-weight:600;
+}
+h1{font-size:clamp(28px,6vw,38px);letter-spacing:-.01em}
+.subtitle{margin:6px 0 0;color:var(--fg-muted);max-width:52ch}
+
+/* ---------- Tabs ---------- */
+.tabs{
+  display:flex;gap:6px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  padding-bottom:0;margin-bottom:22px;
+  position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;
+  padding-top:4px;
+}
+.tab-btn{
+  font-family:var(--font-body);font-weight:600;font-size:13.5px;
+  background:none;border:none;color:var(--fg-muted);cursor:pointer;
+  padding:10px 14px;border-bottom:2.5px solid transparent;border-radius:6px 6px 0 0;
+}
+.tab-btn:hover{color:var(--fg);background:var(--surface-2)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{padding-bottom:48px}
+.panel > section{margin-bottom:34px}
+.panel h2{font-size:21px;margin-bottom:4px}
+.panel h2 .n{color:var(--accent);font-family:var(--font-mono);font-size:15px;margin-right:8px}
+.lead{color:var(--fg-muted);margin:2px 0 14px;max-width:62ch}
+
+/* ---------- Reusable components ---------- */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);
+}
+pre.code{
+  background:var(--surface-2);border:1px solid var(--border);border-radius:9px;
+  padding:11px 13px;overflow-x:auto;font-size:12.5px;line-height:1.55;margin:8px 0;
+}
+table.ruleof{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+table.ruleof th,table.ruleof td{border:1px solid var(--border);padding:7px 9px;text-align:left}
+table.ruleof th{background:var(--surface-2);font-size:11.5px;letter-spacing:.03em;text-transform:uppercase}
+table.ruleof td code{font-size:12px}
+
+/* ---------- Flashcards ---------- */
+.cat-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{
+  font-family:var(--font-body);font-size:12.5px;font-weight:600;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg-muted);
+  padding:6px 12px;cursor:pointer;
+}
+.chip.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.card-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg-muted);margin-bottom:14px}
+
+.flash-wrap{max-width:480px;margin:0 auto}
+.flashcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--border);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;display:flex;flex-direction:column;justify-content:center;
+  cursor:pointer;position:relative;
+}
+.flashcard[hidden]{display:none}
+.flash-cat{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--fg-muted);
+}
+.flash-side{font-size:16px;text-align:center}
+.flash-q{font-weight:600}
+.flash-a{color:var(--accent)}
+.flash-hint{
+  position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:var(--fg-muted);
+}
+.flash-explain-row{display:flex;justify-content:center;margin-top:12px}
+.flash-explain-row[hidden]{display:none}
+.flash-explain{
+  margin-top:10px;font-size:13px;color:var(--fg);border-left:3px solid var(--accent-2);
+  padding:10px 13px;background:var(--accent-2-tint);border-radius:0 8px 8px 0;text-align:left;
+}
+.flash-explain[hidden]{display:none}
+.flash-controls{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.flash-controls[hidden]{display:none}
+.btn{
+  font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg);padding:9px 14px;
+}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.warn{background:var(--incorrect-tint);border-color:var(--incorrect);color:var(--incorrect)}
+.flash-meta{text-align:center;color:var(--fg-muted);font-size:12.5px;margin-top:12px}
+
+.addcard-form{
+  margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);text-align:left;
+}
+.addcard-form[hidden]{display:none}
+.addcard-form h3{font-size:15px;margin-bottom:2px}
+.addcard-form label{display:block;font-size:12.5px;font-weight:600;color:var(--fg-muted);margin:12px 0 4px}
+.addcard-form select,.addcard-form input[type="text"],.addcard-form textarea{
+  width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:13.5px;resize:vertical;
+}
+.addcard-form .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.addcard-form .hint{font-size:11.5px;color:var(--fg-muted);margin-top:2px}
+
+/* ---------- Verständnis-Check (periodic interrupt card) ---------- */
+.checkcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--accent-2);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;position:relative;text-align:center;
+}
+.checkcard[hidden]{display:none}
+.check-label{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--accent-2);
+}
+.check-q{font-size:16px;font-weight:600;margin:18px 0 18px}
+.check-bool{display:flex;justify-content:center;gap:10px}
+.check-bool[hidden]{display:none}
+.check-text{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.check-text[hidden]{display:none}
+.check-text input{
+  flex:1 1 220px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;
+}
+.check-feedback{margin-top:14px;font-size:13.5px;text-align:left;border-radius:0 8px 8px 0;padding:9px 13px;border-left:3px solid var(--border)}
+.check-feedback[hidden]{display:none}
+.check-feedback.correct{color:var(--accent);border-left-color:var(--accent);background:var(--accent-tint)}
+.check-feedback.wrong{color:var(--incorrect);border-left-color:var(--incorrect);background:var(--incorrect-tint)}
+.check-controls{display:flex;justify-content:center;margin-top:14px}
+.check-controls[hidden]{display:none}
+
+/* ---------- Quiz ---------- */
+.quiz-score{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;
+}
+.quiz-score strong{color:var(--accent);font-family:var(--font-mono)}
+.q-item{margin-bottom:18px}
+.q-item p.q-text{font-weight:600;margin:0 0 9px;white-space:pre-line}
+.q-opts{display:grid;gap:7px}
+.opt{
+  text-align:left;border:1px solid var(--border);background:var(--surface);border-radius:9px;
+  padding:9px 12px;font-family:var(--font-body);font-size:13.5px;cursor:pointer;color:var(--fg);
+}
+.opt:hover{background:var(--surface-2)}
+.opt.correct{background:var(--accent-tint);border-color:var(--accent)}
+.opt.incorrect{background:var(--incorrect-tint);border-color:var(--incorrect)}
+.opt[disabled]{cursor:default}
+.q-explain{
+  margin-top:7px;font-size:12.5px;color:var(--fg-muted);border-left:3px solid var(--accent);
+  padding:5px 10px;background:var(--surface-2);border-radius:0 8px 8px 0;display:none;
+}
+.q-explain.shown{display:block}
+
+/* ---------- Tasks ---------- */
+details.task{
+  background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:13px 16px;margin-bottom:10px;box-shadow:var(--shadow);
+}
+details.task summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.task summary::-webkit-details-marker{display:none}
+details.task summary .tnum{
+  font-family:var(--font-mono);color:var(--accent-ink);background:var(--accent);
+  border-radius:6px;padding:1px 7px;font-size:12px;flex:0 0 auto;
+}
+details.task .body{margin-top:10px;font-size:13.5px}
+details.task .tip{
+  margin-top:9px;font-size:12.5px;border-left:3px solid var(--accent-2);padding:6px 10px;
+  background:var(--accent-2-tint);border-radius:0 8px 8px 0;
+}
+details.task .sol summary{font-size:12.5px;font-weight:600;color:var(--fg-muted);margin-top:8px}
+.task-footnote{color:var(--fg-muted);font-size:12.5px;margin-top:14px}
+
+footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10px 0 30px}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <div class="ns-deco" aria-hidden="true">
+      <svg viewBox="0 0 64 64" width="64" height="64">
+        <rect x="4" y="4" width="56" height="56" rx="10" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+        <rect x="16" y="16" width="32" height="32" rx="8" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+        <rect x="26" y="26" width="12" height="12" rx="4" fill="none" stroke="var(--accent-2)" stroke-width="1.5"/>
+      </svg>
+      <i class="dot pkg" style="left:10px;top:10px"></i>
+      <i class="dot cls" style="left:16px;top:16px"></i>
+      <i class="dot priv" style="left:32px;top:32px"></i>
+    </div>
+    <div class="head-text">
+      <p class="eyebrow">Programmiertechnik I · Vorlesung 13 von 30 · HTWG Konstanz</p>
+      <h1>Namespaces &amp; Packages</h1>
+      <p class="subtitle">Dein Lernset zu Packages und Imports in Java und Scala, zu Sichtbarkeit (public/protected/private), zu Objects als Module, Opaque Types und Export-Klauseln sowie zur Bibliothek Squants — zum Verstehen, Behalten und Anwenden.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Lernbereiche">
+    <button class="tab-btn active" data-tab="cards" role="tab" aria-selected="true" id="tabbtn-cards">Karteikarten</button>
+    <button class="tab-btn" data-tab="quiz" role="tab" aria-selected="false" id="tabbtn-quiz">Verständnisfragen</button>
+    <button class="tab-btn" data-tab="tasks" role="tab" aria-selected="false" id="tabbtn-tasks">Übungsaufgaben</button>
+  </nav>
+
+  <main>
+    <!-- ============ FLASHCARDS ============ -->
+    <div class="panel" id="panel-cards" role="tabpanel" aria-labelledby="tabbtn-cards">
+      <section>
+        <h2><span class="n">◆</span>Karteikarten</h2>
+        <p class="lead">Karte anklicken, um die Antwort zu sehen — ehrlich einschätzen, das bringt mehr als nur lesen. Nach dem Umdrehen gibt „🔎 Mehr erklären" bei Bedarf noch mehr Hintergrund. Alle 6–8 Karten kommt ein kurzer Verständnis-Check zwischendurch (Ja/Nein oder kurze Texteingabe). Über „➕ Eigene Karte" kannst du jederzeit eigene Karten ergänzen.</p>
+
+        <div class="cat-filters" id="catFilters"></div>
+        <label class="card-toggle"><input type="checkbox" id="onlyUnsure"> Nur Karten üben, die ich noch nicht sicher weiß</label>
+
+        <div class="flash-wrap">
+          <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Karte umdrehen">
+            <span class="flash-cat" id="flashCat"></span>
+            <div class="flash-side" id="flashFront"></div>
+            <div class="flash-side flash-a" id="flashBack" hidden></div>
+            <span class="flash-hint" id="flashHint">Antippen zum Umdrehen</span>
+          </div>
+
+          <div class="checkcard" id="checkCard" hidden>
+            <span class="check-label">Verständnis-Check</span>
+            <p class="check-q" id="checkQ"></p>
+            <div class="check-bool" id="checkBool">
+              <button class="btn" id="checkYes" type="button">Ja</button>
+              <button class="btn" id="checkNo" type="button">Nein</button>
+            </div>
+            <div class="check-text" id="checkTextWrap">
+              <input type="text" id="checkInput" placeholder="Deine Antwort …" autocomplete="off">
+              <button class="btn primary" id="checkSubmit" type="button">Prüfen</button>
+            </div>
+            <div class="check-feedback" id="checkFeedback" hidden></div>
+            <div class="check-controls" id="checkControls" hidden>
+              <button class="btn primary" id="btnCheckDone" type="button">Weiter mit Karteikarten ▶</button>
+            </div>
+          </div>
+
+          <div class="flash-explain-row" id="flashExplainRow" hidden>
+            <button class="btn" id="btnExplain" type="button">🔎 Mehr erklären</button>
+          </div>
+          <div class="flash-explain" id="flashExplain" hidden></div>
+
+          <div class="flash-controls" id="flashControlsMain">
+            <button class="btn" id="btnPrev" type="button">◀ Zurück</button>
+            <button class="btn warn" id="btnUnknown" type="button">↻ Nochmal üben</button>
+            <button class="btn primary" id="btnKnown" type="button">✓ Weiß ich</button>
+            <button class="btn" id="btnNext" type="button">Weiter ▶</button>
+          </div>
+          <div class="flash-controls" id="flashControlsShuffle">
+            <button class="btn" id="btnShuffle" type="button">⤨ Mischen</button>
+            <button class="btn" id="btnAddCard" type="button">➕ Eigene Karte</button>
+          </div>
+          <div class="flash-controls" id="flashControlsManage">
+            <button class="btn" id="btnEditCard" type="button">✏️ Karte bearbeiten</button>
+            <button class="btn" id="btnDeleteCard" type="button" style="border-color:var(--incorrect);color:var(--incorrect)">🗑 Karte entfernen</button>
+            <button class="btn" id="btnRestoreRemoved" type="button" hidden>↺ Entfernte Karten wiederherstellen (<span id="removedCount">0</span>)</button>
+          </div>
+          <p class="flash-meta" id="flashMeta"></p>
+
+          <form class="addcard-form" id="addCardForm" hidden>
+            <h3 id="addCardFormTitle">Eigene Karteikarte hinzufügen</h3>
+            <p class="lead" id="addCardFormLead" style="margin-bottom:0">Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.</p>
+
+            <label for="addCardCat">Kategorie</label>
+            <select id="addCardCat"></select>
+            <input type="text" id="addCardCatNew" placeholder="Neue Kategorie…" hidden>
+
+            <label for="addCardQ">Frage (Vorderseite)</label>
+            <textarea id="addCardQ" rows="2" placeholder="Was soll abgefragt werden?"></textarea>
+
+            <label for="addCardA">Antwort (Rückseite)</label>
+            <textarea id="addCardA" rows="3" placeholder="Die vollständige, gute Antwort"></textarea>
+
+            <p class="hint">Frage und Antwort sind Pflicht.</p>
+
+            <div class="row">
+              <button class="btn primary" id="btnSaveCard" type="submit">Karte speichern</button>
+              <button class="btn" id="btnCancelCard" type="button">Abbrechen</button>
+              <button class="btn" id="btnResetCard" type="button" hidden style="border-color:var(--incorrect);color:var(--incorrect)">↺ Original wiederherstellen</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ QUIZ ============ -->
+    <div class="panel" id="panel-quiz" role="tabpanel" aria-labelledby="tabbtn-quiz" hidden>
+      <section>
+        <h2><span class="n">?</span>Verständnisfragen</h2>
+        <p class="lead" id="quizIntro">15 Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.</p>
+        <div class="quiz-score">
+          <span>Ergebnis: <strong id="quizScore">0</strong> / 15 richtig</span>
+          <button class="btn" id="btnQuizReset" type="button">Zurücksetzen</button>
+        </div>
+        <div id="quizList"></div>
+      </section>
+    </div>
+
+    <!-- ============ TASKS ============ -->
+    <div class="panel" id="panel-tasks" role="tabpanel" aria-labelledby="tabbtn-tasks" hidden>
+      <section>
+        <h2><span class="n">▸</span>Übungsaufgaben</h2>
+        <p class="lead">Die ersten beiden Aufgaben sind die Original-Vorlesungsaufgaben, danach ergänzende Übungen im selben Schwierigkeitsgrad — zum echten Programmieren, nicht zum schnellen Abrufen. Erst selbst in Scala (bzw. Java, wo angegeben) probieren, dann Tipp bzw. Lösungsidee zum Gegenchecken aufklappen.</p>
+        <div id="taskList"></div>
+        <p class="task-footnote">Der Verbrauch in Aufgabe 1 (dec.since(jan) für die Zählerstände 12 400 und 15 900 kWh) ergibt genau 3500 kWh — denselben Wert wie das Wärmepumpen-Beispiel aus der Vorlesung. Die dort genannten Kontrollwerte €1257.64 und $1383.40 lassen sich deshalb direkt gegenchecken.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="credit">Lernset zu Prof. Dr. Boger / Prof. Dr. Laube, Programmiertechnik I — Vorlesung 13: Namespaces, Packages and Visibility</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Tabs ----------
+  var tabBtns = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  var panels = {
+    cards: document.getElementById("panel-cards"),
+    quiz: document.getElementById("panel-quiz"),
+    tasks: document.getElementById("panel-tasks")
+  };
+  tabBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabBtns.forEach(function(b){ b.classList.remove("active"); b.setAttribute("aria-selected","false"); });
+      btn.classList.add("active"); btn.setAttribute("aria-selected","true");
+      Object.keys(panels).forEach(function(k){ panels[k].hidden = (k !== btn.dataset.tab); });
+    });
+  });
+
+  // ---------- Storage helpers ----------
+  function loadJSON(key, fallback){
+    try{ var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function saveJSON(key, val){
+    try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+  }
+
+  // ======================================================
+  // FLASHCARDS — Frage vorne, vollständige gute Antwort hinten.
+  // ======================================================
+  var CARDS = [
+    {cat:"Namespaces & Pakete", q:"Was ist das Grundproblem, das Namespaces lösen?", a:"Programme wachsen und Namen kollidieren — zum Beispiel ist unklar, ob List für scala.List oder java.util.List steht. Ein Namespace macht Namen innerhalb seines Bereichs eindeutig."},
+    {cat:"Namespaces & Pakete", q:"Was ist ein Namespace?", a:"Ein benannter Scope, der Namen eindeutig macht: der einfache Name (z. B. List) ist kurz, aber mehrdeutig; der vollqualifizierte Name (z. B. java.util.List) ist eindeutig."},
+    {cat:"Namespaces & Pakete", q:"Wodurch werden Namespaces in Java und Scala konkret erzeugt?", a:"Durch Packages."},
+    {cat:"Namespaces & Pakete", q:"Welche drei Zwecke erfüllen Packages laut Vorlesung?", a:"Eindeutigkeit (Namen müssen nur innerhalb eines Packages eindeutig sein), Struktur (zusammengehörige Klassen liegen zusammen, z. B. bank.model und bank.ui) und Zugriffskontrolle (ein Package bildet eine Grenze für Sichtbarkeit)."},
+    {cat:"Namespaces & Pakete", q:"Welche Namenskonvention gilt für Packages?", a:"Die umgekehrte Internet-Domain, komplett kleingeschrieben, zum Beispiel de.htwg.ain.bank.model."},
+    {cat:"Namespaces & Pakete", q:"Wo muss die package-Anweisung in einer Java-Datei stehen?", a:"Als allererste Anweisung der Datei, noch vor allen Imports."},
+    {cat:"Namespaces & Pakete", q:"Wie muss die Verzeichnisstruktur in Java zum Package passen?", a:"Sie muss exakt übereinstimmen — package de.htwg.bank erfordert die Datei unter src/de/htwg/bank/Account.java."},
+    {cat:"Namespaces & Pakete", q:"Wie viele public-Top-Level-Klassen darf eine Java-Datei maximal enthalten, und wie muss sie heißen?", a:"Höchstens eine, und sie muss genauso heißen wie die Datei selbst."},
+    {cat:"Namespaces & Pakete", q:"Was passiert, wenn eine Java-Klasse keine package-Anweisung hat?", a:"Sie landet im unbenannten (default) Package — das ist nur für kleine Experimente gedacht, nicht für echte Programme."},
+
+    {cat:"Java: Imports & Sichtbarkeit", q:"Spart ein import in Java mehr als nur Tipparbeit?", a:"Nein — import spart nur Schreibarbeit. Der vollqualifizierte Name (z. B. java.util.List) funktioniert immer auch ohne Import."},
+    {cat:"Java: Imports & Sichtbarkeit", q:"Was macht ein On-Demand- bzw. Wildcard-Import in Java? Beispiel?", a:"Er importiert alle Typen eines Packages auf einmal, zum Beispiel import java.util.*;"},
+    {cat:"Java: Imports & Sichtbarkeit", q:"Was macht ein static import in Java? Beispiel?", a:"Er importiert ein einzelnes Mitglied (Feld oder Methode) einer Klasse, sodass es ohne Klassen-Präfix genutzt werden kann — zum Beispiel macht import static java.lang.Math.max; den einfachen Aufruf max(a, b) möglich."},
+    {cat:"Java: Imports & Sichtbarkeit", q:"Welches Package wird in Java automatisch importiert?", a:"java.lang.* — String und Math stehen deshalb ohne eigenen Import zur Verfügung."},
+    {cat:"Java: Imports & Sichtbarkeit", q:"Wo müssen Imports in einer Java-Datei stehen?", a:"Ganz oben in der Datei, direkt nach der package-Anweisung."},
+    {cat:"Java: Imports & Sichtbarkeit", q:"Welche vier Sichtbarkeitsmodifizierer gibt es in Java?", a:"public, protected, package-private (kein eigenes Schlüsselwort — einfach kein Modifizierer) und private."},
+    {cat:"Java: Imports & Sichtbarkeit", q:"Was ist die Default-Sichtbarkeit in Java, wenn man gar keinen Modifizierer angibt?", a:"package-private."},
+    {cat:"Java: Imports & Sichtbarkeit", q:"Was ist an Javas protected oft überraschend?", a:"Dass es das ganze Package mit einschließt, nicht nur Subklassen — protected ist in Java also weiter gefasst, als der Name vermuten lässt."},
+    {cat:"Java: Imports & Sichtbarkeit", q:"Warum sind Felder in Java typischerweise private mit Zugriff über public-Methoden statt direkt public?", a:"Wegen Encapsulation: eine Methode wie deposit kann eine Invariante prüfen (zum Beispiel amount > 0), bevor sie das Feld ändert — ein öffentliches Feld könnte das nicht verhindern."},
+    {cat:"Java: Imports & Sichtbarkeit", q:"Welche Sichtbarkeit hat ein Java-Feld ganz ohne Modifizierer, z. B. int branch;?", a:"package-private — sichtbar innerhalb derselben Klasse und innerhalb desselben Packages, aber nicht außerhalb."},
+
+    {cat:"Scala: Pakete & Imports", q:"Was unterscheidet Scala von Java bezüglich der Verzeichnisstruktur von Packages?", a:"Die Verzeichnisstruktur sollte zum Package passen, aber der Scala-Compiler erzwingt es nicht — anders als in Java."},
+    {cat:"Scala: Pakete & Imports", q:"Wie viele public-Klassen darf eine einzelne Scala-Datei enthalten?", a:"Mehrere — anders als in Java, wo pro Datei höchstens eine public-Top-Level-Klasse erlaubt ist."},
+    {cat:"Scala: Pakete & Imports", q:"Welche drei Dinge werden in Scala automatisch importiert?", a:"java.lang.*, scala.* und Predef."},
+    {cat:"Scala: Pakete & Imports", q:"Was ist ein package-Block in Scala? Beispiel?", a:"Eine Schreibweise, die Definitionen umschließt, zum Beispiel package bank: ... — dadurch können sogar mehrere, auch verschachtelte Packages in einer einzigen Datei stehen."},
+    {cat:"Scala: Pakete & Imports", q:"Was können verschachtelte (nested) Packages in Scala sehen?", a:"Sie sehen die Member der umschließenden äußeren Packages, ganz ohne zusätzlichen Import."},
+    {cat:"Scala: Pakete & Imports", q:"Was geht in Scala 3 bei Top-Level-Definitionen, das in Java nicht geht?", a:"def, val und var können direkt in einem Package liegen, ohne dass sie in einer Klasse stecken müssen."},
+    {cat:"Scala: Pakete & Imports", q:"Wie musste man Top-Level-Definitionen vor Scala 3 (in Scala 2) umsetzen, und wie steht es heute dazu?", a:"Mit einem package object, zum Beispiel package object bank { def fee(...) = ... } — in Scala 3 sind package objects deprecated, seit es direkte Top-Level-Definitionen gibt."},
+    {cat:"Scala: Pakete & Imports", q:"Wie importiert man in Scala mehrere Mitglieder eines Packages auf einmal? Beispiel?", a:"Mit geschweiften Klammern, zum Beispiel import bank.{Account, fee}."},
+    {cat:"Scala: Pakete & Imports", q:"Was ist das Scala-3-Wildcard-Zeichen für Imports, und wie hieß es in Scala 2?", a:"In Scala 3 ist es *, zum Beispiel import bank.*; in Scala 2 war es _."},
+    {cat:"Scala: Pakete & Imports", q:"Was ist das Scala-Äquivalent zu Javas static import?", a:"Das Importieren von Mitgliedern eines objects, zum Beispiel import scala.math.max — Methoden eines objects entsprechen den statischen Methoden einer Java-Klasse."},
+    {cat:"Scala: Pakete & Imports", q:"Braucht man in Scala einen Import, um etwas aus demselben Package zu verwenden?", a:"Nein."},
+    {cat:"Scala: Pakete & Imports", q:"Wie benennt man einen importierten Namen in Scala 3 um? Beispiel?", a:"Mit as — zum Beispiel benennt import java.util.{List as JList} die importierte List zu JList um."},
+    {cat:"Scala: Pakete & Imports", q:"Wie schließt man ein einzelnes Mitglied aus einem Wildcard-Import in Scala 3 aus? Beispiel?", a:"Mit as _ — zum Beispiel importiert import java.util.{Random as _, *} alles aus java.util außer Random."},
+    {cat:"Scala: Pakete & Imports", q:"Wo darf ein Import in Scala stehen, im Unterschied zu Java, und was bestimmt seinen Scope?", a:"In jedem Block, auch innerhalb einer Klasse oder sogar innerhalb einer einzelnen Methode — nicht nur ganz oben in der Datei wie in Java. Sein Scope ist genau der umschließende Block, in dem er steht."},
+
+    {cat:"Objects & Sichtbarkeit", q:"Wie fungiert ein Scala object als Namespace bzw. Modul?", a:"Es gruppiert zusammengehörige Funktionen und Konstanten; von außen erreichbar über ObjektName.member oder, nach einem Wildcard-Import, direkt über den Namen."},
+    {cat:"Objects & Sichtbarkeit", q:"Wie bleibt eine Hilfsfunktion innerhalb eines objects für Nutzer des Moduls unsichtbar?", a:"Indem man sie mit private markiert — private-Helfer sind für Nutzer des Moduls unsichtbar, auch nach einem Wildcard-Import."},
+    {cat:"Objects & Sichtbarkeit", q:"Was ist der grundlegende Unterschied zwischen Javas und Scalas Standard-Sichtbarkeit?", a:"Java ist standardmäßig package-private, Scala dagegen standardmäßig public — Scala kennt kein eigenes public-Schlüsselwort."},
+    {cat:"Objects & Sichtbarkeit", q:"Was entspricht in Scala am ehesten Javas package-private, und wie schreibt man es?", a:"private[pkg] — man gibt dabei das Package explizit als Sichtbarkeitsgrenze an, statt an eine feste Default-Regel gebunden zu sein."},
+    {cat:"Objects & Sichtbarkeit", q:"Ist Scalas protected strenger oder lockerer als Javas protected?", a:"Strenger — Scalas protected gilt nur für Subklassen, während Javas protected zusätzlich das ganze Package einschließt."},
+    {cat:"Objects & Sichtbarkeit", q:"Sind private-Member in einer Subklasse sichtbar?", a:"Nein, in beiden Sprachen nicht — private-Member sind ausschließlich innerhalb der definierenden Klasse selbst sichtbar."},
+    {cat:"Objects & Sichtbarkeit", q:"Darf man innerhalb derselben Klasse auf ein private-Member einer anderen Instanz zugreifen, z. B. other.balance?", a:"Ja — private gilt pro Klasse, nicht pro einzelnes Objekt, also ist der Zugriff auf other.balance innerhalb derselben Klasse erlaubt."},
+    {cat:"Objects & Sichtbarkeit", q:"Was bedeutet die Schreibweise private[bank] konkret, und gibt es das auch für protected?", a:"Das Member ist sichtbar innerhalb des Packages bank — man kann die Sichtbarkeitsgrenze selbst als Package angeben. Eine analoge qualifizierte Variante protected[pkg] existiert ebenfalls."},
+    {cat:"Objects & Sichtbarkeit", q:"Was bedeutet private[Account] im Vergleich zu einfachem private?", a:"Sichtbar innerhalb der Klasse Account und ihrer verschachtelten Definitionen — die Grenze lässt sich also auch auf eine Klasse statt ein Package setzen."},
+    {cat:"Objects & Sichtbarkeit", q:"Was ist ein Companion Object?", a:"Ein object mit demselben Namen wie eine class, definiert in derselben Datei."},
+    {cat:"Objects & Sichtbarkeit", q:"Was dürfen eine Klasse und ihr Companion Object, das fremde Klassen nicht dürfen?", a:"Sie dürfen gegenseitig auf ihre private-Member zugreifen."},
+    {cat:"Objects & Sichtbarkeit", q:"Was entspricht in Scala am ehesten Javas static-Deklarationen, und wofür wird das typischerweise genutzt?", a:"Das, was im Companion Object einer Klasse steht — ein typischer Anwendungsfall sind Factory-Methoden, zum Beispiel ein apply, das über ClassName(...) statt new ClassName(...) aufgerufen wird."},
+
+    {cat:"Opaque Types", q:"Was macht ein opaque type in Scala 3 grundsätzlich?", a:"Er verbirgt die konkrete Repräsentation eines Typs nach außen, während er innerhalb seines definierenden Scopes genau als dieser zugrunde liegende Typ behandelt wird."},
+    {cat:"Opaque Types", q:"Wie unterscheidet sich opaque von private in dem, was jeweils verborgen wird?", a:"private verbirgt einzelne Member (Felder, Methoden); opaque verbirgt die Repräsentation eines ganzen Typs."},
+    {cat:"Opaque Types", q:"Was kostet ein opaque type zur Laufzeit zusätzlich, im Vergleich zum zugrunde liegenden Typ?", a:"Nichts — zur Laufzeit ist ein opaque type exakt der zugrunde liegende Typ, es entsteht kein zusätzliches Wrapper-Objekt."},
+    {cat:"Opaque Types", q:"Wie verhält sich das im Vergleich zu einer case class als Wrapper, z. B. case class Euro(value: BigDecimal)?", a:"Eine case class legt pro Wert ein eigenes Objekt an (Allokation); ein opaque type verursacht dagegen keine zusätzliche Laufzeit-Allokation."},
+    {cat:"Opaque Types", q:"Was passiert, wenn man außerhalb des definierenden Scopes versucht, den zugrunde liegenden Typ direkt einem opaque-Typ zuzuweisen, z. B. val bad: Money.Euro = BigDecimal(3)?", a:"Ein Compile-Fehler — von außen ist Euro ein eigener, inkompatibler Typ, auch wenn er intern BigDecimal ist."},
+    {cat:"Opaque Types", q:"Warum hat Java kein Äquivalent zu opaque types?", a:"Java kennt dieses Sprachfeature schlicht nicht — es bietet dafür nur Wrapper-Klassen als Ersatz, die aber zur Laufzeit echte zusätzliche Objekte sind."},
+    {cat:"Opaque Types", q:"Gibt es opaque types bereits in Scala 2?", a:"Nein, es ist ein Feature von Scala 3."},
+
+    {cat:"Export-Klauseln", q:"Was macht eine export-Klausel in Scala 3?", a:"Sie leitet ausgewählte Member eines anderen Objekts (zum Beispiel eines private Felds) an die eigene Klasse weiter — sie erzeugt dafür automatisch Forwarder-Methoden."},
+    {cat:"Export-Klauseln", q:"Welche Selektor-Syntax teilt sich export mit import?", a:"Dieselbe: Umbenennen mit as, Ausschließen mit as _, alles mit *."},
+    {cat:"Export-Klauseln", q:"Wenn eine Klasse Copier export printer.print enthält — was passiert bei Copier().print(\"x\")?", a:"Es ruft intern printer.print(\"x\") auf — export erzeugt eine Forwarder-Methode mit demselben Namen (oder einem umbenannten, falls as genutzt wurde)."},
+    {cat:"Export-Klauseln", q:"Wofür ist export typischerweise nützlich?", a:"Für Delegation — es erspart handgeschriebene Weiterleitungsmethoden, die sonst jede Methode einzeln an ein internes Objekt durchreichen müssten."},
+
+    {cat:"Squants", q:"Was ist Squants?", a:"Eine Scala-Bibliothek für physikalische Größen mit Einheiten — zum Beispiel Längen, Massen, Zeit, Energie und Geld."},
+    {cat:"Squants", q:"Wie ist Squants paketweise organisiert?", a:"Ein Package pro physikalischer Dimension, zum Beispiel Length in squants.space, Mass in squants.mass, Energy in squants.energy — die Verzeichnisse entsprechen dabei den Packages."},
+    {cat:"Squants", q:"Was verhindert der Compiler bei Squants-Größen, z. B. bei 5.meters + 10.kilograms?", a:"Er lehnt es ab, unterschiedliche physikalische Dimensionen direkt zu addieren — das compiliert nicht, weil es fachlich keinen Sinn ergibt."},
+    {cat:"Squants", q:"Was liefert Length mal Length bei Squants, z. B. 2.meters * 3.meters?", a:"Eine neue Dimension, nämlich Area (hier 6.0 m²) — Multiplikation kombinierter Dimensionen erzeugt automatisch den passenden neuen Typ."},
+    {cat:"Squants", q:"Wie sind Einheiten wie KilowattHours in Squants implementiert?", a:"Als Singleton-Objects (object KilowattHours extends EnergyUnit) — es gibt genau eine Instanz, die als Namespace für das Symbol und den Umrechnungsfaktor der Einheit dient."},
+    {cat:"Squants", q:"Warum hat Money in Squants einen private Konstruktor, und wie erzeugt man trotzdem Instanzen?", a:"Damit nur das Companion Object per apply neue Money-Instanzen erzeugen kann — die Bibliothek kontrolliert so selbst, wie ihre Objekte entstehen. Clients rufen stattdessen einfach Money(...) auf, was intern apply nutzt."},
+    {cat:"Squants", q:"Wie wird das Opaque-Type-Pattern in Squants beispielhaft genutzt, am Beispiel Metering.Reading?", a:"Reading ist intern eine Energy, aber von außen ein eigener Typ — eine Operation wie die Addition zweier Readings ergibt fachlich keinen Sinn und ist deshalb außerhalb nicht verfügbar."},
+    {cat:"Squants", q:"Was ermöglichen eigene Extension Methods wie 5.kW in einem selbstgeschriebenen Units-Objekt?", a:"Eine eigene, lesbare Einheiten-Syntax auf vorhandenen Typen wie Int oder Double, ohne explizite Konstruktor-Aufrufe wie Kilowatts(5) schreiben zu müssen."},
+    {cat:"Squants", q:"Was liefert in Squants ein Price[Energy] multipliziert mit einer Energy?", a:"Money — Preis mal Menge ergibt einen Geldbetrag."},
+    {cat:"Squants", q:"Was macht bei Geldbeträgen in Squants die Methode in im Unterschied zu to?", a:"in konvertiert den Betrag in eine Money in einer anderen Währung; to liefert dagegen nur den reinen Zahlenwert ohne Währungseinheit."}
+  ].map(function(c, i){ c.id = i; return c; });
+
+  var BASE_CATS = ["Namespaces & Pakete","Java: Imports & Sichtbarkeit","Scala: Pakete & Imports","Objects & Sichtbarkeit","Opaque Types","Export-Klauseln","Squants"];
+  var STORE_KEY = "prog1-namespaces";
+  var knownIds = new Set(loadJSON(STORE_KEY + "-known", []));
+  var removedIds = new Set(loadJSON(STORE_KEY + "-removed", []));
+  var customCards = loadJSON(STORE_KEY + "-custom", []);
+  var overrides = loadJSON(STORE_KEY + "-overrides", {});
+  var ALL = [];
+  function refreshAll(){
+    customCards.forEach(function(c, i){ c.id = CARDS.length + i; });
+    ALL = CARDS.concat(customCards).map(function(c){
+      var o = overrides[c.id];
+      if(!o) return c;
+      return {id:c.id, cat:o.cat, q:o.q, a:o.a, expl:(o.expl !== undefined ? o.expl : c.expl)};
+    });
+  }
+  refreshAll();
+
+  function activeTotal(){ return ALL.length - removedIds.size; }
+  var activeCat = "Alle";
+  var onlyUnsure = false;
+  var order = [];
+  var pos = 0;
+  var flipped = false;
+
+  var catFiltersEl = document.getElementById("catFilters");
+  function currentCats(){
+    var extra = [];
+    ALL.forEach(function(c){ if(BASE_CATS.indexOf(c.cat) === -1 && extra.indexOf(c.cat) === -1) extra.push(c.cat); });
+    return ["Alle"].concat(BASE_CATS, extra);
+  }
+  function renderCatFilters(){
+    catFiltersEl.innerHTML = "";
+    currentCats().forEach(function(cat){
+      var b = document.createElement("button");
+      b.className = "chip" + (cat === activeCat ? " active" : "");
+      b.type = "button"; b.textContent = cat; b.dataset.cat = cat;
+      b.addEventListener("click", function(){
+        activeCat = cat;
+        Array.prototype.forEach.call(catFiltersEl.children, function(c){ c.classList.toggle("active", c.dataset.cat === cat); });
+        rebuildOrder();
+      });
+      catFiltersEl.appendChild(b);
+    });
+  }
+  renderCatFilters();
+  document.getElementById("onlyUnsure").addEventListener("change", function(e){
+    onlyUnsure = e.target.checked; rebuildOrder();
+  });
+
+  function shuffle(arr){
+    for(var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function rebuildOrder(){
+    var pool = ALL.filter(function(c){
+      if(removedIds.has(c.id)) return false;
+      if(activeCat !== "Alle" && c.cat !== activeCat) return false;
+      if(onlyUnsure && knownIds.has(c.id)) return false;
+      return true;
+    });
+    order = pool.map(function(c){ return c.id; });
+    pos = 0; flipped = false;
+    renderCard();
+  }
+
+  var flashcardEl = document.getElementById("flashcard");
+  var flashCat = document.getElementById("flashCat");
+  var flashFront = document.getElementById("flashFront");
+  var flashBack = document.getElementById("flashBack");
+  var flashHint = document.getElementById("flashHint");
+  var flashMeta = document.getElementById("flashMeta");
+  var flashExplainRow = document.getElementById("flashExplainRow");
+  var flashExplain = document.getElementById("flashExplain");
+  var btnExplain = document.getElementById("btnExplain");
+
+  function cardAt(id){
+    for(var i = 0; i < ALL.length; i++){ if(ALL[i].id === id) return ALL[i]; }
+    return null;
+  }
+
+  function resetExplain(){
+    flashExplain.hidden = true;
+    btnExplain.textContent = "🔎 Mehr erklären";
+  }
+
+  function renderCard(){
+    resetExplain();
+    if(order.length === 0){
+      flashCat.textContent = "";
+      flashFront.textContent = onlyUnsure ? "Alles in dieser Kategorie sitzt schon. 🎉" : "Keine Karten in dieser Auswahl.";
+      flashBack.hidden = true; flashFront.hidden = false;
+      flashExplainRow.hidden = true;
+      flashHint.textContent = "";
+      flashMeta.textContent = "Gewusst: " + knownIds.size + " / " + activeTotal();
+      return;
+    }
+    var card = cardAt(order[pos]);
+    flashCat.textContent = card.cat;
+    flashFront.textContent = card.q;
+    flashBack.textContent = card.a;
+    flashFront.hidden = flipped;
+    flashBack.hidden = !flipped;
+    flashExplainRow.hidden = !(flipped && card.expl);
+    flashHint.textContent = flipped ? "Antippen für die Frage" : "Antippen zum Umdrehen";
+    flashMeta.textContent = "Karte " + (pos+1) + " / " + order.length + " · Gewusst gesamt: " + knownIds.size + " / " + activeTotal();
+  }
+
+  btnExplain.addEventListener("click", function(){
+    var card = order.length ? cardAt(order[pos]) : null;
+    if(!card) return;
+    flashExplain.textContent = card.expl || "";
+    flashExplain.hidden = !flashExplain.hidden;
+    btnExplain.textContent = flashExplain.hidden ? "🔎 Mehr erklären" : "🔽 Erklärung ausblenden";
+  });
+
+  flashcardEl.addEventListener("click", function(){
+    if(order.length === 0) return;
+    flipped = !flipped; renderCard();
+  });
+  flashcardEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flashcardEl.click(); }
+  });
+
+  function advance(delta){
+    if(order.length === 0) return;
+    pos = (pos + delta + order.length) % order.length;
+    flipped = false; renderCard();
+  }
+  document.getElementById("btnPrev").addEventListener("click", function(){ advance(-1); });
+  document.getElementById("btnNext").addEventListener("click", function(){ advance(1); });
+  document.getElementById("btnShuffle").addEventListener("click", function(){ shuffle(order); pos = 0; flipped = false; renderCard(); });
+  document.getElementById("btnKnown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.add(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    if(onlyUnsure){ rebuildOrder(); } else { advance(1); }
+    maybeShowCheck();
+  });
+  document.getElementById("btnUnknown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.delete(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    advance(1);
+    maybeShowCheck();
+  });
+
+  function updateRestoreBtn(){
+    var btn = document.getElementById("btnRestoreRemoved");
+    var countEl = document.getElementById("removedCount");
+    if(countEl) countEl.textContent = removedIds.size;
+    btn.hidden = removedIds.size === 0;
+  }
+  document.getElementById("btnDeleteCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    if(!confirm("Diese Karte wirklich dauerhaft aus dem Lernset entfernen?\n\n„" + card.q + "“")) return;
+    removedIds.add(card.id);
+    knownIds.delete(card.id);
+    saveJSON(STORE_KEY + "-removed", Array.from(removedIds));
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  document.getElementById("btnRestoreRemoved").addEventListener("click", function(){
+    if(removedIds.size === 0) return;
+    if(!confirm("Alle " + removedIds.size + " entfernten Karten wiederherstellen?")) return;
+    removedIds.clear();
+    saveJSON(STORE_KEY + "-removed", []);
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  updateRestoreBtn();
+
+  // ---------- Add / edit own card ----------
+  var addCardForm = document.getElementById("addCardForm");
+  var addCardCat = document.getElementById("addCardCat");
+  var addCardCatNew = document.getElementById("addCardCatNew");
+  var addCardFormTitle = document.getElementById("addCardFormTitle");
+  var addCardFormLead = document.getElementById("addCardFormLead");
+  var btnSaveCard = document.getElementById("btnSaveCard");
+  var btnResetCard = document.getElementById("btnResetCard");
+  var NEW_CAT_VALUE = "__new__";
+  var editingId = null;
+
+  function populateAddCardCats(){
+    addCardCat.innerHTML = "";
+    BASE_CATS.concat(currentCats().filter(function(c){ return c !== "Alle" && BASE_CATS.indexOf(c) === -1; })).forEach(function(cat){
+      var o = document.createElement("option"); o.value = cat; o.textContent = cat;
+      addCardCat.appendChild(o);
+    });
+    var o2 = document.createElement("option"); o2.value = NEW_CAT_VALUE; o2.textContent = "Neue Kategorie…";
+    addCardCat.appendChild(o2);
+  }
+  addCardCat.addEventListener("change", function(){
+    addCardCatNew.hidden = addCardCat.value !== NEW_CAT_VALUE;
+  });
+
+  function closeAddCardForm(){
+    addCardForm.reset(); addCardCatNew.hidden = true; addCardForm.hidden = true;
+    editingId = null;
+  }
+
+  document.getElementById("btnAddCard").addEventListener("click", function(){
+    if(!addCardForm.hidden && editingId === null){ closeAddCardForm(); return; }
+    editingId = null;
+    populateAddCardCats();
+    document.getElementById("addCardQ").value = "";
+    document.getElementById("addCardA").value = "";
+    addCardFormTitle.textContent = "Eigene Karteikarte hinzufügen";
+    addCardFormLead.textContent = "Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.";
+    btnSaveCard.textContent = "Karte speichern";
+    btnResetCard.hidden = true;
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnEditCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    editingId = card.id;
+    populateAddCardCats();
+    addCardCat.value = card.cat;
+    addCardCatNew.hidden = true;
+    document.getElementById("addCardQ").value = card.q;
+    document.getElementById("addCardA").value = card.a;
+    addCardFormTitle.textContent = "Karte bearbeiten";
+    addCardFormLead.textContent = "Änderungen werden dauerhaft in diesem Lernset gespeichert (im Browser).";
+    btnSaveCard.textContent = "Änderungen speichern";
+    btnResetCard.hidden = !overrides[card.id];
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnCancelCard").addEventListener("click", closeAddCardForm);
+
+  btnResetCard.addEventListener("click", function(){
+    if(editingId === null) return;
+    if(!confirm("Diese Karte wirklich auf die ursprüngliche Version zurücksetzen?")) return;
+    delete overrides[editingId];
+    saveJSON(STORE_KEY + "-overrides", overrides);
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  addCardForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var q = document.getElementById("addCardQ").value.trim();
+    var a = document.getElementById("addCardA").value.trim();
+    var cat = addCardCat.value === NEW_CAT_VALUE ? addCardCatNew.value.trim() : addCardCat.value;
+    if(!q || !a || !cat){ alert("Bitte Kategorie, Frage und Antwort ausfüllen."); return; }
+    if(editingId !== null){
+      overrides[editingId] = {cat:cat, q:q, a:a};
+      saveJSON(STORE_KEY + "-overrides", overrides);
+    } else {
+      customCards.push({cat:cat, q:q, a:a, expl:""});
+      saveJSON(STORE_KEY + "-custom", customCards);
+    }
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  rebuildOrder();
+
+  // ======================================================
+  // VERSTÄNDNIS-CHECK — alle 6-8 Karten ein kurzer, geprüfter
+  // Ja/Nein- oder Kurztext-Check zu einem Thema, das gerade geübt wurde.
+  // ======================================================
+  var ABFRAGE = [
+    {type:"bool", q:"Ja oder Nein: In Java muss die Verzeichnisstruktur exakt zum Package passen.", correct:true,
+     explain:"Richtig — package de.htwg.bank erfordert z. B. die Datei unter src/de/htwg/bank/Account.java."},
+    {type:"bool", q:"Ja oder Nein: In Scala erzwingt der Compiler, dass die Verzeichnisstruktur zum Package passt.", correct:false,
+     explain:"Falsch — in Scala sollte die Struktur passen, der Compiler erzwingt es aber nicht, anders als in Java."},
+    {type:"text", q:"Was ist die Default-Sichtbarkeit in Java ohne Modifizierer? (ein Wort, mit Bindestrich)", answer:"package-private",
+     explain:"Ohne Modifizierer ist ein Java-Member package-private — sichtbar innerhalb der Klasse und des Packages."},
+    {type:"text", q:"Was ist die Default-Sichtbarkeit in Scala ohne Modifizierer? (ein Wort)", answer:"public",
+     explain:"Scala kennt kein eigenes public-Schlüsselwort — ohne Modifizierer ist ein Member automatisch public."},
+    {type:"bool", q:"Ja oder Nein: Javas protected schließt das ganze Package mit ein, nicht nur Subklassen.", correct:true,
+     explain:"Richtig — das ist einer der häufigsten Überraschungspunkte beim Vergleich mit Scala."},
+    {type:"bool", q:"Ja oder Nein: Scalas protected ist genauso weit gefasst wie Javas protected.", correct:false,
+     explain:"Falsch — Scalas protected gilt nur für Subklassen, nicht für das ganze Package."},
+    {type:"text", q:"Welches Zeichen ist in Scala 3 der Wildcard für Imports? (ein Zeichen)", answer:"*",
+     explain:"In Scala 3 schreibt man z. B. import bank.*; in Scala 2 war dafür _ üblich."},
+    {type:"bool", q:"Ja oder Nein: Ein Scala-Import darf nur ganz oben in der Datei stehen, wie in Java.", correct:false,
+     explain:"Falsch — ein Scala-Import darf in jedem Block stehen, auch innerhalb einer einzelnen Methode."},
+    {type:"text", q:"Mit welchem Keyword benennt man in Scala 3 einen Import um? (ein Wort)", answer:"as",
+     explain:"import java.util.{List as JList} benennt die importierte List zu JList um."},
+    {type:"bool", q:"Ja oder Nein: Ein Companion Object darf auf die private-Member seiner Klasse zugreifen.", correct:true,
+     explain:"Richtig — Klasse und Companion Object teilen sich gegenseitig den Zugriff auf private-Member."},
+    {type:"bool", q:"Ja oder Nein: Ein opaque type erzeugt zur Laufzeit ein zusätzliches Wrapper-Objekt.", correct:false,
+     explain:"Falsch — zur Laufzeit ist ein opaque type exakt der zugrunde liegende Typ, ohne Wrapper-Objekt."},
+    {type:"text", q:"Welche Scala-3-Klausel leitet Member eines anderen Objekts als Forwarder-Methoden weiter? (ein Wort)", answer:"export",
+     explain:"export printer.print erzeugt z. B. eine Forwarder-Methode, die intern printer.print aufruft."},
+    {type:"bool", q:"Ja oder Nein: In Squants ist eine Einheit wie KilowattHours als Singleton-Object implementiert.", correct:true,
+     explain:"Richtig — object KilowattHours extends EnergyUnit; es gibt genau eine Instanz, die als Namespace für Symbol und Umrechnungsfaktor dient."},
+    {type:"text", q:"Was liefert Length mal Length bei Squants, z. B. 2.meters * 3.meters? (ein Wort, englisch)", answer:"Area",
+     explain:"Die Multiplikation zweier Längen ergibt automatisch eine neue Dimension, Area."}
+  ];
+
+  var checkCardEl = document.getElementById("checkCard");
+  var checkQEl = document.getElementById("checkQ");
+  var checkBoolEl = document.getElementById("checkBool");
+  var checkTextWrapEl = document.getElementById("checkTextWrap");
+  var checkInputEl = document.getElementById("checkInput");
+  var checkFeedbackEl = document.getElementById("checkFeedback");
+  var checkControlsEl = document.getElementById("checkControls");
+  var checkYesEl = document.getElementById("checkYes");
+  var checkNoEl = document.getElementById("checkNo");
+  var checkSubmitEl = document.getElementById("checkSubmit");
+  var flashControlsMain = document.getElementById("flashControlsMain");
+  var flashControlsShuffle = document.getElementById("flashControlsShuffle");
+  var flashControlsManage = document.getElementById("flashControlsManage");
+  var abfrageBag = [];
+  var currentCheckItem = null;
+
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  var cardsUntilCheck = randInt(6, 8);
+
+  function drawAbfrage(){
+    if(ABFRAGE.length === 0) return null;
+    if(abfrageBag.length === 0){ abfrageBag = shuffle(ABFRAGE.map(function(_, i){ return i; })); }
+    return ABFRAGE[abfrageBag.pop()];
+  }
+  function normalize(s){ return (s || "").toString().trim().toLowerCase().replace(/\s+/g, " "); }
+
+  function maybeShowCheck(){
+    cardsUntilCheck--;
+    if(cardsUntilCheck > 0) return;
+    cardsUntilCheck = randInt(6, 8);
+    var item = drawAbfrage();
+    if(!item) return;
+    currentCheckItem = item;
+    checkQEl.textContent = item.q;
+    checkBoolEl.hidden = item.type !== "bool";
+    checkTextWrapEl.hidden = item.type !== "text";
+    checkInputEl.value = "";
+    checkYesEl.disabled = checkNoEl.disabled = false;
+    checkSubmitEl.disabled = false;
+    checkFeedbackEl.hidden = true;
+    checkFeedbackEl.className = "check-feedback";
+    checkControlsEl.hidden = true;
+
+    flashcardEl.hidden = true;
+    flashControlsMain.hidden = true;
+    flashControlsShuffle.hidden = true;
+    flashControlsManage.hidden = true;
+    flashExplainRow.hidden = true;
+    flashExplain.hidden = true;
+    checkCardEl.hidden = false;
+  }
+
+  function finishCheck(isCorrect){
+    checkFeedbackEl.textContent = (isCorrect ? "✓ Richtig. " : "✗ Nicht ganz. ") + (currentCheckItem.explain || "");
+    checkFeedbackEl.className = "check-feedback " + (isCorrect ? "correct" : "wrong");
+    checkFeedbackEl.hidden = false;
+    checkYesEl.disabled = checkNoEl.disabled = true;
+    checkSubmitEl.disabled = true;
+    checkControlsEl.hidden = false;
+  }
+  checkYesEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === true); });
+  checkNoEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === false); });
+  checkSubmitEl.addEventListener("click", function(){
+    var val = normalize(checkInputEl.value);
+    var candidates = [currentCheckItem.answer].concat(currentCheckItem.accept || []).map(normalize);
+    finishCheck(candidates.indexOf(val) !== -1);
+  });
+  checkInputEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); checkSubmitEl.click(); }
+  });
+  document.getElementById("btnCheckDone").addEventListener("click", function(){
+    checkCardEl.hidden = true;
+    flashcardEl.hidden = false;
+    flashControlsMain.hidden = false;
+    flashControlsShuffle.hidden = false;
+    flashControlsManage.hidden = false;
+    renderCard();
+  });
+
+  // ======================================================
+  // QUIZ
+  // ======================================================
+  var QUIZ = [
+    {q:"Was ist die Ursache des Name-Clash-Problems, das Namespaces lösen?",
+     opts:["Programme werden zu lang, um sie zu lesen","Mehrere Bibliotheken oder Packages definieren denselben einfachen Namen, z. B. List oder Parser","Es gibt zu wenige reservierte Schlüsselwörter","Compiler können keine Großbuchstaben unterscheiden"],
+     correct:1, explain:"Der einfache Name (z. B. List) ist kurz, aber mehrdeutig; der vollqualifizierte Name (z. B. java.util.List) ist eindeutig."},
+    {q:"Wo muss in Java die package-Anweisung stehen?",
+     opts:["Egal wo in der Datei","Als allererste Anweisung der Datei","Nur innerhalb der main-Methode","Package-Anweisungen gibt es in Java nicht"],
+     correct:1, explain:"Die package-Anweisung muss als allererstes in der Datei stehen, noch vor allen Imports."},
+    {q:"Was macht import java.util.*; in Java?",
+     opts:["Nur die Klasse util wird importiert","Alle Typen des Packages java.util werden auf einmal importiert","Es importiert automatisch auch alle Subpackages von java","Es ist ein Syntaxfehler"],
+     correct:1, explain:"Das ist der On-Demand- bzw. Wildcard-Import — er importiert alle Typen eines Packages gleichzeitig."},
+    {q:"Was ist die Default-Sichtbarkeit in Java ohne Modifizierer?",
+     opts:["public","protected","package-private","private"],
+     correct:2, explain:"Ohne Modifizierer ist ein Java-Member automatisch package-private."},
+    {q:"Was ist an Javas protected im Vergleich zu seinem Namen überraschend?",
+     opts:["Es verhält sich wie private","Es schließt das ganze Package mit ein, nicht nur Subklassen","Es gilt nur innerhalb derselben Methode","protected existiert in Java gar nicht"],
+     correct:1, explain:"Javas protected ist weiter gefasst, als der Name vermuten lässt — es schließt das gesamte Package ein."},
+    {q:"Was unterscheidet Scala von Java bei der Verzeichnisstruktur von Packages?",
+     opts:["Scala erzwingt sie strenger als Java","Scala erzwingt sie überhaupt nicht, Java schon","Beide erzwingen sie identisch streng","Scala hat gar keine Packages"],
+     correct:1, explain:"In Scala sollte die Verzeichnisstruktur zum Package passen, der Compiler erzwingt es aber nicht — anders als in Java."},
+    {q:"Wie schreibt man in Scala 3 einen Wildcard-Import eines ganzen Packages?",
+     opts:["import bank._","import bank.*","using bank.*","import * from bank"],
+     correct:1, explain:"Scala 3 nutzt * als Wildcard; _ war die Scala-2-Schreibweise."},
+    {q:"Was macht import java.util.{Random as _, *}?",
+     opts:["Importiert nur Random","Importiert alles aus java.util außer Random","Benennt Random in _ um und importiert sonst nichts","Ist ein Syntaxfehler"],
+     correct:1, explain:"as _ schließt ein einzelnes Mitglied von einem Wildcard-Import aus — hier bleibt alles außer Random übrig."},
+    {q:"Wo darf ein Import in Scala stehen, anders als in Java?",
+     opts:["Nur ganz oben in der Datei, genau wie in Java","In jedem Block, auch innerhalb einer einzelnen Methode","Nur innerhalb von object-Deklarationen","Imports sind in Scala generell nicht erlaubt"],
+     correct:1, explain:"Scala-Imports dürfen in jedem Block stehen; ihr Scope ist der umschließende Block."},
+    {q:"Was ist Scalas Standard-Sichtbarkeit, wenn kein Modifizierer angegeben ist?",
+     opts:["package-private, wie in Java","private","public","protected"],
+     correct:2, explain:"Scala kennt kein eigenes public-Schlüsselwort — ohne Angabe ist ein Member automatisch public."},
+    {q:"Was bedeutet private[bank] in Scala?",
+     opts:["private ist in Scala nicht erlaubt","Sichtbar innerhalb des Packages bank","Nur innerhalb der Methode mit Namen bank sichtbar","Dasselbe wie public"],
+     correct:1, explain:"Mit private[pkg] wählt man das Package selbst als Sichtbarkeitsgrenze — ähnlich wie Javas package-private, aber explizit wählbar."},
+    {q:"Was dürfen eine Klasse und ihr Companion Object, das fremde Klassen nicht dürfen?",
+     opts:["Nichts Besonderes, wie zwei beliebige fremde Klassen","Gegenseitig auf ihre private-Member zugreifen","Nur gemeinsam in einer Datei stehen, sonst nichts","Sich gegenseitig automatisch überschreiben (override)"],
+     correct:1, explain:"Companion-Klasse und -Objekt teilen sich gegenseitig den Zugriff auf private-Member."},
+    {q:"Was kostet ein opaque type zur Laufzeit zusätzlich im Vergleich zum zugrunde liegenden Typ?",
+     opts:["Ein zusätzliches Wrapper-Objekt pro Wert","Nichts — zur Laufzeit ist es der zugrunde liegende Typ","Eine zusätzliche virtuelle Methode pro Aufruf","Einen zusätzlichen Pattern-Match bei jedem Zugriff"],
+     correct:1, explain:"Ein opaque type ist zur Laufzeit identisch mit seinem zugrunde liegenden Typ — es entsteht kein Wrapper-Objekt."},
+    {q:"Was macht eine export-Klausel in Scala 3?",
+     opts:["Sie exportiert eine Datei direkt als JAR","Sie leitet ausgewählte Member eines anderen Objekts als Forwarder-Methoden weiter","Sie macht alle Member einer Klasse automatisch private","Sie ist ausschließlich für Java-Interop gedacht"],
+     correct:1, explain:"export erzeugt Forwarder-Methoden, die intern an ein anderes Objekt delegieren — nützlich für Delegation ohne Handarbeit."},
+    {q:"Was liefert in Squants Length * Length, zum Beispiel 2.meters * 3.meters?",
+     opts:["Einen Compile-Fehler","Volume","Area","Einen reinen Double ohne Einheit"],
+     correct:2, explain:"Die Multiplikation zweier Längen ergibt automatisch die neue Dimension Area."}
+  ];
+
+  var quizListEl = document.getElementById("quizList");
+  var quizScoreEl = document.getElementById("quizScore");
+  document.getElementById("quizIntro").textContent = QUIZ.length + " Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.";
+  var score = 0;
+
+  function renderQuiz(){
+    quizListEl.innerHTML = "";
+    score = 0; quizScoreEl.textContent = "0";
+    QUIZ.forEach(function(item, qi){
+      var wrap = document.createElement("div");
+      wrap.className = "q-item card";
+      var qText = document.createElement("p");
+      qText.className = "q-text";
+      qText.textContent = (qi+1) + ". " + item.q;
+      wrap.appendChild(qText);
+
+      var optsWrap = document.createElement("div");
+      optsWrap.className = "q-opts";
+      var explainEl = document.createElement("div");
+      explainEl.className = "q-explain";
+      explainEl.textContent = item.explain;
+
+      item.opts.forEach(function(optText, oi){
+        var b = document.createElement("button");
+        b.className = "opt"; b.type = "button"; b.textContent = optText;
+        b.addEventListener("click", function(){
+          if(wrap.dataset.answered) return;
+          wrap.dataset.answered = "1";
+          Array.prototype.forEach.call(optsWrap.children, function(o, idx){
+            o.disabled = true;
+            if(idx === item.correct) o.classList.add("correct");
+            else if(idx === oi) o.classList.add("incorrect");
+          });
+          explainEl.classList.add("shown");
+          if(oi === item.correct){ score++; quizScoreEl.textContent = String(score); }
+        });
+        optsWrap.appendChild(b);
+      });
+
+      wrap.appendChild(optsWrap);
+      wrap.appendChild(explainEl);
+      quizListEl.appendChild(wrap);
+    });
+  }
+  document.getElementById("btnQuizReset").addEventListener("click", renderQuiz);
+  renderQuiz();
+
+  // ======================================================
+  // TASKS (Vorlesungsaufgaben + ergänzende Übungen im selben Schwierigkeitsgrad)
+  // ======================================================
+  var TASKS = [
+    {t:"Energy-Bill aus Zählerständen — die erste Original-Vorlesungsaufgabe",
+     d:"Nutze den opaque type Metering.Reading aus der Vorlesung und baue Readings für Januar (12 400 kWh) und Dezember (15 900 kWh). Berechne den Verbrauch mit since, bepreise ihn mit 0.35.usd / 1.kWh und addiere die Grundgebühr 12.eur * 12. Gib mit dem Beispielkurs 1 EUR = 1.10 USD den Gesamtbetrag einmal in EUR und einmal in USD aus.",
+     tip:"since liefert eine normale Energy zurück (kein Reading mehr) — die kannst du direkt mit einem Price[Energy] bepreisen. Für die Umrechnung in eine andere Währung brauchst du einen impliziten MoneyContext mit dem Wechselkurs, dann liefert in die Money in der Zielwährung.",
+     sol:"import squants.energy.{Energy, KilowattHours}\nimport squants.market.*\nimport Units.*\n\nobject Metering:\n  opaque type Reading = Energy\n  object Reading:\n    def apply(kWh: Double): Reading =\n      require(kWh &gt;= 0, \"a meter reading is never negative\")\n      KilowattHours(kWh)\n  extension (r: Reading)\n    def since(earlier: Reading): Energy = r - earlier\n\nimport Metering.*\n\ngiven MoneyContext =\n  MoneyContext(EUR, defaultCurrencySet, List(CurrencyExchangeRate(EUR(1), USD(1.10))))\n\nval jan = Reading(12_400)\nval dec = Reading(15_900)\nval consumption: Energy = dec.since(jan)        // 3500.0 kWh\n\nval priceUsd = 0.35.usd / 1.kWh\nval baseFee: Money = 12.eur * 12\nval total: Money = priceUsd * consumption + baseFee\n\nprintln(total.toFormattedString)                 // $1383.40\nprintln((total in EUR).toFormattedString)         // €1257.64"},
+    {t:"Eigene Einheiten und Packages mit Squants — die zweite Vorlesungsaufgabe",
+     d:"Lege in deinem Mill-Projekt (mit org.typelevel::squants:1.8.3 als Abhängigkeit) ein Package energy an und packe das Units-Objekt aus der Vorlesung dort hinein. Ergänze eigene Extension Methods, z. B. def MWh: Energy, def minutes: Time und def chf: Money. Nutze sie anschließend aus einem @main in einem anderen Package — einmal mit import Units.*, einmal mit einem umbenannten Import.",
+     tip:"MWh ist tausendmal so groß wie kWh — definiere es z. B. über KilowattHours(n * 1000). Für den umbenannten Import reicht import energy.{Units as E} und danach z. B. E.kWh(10).",
+     sol:"package energy\n\nimport squants.energy.{Energy, KilowattHours}\nimport squants.time.{Time, Minutes}\nimport squants.market.{Money, EUR}\n\nobject Units:\n  extension (n: Int)\n    def kWh: Energy = KilowattHours(n)\n    def MWh: Energy = KilowattHours(n * 1000)\n    def minutes: Time = Minutes(n)\n    def chf: Money = EUR(n)          // vereinfachte Annahme ohne eigenen Wechselkurs\n\npackage app:\n  import energy.Units.*\n  @main def run1(): Unit = println(3.MWh)\n\npackage app2:\n  import energy.{Units as E}\n  @main def run2(): Unit = println(E.kWh(10))"},
+    {t:"Packages und Sichtbarkeit in Java — ein kleines Bank-Beispiel",
+     d:"Schreibe in Java eine Klasse Account im Package de.htwg.bank mit einem private-Feld balance, einem package-private-Feld branch, einem protected-Feld owner und einer public-Methode deposit(int amount), die nur positive Beträge zulässt. Lege außerdem die passende Verzeichnisstruktur an.",
+     tip:"Die Datei muss unter src/de/htwg/bank/Account.java liegen — die Verzeichnisstruktur muss exakt zum Package passen. Ein Feld ganz ohne Modifizierer ist automatisch package-private.",
+     sol:"// Datei: src/de/htwg/bank/Account.java\npackage de.htwg.bank;\n\npublic class Account {\n    private int balance;          // nur innerhalb Account\n    int branch;                   // package-private\n    protected String owner;       // package + Subklassen\n\n    public Account(String owner) { this.owner = owner; }\n    public int getBalance() { return balance; }\n\n    public void deposit(int amount) {\n        if (amount &lt;= 0) throw new IllegalArgumentException(\"amount must be positive\");\n        balance += amount;\n    }\n}"},
+    {t:"Name-Clash auflösen mit Renaming",
+     d:"Du willst sowohl scala.List als auch java.util.List in derselben Scala-Datei verwenden. Löse den Namenskonflikt mit einem umbenannten Import, sodass java.util.List als JList zur Verfügung steht und scala.List unverändert als List nutzbar bleibt.",
+     tip:"Scalas eigenes List ist durch Predef automatisch im Scope — du musst nur java.util.List umbenennen, nicht scala.List.",
+     sol:"import java.util.{List as JList, ArrayList}\n\nval jl: JList[Int] = new ArrayList[Int]()\nval xs: List[Int] = List(1, 2)   // weiterhin scala.List"},
+    {t:"Ein eigenes Companion Object mit Factory-Methode",
+     d:"Schreibe eine Scala-Klasse Point(x: Double, y: Double) mit privatem Konstruktor sowie ein Companion Object mit einer apply-Methode, die nur gültige Punkte erzeugt (x und y jeweils endlich, also nicht NaN oder unendlich).",
+     tip:"private vor der Parameterliste macht den Konstruktor privat — nur das Companion Object darf dann new Point(...) aufrufen; Clients nutzen stattdessen einfach Point(x, y), was intern apply aufruft.",
+     sol:"class Point private (val x: Double, val y: Double)\n\nobject Point:\n  def apply(x: Double, y: Double): Point =\n    require(!x.isNaN &amp;&amp; !x.isInfinite, \"x muss endlich sein\")\n    require(!y.isNaN &amp;&amp; !y.isInfinite, \"y muss endlich sein\")\n    new Point(x, y)"},
+    {t:"Ein opaque type für sichere Prozentwerte",
+     d:"Definiere einen opaque type Percent, der intern ein Double zwischen 0.0 und 1.0 ist, mit einer Factory apply, die den Wert validiert, und einer Extension-Methode of(amount: Double): Double, die den Prozentsatz auf einen Betrag anwendet.",
+     tip:"Die Validierung gehört in die apply-Methode des Companion Objects, nicht in die extension — zum Zeitpunkt der extension existiert der Wert ja schon, die Invariante muss also vorher geprüft werden.",
+     sol:"object Percentages:\n  opaque type Percent = Double\n  object Percent:\n    def apply(p: Double): Percent =\n      require(p &gt;= 0.0 &amp;&amp; p &lt;= 1.0, \"percent must be between 0 and 1\")\n      p\n  extension (p: Percent)\n    def of(amount: Double): Double = p * amount"},
+    {t:"Delegation mit export statt Handarbeit",
+     d:"Eine Klasse Car hat intern ein Engine-Objekt mit den Methoden start(): String und stop(): String. Schreibe Car so, dass Car().start() und Car().stop() funktionieren, ohne die beiden Methoden händisch weiterzuleiten.",
+     tip:"Genau dafür ist export da — export engine.{start, stop} erzeugt die beiden Forwarder-Methoden automatisch.",
+     sol:"class Engine:\n  def start(): String = \"Engine started\"\n  def stop(): String = \"Engine stopped\"\n\nclass Car:\n  private val engine = Engine()\n  export engine.{start, stop}"},
+    {t:"Top-Level-Definitionen statt package object",
+     d:"Portiere das folgende Scala-2-package-object in den Scala-3-Stil mit Top-Level-Definitionen: package object shop { val TaxRate = 0.19; def priceWithTax(net: Double): Double = net * (1 + TaxRate) }",
+     tip:"In Scala 3 reicht es, package shop zu schreiben und val bzw. def direkt danach in derselben Datei zu definieren, ganz ohne object-Wrapper.",
+     sol:"package shop\n\nval TaxRate = 0.19\ndef priceWithTax(net: Double): Double = net * (1 + TaxRate)"},
+    {t:"Qualifizierte Sichtbarkeit mit private[pkg]",
+     d:"Im Package shop soll die Klasse Cart ein Feld items haben, das innerhalb des gesamten Packages shop sichtbar ist, aber nicht von außerhalb. Schreibe die passende Scala-Deklaration.",
+     tip:"private[shop] gibt genau diese Grenze an — sichtbar innerhalb des Packages shop, unsichtbar außerhalb, unabhängig davon, in welcher Klasse der Zugriff passiert.",
+     sol:"package shop\n\nclass Cart:\n  private[shop] var items: List[String] = Nil"},
+    {t:"Verschachtelte Packages in einer Datei",
+     d:"Schreibe in einer einzigen Scala-Datei ein Package library mit einer Klasse Book(title: String) und ein verschachteltes Package library.catalog mit einer Funktion describe(b: Book): String, die auf title zugreift.",
+     tip:"Ein inneres Package sieht automatisch die Member der umschließenden äußeren Packages — ein zusätzlicher Import für Book ist innerhalb von library.catalog deshalb nicht nötig.",
+     sol:"package library:\n  class Book(val title: String)\n\n  package catalog:\n    def describe(b: Book): String = s\"Buch: ${b.title}\""},
+    {t:"Statische Hilfsmethoden: Java vs. Scala",
+     d:"Schreibe eine Methode square(n: Int): Int einmal als statische Hilfsmethode in einer Java-Utility-Klasse MathUtils im Package de.htwg.util, und einmal als Top-Level-Definition in Scala im Package mathutils.",
+     tip:"In Java muss die Methode zwingend in einer Klasse stecken und static sein; in Scala genügt die Top-Level-Definition direkt im Package, ganz ohne umschließende Klasse.",
+     sol:"// Java, Datei: src/de/htwg/util/MathUtils.java\npackage de.htwg.util;\npublic class MathUtils {\n    public static int square(int n) { return n * n; }\n}\n\n// Scala\npackage mathutils\ndef square(n: Int): Int = n * n"},
+    {t:"Visibility-Vergleich: ein Shape-Beispiel in Scala",
+     d:"Schreibe eine Scala-Klasse Shape mit protected def area: Double = 0.0, und eine Subklasse Circle(radius: Double) extends Shape, die area überschreibt und zusätzlich eine öffentliche Methode describe anbietet, die area intern nutzt.",
+     tip:"protected-Member sind in Scala nur innerhalb der Klasse und ihrer Subklassen sichtbar, nicht im ganzen Package wie in Java — describe darf area trotzdem aufrufen, weil es Teil derselben Klassenhierarchie ist.",
+     sol:"class Shape:\n  protected def area: Double = 0.0\n  def describe: String = s\"Fläche: $area\"\n\nclass Circle(radius: Double) extends Shape:\n  override protected def area: Double = math.Pi * radius * radius"},
+    {t:"Ein eigenes Device mit versteckten Details — alles zusammen",
+     d:"Baue eine Klasse Device in einem Package iot, die intern ein privates Sensor-Objekt mit einer Methode read(): Double hat. Verberge die rohe Zahl hinter einem opaque type Reading (das intern ein Double ist), biete eine öffentliche Methode currentReading an, und delegiere eine Methode calibrate() per export an den Sensor.",
+     tip:"Kombiniere mehrere Muster aus dieser Vorlesung: eine private Sensor-Instanz als Feld, ein opaque type für den Rückgabewert, und export für die Delegation einer einzelnen Methode.",
+     sol:"package iot\n\nclass Sensor:\n  def read(): Double = math.random()\n  def calibrate(): Unit = ()\n\nobject Device:\n  opaque type Reading = Double\n  object Reading:\n    def apply(d: Double): Reading = d\n  extension (r: Reading)\n    def value: Double = r\n\nclass Device:\n  private val sensor = Sensor()\n  export sensor.calibrate\n  def currentReading: Device.Reading = Device.Reading(sensor.read())"}
+  ];
+  function taskBodyHtml(task){
+    return "<p>" + task.d + "</p>" +
+      '<div class="tip">💡 Tipp: ' + task.tip + "</div>" +
+      '<details class="sol"><summary>✅ Lösungsidee zum Gegenchecken</summary><pre class="code">' + task.sol + "</pre></details>";
+  }
+  var taskListEl = document.getElementById("taskList");
+  TASKS.forEach(function(task, i){
+    var det = document.createElement("details");
+    det.className = "task";
+    var summary = document.createElement("summary");
+    summary.innerHTML = '<span class="tnum">' + (i+1) + '</span> ' + task.t;
+    det.appendChild(summary);
+    var body = document.createElement("div");
+    body.className = "body";
+    body.innerHTML = taskBodyHtml(task);
+    det.appendChild(body);
+    taskListEl.appendChild(det);
+  });
+
+})();
+</script>

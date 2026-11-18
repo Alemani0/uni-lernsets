@@ -1,0 +1,1054 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Scala-Collections-Lernset</title>
+<style>
+:root{
+  --bg:#f2f5f3;
+  --surface:#ffffff;
+  --surface-2:#e8ede9;
+  --fg:#162220;
+  --fg-muted:#52635d;
+  --border:#d7e0da;
+  --accent:#0f8f7c;
+  --accent-ink:#ffffff;
+  --accent-tint:#e3f3ef;
+  --accent-2:#b85c12;
+  --accent-2-ink:#ffffff;
+  --accent-2-tint:#f8ead9;
+  --incorrect:#b23b3b;
+  --incorrect-tint:#fbe6e6;
+  --shadow:0 1px 2px rgba(15,30,25,.06), 0 6px 18px rgba(15,30,25,.07);
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1615;
+    --surface:#161f1e;
+    --surface-2:#1d2928;
+    --fg:#e7efec;
+    --fg-muted:#9db0aa;
+    --border:#2a3836;
+    --accent:#2bbfa3;
+    --accent-ink:#06211c;
+    --accent-tint:#133430;
+    --accent-2:#e2984c;
+    --accent-2-ink:#2a1703;
+    --accent-2-tint:#3a2a16;
+    --incorrect:#e2766e;
+    --incorrect-tint:#3a1f1d;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1615;
+  --surface:#161f1e;
+  --surface-2:#1d2928;
+  --fg:#e7efec;
+  --fg-muted:#9db0aa;
+  --border:#2a3836;
+  --accent:#2bbfa3;
+  --accent-ink:#06211c;
+  --accent-tint:#133430;
+  --accent-2:#e2984c;
+  --accent-2-ink:#2a1703;
+  --accent-2-tint:#3a2a16;
+  --incorrect:#e2766e;
+  --incorrect-tint:#3a1f1d;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;text-wrap:balance;margin:0}
+code,pre,.mono{font-family:var(--font-mono)}
+a{color:var(--accent)}
+
+.wrap{max-width:860px;margin:0 auto}
+
+/* ---------- Header ---------- */
+.page-head{
+  display:flex;align-items:center;gap:20px;
+  padding-block:28px 18px;
+  flex-wrap:wrap;
+}
+.coll-deco{position:relative;width:64px;height:64px;flex:0 0 auto}
+.coll-deco svg{position:absolute;inset:0}
+.coll-deco .dot{position:absolute;border-radius:50%;width:13px;height:13px;transform:translate(-50%,-50%)}
+.coll-deco .dot.root{background:var(--surface);border:1.5px solid var(--fg-muted)}
+.coll-deco .dot.seq{border:1.5px solid var(--accent);background:var(--accent-tint)}
+.coll-deco .dot.set{border:1.5px solid var(--accent-2);background:var(--accent-2-tint)}
+.coll-deco .dot.map{border:1.5px solid var(--accent);background:var(--accent-tint)}
+.head-text{flex:1 1 260px;min-width:0}
+.eyebrow{
+  margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--fg-muted);font-weight:600;
+}
+h1{font-size:clamp(28px,6vw,38px);letter-spacing:-.01em}
+.subtitle{margin:6px 0 0;color:var(--fg-muted);max-width:52ch}
+
+/* ---------- Tabs ---------- */
+.tabs{
+  display:flex;gap:6px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  padding-bottom:0;margin-bottom:22px;
+  position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;
+  padding-top:4px;
+}
+.tab-btn{
+  font-family:var(--font-body);font-weight:600;font-size:13.5px;
+  background:none;border:none;color:var(--fg-muted);cursor:pointer;
+  padding:10px 14px;border-bottom:2.5px solid transparent;border-radius:6px 6px 0 0;
+}
+.tab-btn:hover{color:var(--fg);background:var(--surface-2)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{padding-bottom:48px}
+.panel > section{margin-bottom:34px}
+.panel h2{font-size:21px;margin-bottom:4px}
+.panel h2 .n{color:var(--accent);font-family:var(--font-mono);font-size:15px;margin-right:8px}
+.lead{color:var(--fg-muted);margin:2px 0 14px;max-width:62ch}
+
+/* ---------- Reusable components ---------- */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);
+}
+pre.code{
+  background:var(--surface-2);border:1px solid var(--border);border-radius:9px;
+  padding:11px 13px;overflow-x:auto;font-size:12.5px;line-height:1.55;margin:8px 0;
+}
+table.ruleof{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px}
+table.ruleof th,table.ruleof td{border:1px solid var(--border);padding:7px 9px;text-align:left}
+table.ruleof th{background:var(--surface-2);font-size:11.5px;letter-spacing:.03em;text-transform:uppercase}
+table.ruleof td code{font-size:12px}
+
+/* ---------- Flashcards ---------- */
+.cat-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{
+  font-family:var(--font-body);font-size:12.5px;font-weight:600;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg-muted);
+  padding:6px 12px;cursor:pointer;
+}
+.chip.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.card-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg-muted);margin-bottom:14px}
+
+.flash-wrap{max-width:480px;margin:0 auto}
+.flashcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--border);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;display:flex;flex-direction:column;justify-content:center;
+  cursor:pointer;position:relative;
+}
+.flashcard[hidden]{display:none}
+.flash-cat{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--fg-muted);
+}
+.flash-side{font-size:16px;text-align:center}
+.flash-q{font-weight:600}
+.flash-a{color:var(--accent)}
+.flash-hint{
+  position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:var(--fg-muted);
+}
+.flash-explain-row{display:flex;justify-content:center;margin-top:12px}
+.flash-explain-row[hidden]{display:none}
+.flash-explain{
+  margin-top:10px;font-size:13px;color:var(--fg);border-left:3px solid var(--accent-2);
+  padding:10px 13px;background:var(--accent-2-tint);border-radius:0 8px 8px 0;text-align:left;
+}
+.flash-explain[hidden]{display:none}
+.flash-controls{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.flash-controls[hidden]{display:none}
+.btn{
+  font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg);padding:9px 14px;
+}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.warn{background:var(--incorrect-tint);border-color:var(--incorrect);color:var(--incorrect)}
+.flash-meta{text-align:center;color:var(--fg-muted);font-size:12.5px;margin-top:12px}
+
+.addcard-form{
+  margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);text-align:left;
+}
+.addcard-form[hidden]{display:none}
+.addcard-form h3{font-size:15px;margin-bottom:2px}
+.addcard-form label{display:block;font-size:12.5px;font-weight:600;color:var(--fg-muted);margin:12px 0 4px}
+.addcard-form select,.addcard-form input[type="text"],.addcard-form textarea{
+  width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:13.5px;resize:vertical;
+}
+.addcard-form .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.addcard-form .hint{font-size:11.5px;color:var(--fg-muted);margin-top:2px}
+
+/* ---------- Verständnis-Check (periodic interrupt card) ---------- */
+.checkcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--accent-2);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;position:relative;text-align:center;
+}
+.checkcard[hidden]{display:none}
+.check-label{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--accent-2);
+}
+.check-q{font-size:16px;font-weight:600;margin:18px 0 18px}
+.check-bool{display:flex;justify-content:center;gap:10px}
+.check-bool[hidden]{display:none}
+.check-text{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.check-text[hidden]{display:none}
+.check-text input{
+  flex:1 1 220px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;
+}
+.check-feedback{margin-top:14px;font-size:13.5px;text-align:left;border-radius:0 8px 8px 0;padding:9px 13px;border-left:3px solid var(--border)}
+.check-feedback[hidden]{display:none}
+.check-feedback.correct{color:var(--accent);border-left-color:var(--accent);background:var(--accent-tint)}
+.check-feedback.wrong{color:var(--incorrect);border-left-color:var(--incorrect);background:var(--incorrect-tint)}
+.check-controls{display:flex;justify-content:center;margin-top:14px}
+.check-controls[hidden]{display:none}
+
+/* ---------- Quiz ---------- */
+.quiz-score{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;
+}
+.quiz-score strong{color:var(--accent);font-family:var(--font-mono)}
+.q-item{margin-bottom:18px}
+.q-item p.q-text{font-weight:600;margin:0 0 9px;white-space:pre-line}
+.q-opts{display:grid;gap:7px}
+.opt{
+  text-align:left;border:1px solid var(--border);background:var(--surface);border-radius:9px;
+  padding:9px 12px;font-family:var(--font-body);font-size:13.5px;cursor:pointer;color:var(--fg);
+}
+.opt:hover{background:var(--surface-2)}
+.opt.correct{background:var(--accent-tint);border-color:var(--accent)}
+.opt.incorrect{background:var(--incorrect-tint);border-color:var(--incorrect)}
+.opt[disabled]{cursor:default}
+.q-explain{
+  margin-top:7px;font-size:12.5px;color:var(--fg-muted);border-left:3px solid var(--accent);
+  padding:5px 10px;background:var(--surface-2);border-radius:0 8px 8px 0;display:none;
+}
+.q-explain.shown{display:block}
+
+/* ---------- Tasks ---------- */
+details.task{
+  background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:13px 16px;margin-bottom:10px;box-shadow:var(--shadow);
+}
+details.task summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.task summary::-webkit-details-marker{display:none}
+details.task summary .tnum{
+  font-family:var(--font-mono);color:var(--accent-ink);background:var(--accent);
+  border-radius:6px;padding:1px 7px;font-size:12px;flex:0 0 auto;
+}
+details.task .body{margin-top:10px;font-size:13.5px}
+details.task .tip{
+  margin-top:9px;font-size:12.5px;border-left:3px solid var(--accent-2);padding:6px 10px;
+  background:var(--accent-2-tint);border-radius:0 8px 8px 0;
+}
+details.task .sol summary{font-size:12.5px;font-weight:600;color:var(--fg-muted);margin-top:8px}
+.task-footnote{color:var(--fg-muted);font-size:12.5px;margin-top:14px}
+
+footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10px 0 30px}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <div class="coll-deco" aria-hidden="true">
+      <svg viewBox="0 0 64 64" width="64" height="64">
+        <path d="M32 16 L17 46" stroke="var(--border)" stroke-width="1.5" fill="none"/>
+        <path d="M32 16 L32 46" stroke="var(--border)" stroke-width="1.5" fill="none"/>
+        <path d="M32 16 L47 46" stroke="var(--border)" stroke-width="1.5" fill="none"/>
+      </svg>
+      <i class="dot root" style="left:32px;top:10px"></i>
+      <i class="dot seq" style="left:14px;top:52px"></i>
+      <i class="dot set" style="left:32px;top:52px"></i>
+      <i class="dot map" style="left:50px;top:52px"></i>
+    </div>
+    <div class="head-text">
+      <p class="eyebrow">Programmiertechnik I · Vorlesung 12 von 30 · HTWG Konstanz</p>
+      <h1>Collections</h1>
+      <p class="subtitle">Dein Lernset zu Seq, Set und Map in einer Trait-Hierarchie, zu Higher-Order Functions wie filter, partition, fold und map, und zur Dokumentation mit JavaDoc/ScalaDoc — zum Verstehen, Behalten und Anwenden.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Lernbereiche">
+    <button class="tab-btn active" data-tab="cards" role="tab" aria-selected="true" id="tabbtn-cards">Karteikarten</button>
+    <button class="tab-btn" data-tab="quiz" role="tab" aria-selected="false" id="tabbtn-quiz">Verständnisfragen</button>
+    <button class="tab-btn" data-tab="tasks" role="tab" aria-selected="false" id="tabbtn-tasks">Übungsaufgaben</button>
+  </nav>
+
+  <main>
+    <!-- ============ FLASHCARDS ============ -->
+    <div class="panel" id="panel-cards" role="tabpanel" aria-labelledby="tabbtn-cards">
+      <section>
+        <h2><span class="n">◆</span>Karteikarten</h2>
+        <p class="lead">Karte anklicken, um die Antwort zu sehen — ehrlich einschätzen, das bringt mehr als nur lesen. Nach dem Umdrehen gibt „🔎 Mehr erklären" bei Bedarf noch mehr Hintergrund. Alle 6–8 Karten kommt ein kurzer Verständnis-Check zwischendurch (Ja/Nein oder kurze Texteingabe). Über „➕ Eigene Karte" kannst du jederzeit eigene Karten ergänzen.</p>
+
+        <div class="cat-filters" id="catFilters"></div>
+        <label class="card-toggle"><input type="checkbox" id="onlyUnsure"> Nur Karten üben, die ich noch nicht sicher weiß</label>
+
+        <div class="flash-wrap">
+          <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Karte umdrehen">
+            <span class="flash-cat" id="flashCat"></span>
+            <div class="flash-side" id="flashFront"></div>
+            <div class="flash-side flash-a" id="flashBack" hidden></div>
+            <span class="flash-hint" id="flashHint">Antippen zum Umdrehen</span>
+          </div>
+
+          <div class="checkcard" id="checkCard" hidden>
+            <span class="check-label">Verständnis-Check</span>
+            <p class="check-q" id="checkQ"></p>
+            <div class="check-bool" id="checkBool">
+              <button class="btn" id="checkYes" type="button">Ja</button>
+              <button class="btn" id="checkNo" type="button">Nein</button>
+            </div>
+            <div class="check-text" id="checkTextWrap">
+              <input type="text" id="checkInput" placeholder="Deine Antwort …" autocomplete="off">
+              <button class="btn primary" id="checkSubmit" type="button">Prüfen</button>
+            </div>
+            <div class="check-feedback" id="checkFeedback" hidden></div>
+            <div class="check-controls" id="checkControls" hidden>
+              <button class="btn primary" id="btnCheckDone" type="button">Weiter mit Karteikarten ▶</button>
+            </div>
+          </div>
+
+          <div class="flash-explain-row" id="flashExplainRow" hidden>
+            <button class="btn" id="btnExplain" type="button">🔎 Mehr erklären</button>
+          </div>
+          <div class="flash-explain" id="flashExplain" hidden></div>
+
+          <div class="flash-controls" id="flashControlsMain">
+            <button class="btn" id="btnPrev" type="button">◀ Zurück</button>
+            <button class="btn warn" id="btnUnknown" type="button">↻ Nochmal üben</button>
+            <button class="btn primary" id="btnKnown" type="button">✓ Weiß ich</button>
+            <button class="btn" id="btnNext" type="button">Weiter ▶</button>
+          </div>
+          <div class="flash-controls" id="flashControlsShuffle">
+            <button class="btn" id="btnShuffle" type="button">⤨ Mischen</button>
+            <button class="btn" id="btnAddCard" type="button">➕ Eigene Karte</button>
+          </div>
+          <div class="flash-controls" id="flashControlsManage">
+            <button class="btn" id="btnEditCard" type="button">✏️ Karte bearbeiten</button>
+            <button class="btn" id="btnDeleteCard" type="button" style="border-color:var(--incorrect);color:var(--incorrect)">🗑 Karte entfernen</button>
+            <button class="btn" id="btnRestoreRemoved" type="button" hidden>↺ Entfernte Karten wiederherstellen (<span id="removedCount">0</span>)</button>
+          </div>
+          <p class="flash-meta" id="flashMeta"></p>
+
+          <form class="addcard-form" id="addCardForm" hidden>
+            <h3 id="addCardFormTitle">Eigene Karteikarte hinzufügen</h3>
+            <p class="lead" id="addCardFormLead" style="margin-bottom:0">Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.</p>
+
+            <label for="addCardCat">Kategorie</label>
+            <select id="addCardCat"></select>
+            <input type="text" id="addCardCatNew" placeholder="Neue Kategorie…" hidden>
+
+            <label for="addCardQ">Frage (Vorderseite)</label>
+            <textarea id="addCardQ" rows="2" placeholder="Was soll abgefragt werden?"></textarea>
+
+            <label for="addCardA">Antwort (Rückseite)</label>
+            <textarea id="addCardA" rows="3" placeholder="Die vollständige, gute Antwort"></textarea>
+
+            <p class="hint">Frage und Antwort sind Pflicht.</p>
+
+            <div class="row">
+              <button class="btn primary" id="btnSaveCard" type="submit">Karte speichern</button>
+              <button class="btn" id="btnCancelCard" type="button">Abbrechen</button>
+              <button class="btn" id="btnResetCard" type="button" hidden style="border-color:var(--incorrect);color:var(--incorrect)">↺ Original wiederherstellen</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ QUIZ ============ -->
+    <div class="panel" id="panel-quiz" role="tabpanel" aria-labelledby="tabbtn-quiz" hidden>
+      <section>
+        <h2><span class="n">?</span>Verständnisfragen</h2>
+        <p class="lead" id="quizIntro">15 Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.</p>
+        <div class="quiz-score">
+          <span>Ergebnis: <strong id="quizScore">0</strong> / 15 richtig</span>
+          <button class="btn" id="btnQuizReset" type="button">Zurücksetzen</button>
+        </div>
+        <div id="quizList"></div>
+      </section>
+    </div>
+
+    <!-- ============ TASKS ============ -->
+    <div class="panel" id="panel-tasks" role="tabpanel" aria-labelledby="tabbtn-tasks" hidden>
+      <section>
+        <h2><span class="n">▸</span>Übungsaufgaben</h2>
+        <p class="lead">Die erste Aufgabe ist die Original-Vorlesungsaufgabe, danach ergänzende Übungen im selben Schwierigkeitsgrad — zum echten Programmieren, nicht zum schnellen Abrufen. Erst selbst in Scala probieren, dann Tipp bzw. Lösungsidee zum Gegenchecken aufklappen.</p>
+        <div id="taskList"></div>
+        <p class="task-footnote">Die case-class-Aufgabe nutzt das @define-Makro, das auch in der Scala-Standardbibliothek (z. B. bei Set.concat) zum Einsatz kommt.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="credit">Lernset zu Prof. Dr. Boger / Prof. Dr. Laube, Programmiertechnik I — Vorlesung 12: Collections</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Tabs ----------
+  var tabBtns = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  var panels = {
+    cards: document.getElementById("panel-cards"),
+    quiz: document.getElementById("panel-quiz"),
+    tasks: document.getElementById("panel-tasks")
+  };
+  tabBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabBtns.forEach(function(b){ b.classList.remove("active"); b.setAttribute("aria-selected","false"); });
+      btn.classList.add("active"); btn.setAttribute("aria-selected","true");
+      Object.keys(panels).forEach(function(k){ panels[k].hidden = (k !== btn.dataset.tab); });
+    });
+  });
+
+  // ---------- Storage helpers ----------
+  function loadJSON(key, fallback){
+    try{ var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function saveJSON(key, val){
+    try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+  }
+
+  // ======================================================
+  // FLASHCARDS — Frage vorne, vollständige gute Antwort hinten.
+  // ======================================================
+  var CARDS = [
+    {cat:"Grundlagen", q:"Was unterscheidet Array von List?", a:"Array ist mutable und erlaubt wahlfreien Zugriff per Index; List ist immutable und optimiert für head::tail-Operationen."},
+    {cat:"Grundlagen", q:"Welche drei fundamentalen Collection-Typen gibt es?", a:"Seq, Set und Map."},
+    {cat:"Grundlagen", q:"Was unterscheidet eine Seq von einem Set?", a:"In einer Seq dürfen Elemente mehrfach vorkommen und haben eine feste Reihenfolge; in einem Set ist jedes Element höchstens einmal enthalten."},
+    {cat:"Grundlagen", q:"Linear vs. indexed Seq — je ein Beispiel?", a:"Linear: List (optimiert für head/tail). Indexed: Array, Vector oder Range (optimiert für Zugriff per Index)."},
+    {cat:"Grundlagen", q:"Was ist Vector im Vergleich zu Array?", a:"Die immutable Variante von Array — ebenfalls indexed."},
+    {cat:"Grundlagen", q:"Wofür wird Range typischerweise genutzt?", a:"Für for-Schleifen über einen Zahlenbereich."},
+    {cat:"Grundlagen", q:"Können Sets und Maps sortiert sein?", a:"Ja — es gibt SortedSet und SortedMap als sortierte Varianten, daneben unsortierte."},
+    {cat:"Hierarchie", q:"Was ist ein Trait?", a:"Eine Abstraktion wie eine Klasse, die nur gemeinsames Verhalten beschreibt und sich nicht direkt instanziieren lässt."},
+    {cat:"Hierarchie", q:"Welcher Trait ist die gemeinsame Basis aller Collections?", a:"Iterable."},
+    {cat:"Hierarchie", q:"Wer liefert die vollständige Implementierung — Traits oder Klassen?", a:"Klassen, zum Beispiel HashSet, List oder HashMap. Traits beschreiben nur das gemeinsame Verhalten."},
+    {cat:"Hierarchie", q:"Was ist die Default-Implementierung von Set bzw. Map?", a:"HashSet für Set, HashMap für Map."},
+    {cat:"Hierarchie", q:"Was ist die Default-Implementierung von Seq?", a:"List — Vector, Array, Range, LazyList und Queue sind weitere Seq-Typen für andere Anforderungen."},
+    {cat:"Hierarchie", q:"Nenne zwei Beispiele für spezialisierte Set-Implementierungen.", a:"SortedSet/TreeSet (sortiert) und BitSet (effizient für Mengen kleiner Integer)."},
+    {cat:"Hierarchie", q:"Nenne zwei Beispiele für spezialisierte Map-Implementierungen.", a:"SortedMap/TreeMap (sortiert) sowie ListMap bzw. VectorMap (behalten die Einfügereihenfolge)."},
+    {cat:"Funktionen", q:"Was ist eine Funktion höherer Ordnung?", a:"Eine Funktion, die mindestens eine andere Funktion als Parameter entgegennimmt (oder zurückgibt)."},
+    {cat:"Funktionen", q:"Was macht filterWith anders als filterOdds und filterEvens?", a:"Die Bedingung wird als Funktionsparameter übergeben statt fest im Code zu stehen — dadurch verschwindet die Code-Duplikation."},
+    {cat:"Funktionen", q:"Was liefert partition zurück?", a:"Ein Tupel aus zwei Collections: die Elemente, die die Bedingung erfüllen, und die, die sie nicht erfüllen."},
+    {cat:"Funktionen", q:"Unterschied zwischen reduce und fold?", a:"reduce hat keinen Startwert und nutzt das erste Element als Start; fold bekommt einen expliziten Startwert."},
+    {cat:"Funktionen", q:"Was ist der Unterschied zwischen foldLeft und foldRight?", a:"foldLeft arbeitet die Collection von links nach rechts ab, foldRight von rechts nach links — bei nicht assoziativen Operationen kann das Ergebnis unterschiedlich sein."},
+    {cat:"Funktionen", q:"Was macht map auf einer Collection?", a:"Ruft eine Funktion auf jedem Element auf und liefert eine neue Collection mit den Ergebnissen."},
+    {cat:"Funktionen", q:"Warum gilt map als die Mutter aller Funktionen höherer Ordnung?", a:"Weil sie das Grundmuster — eine Funktion auf jedes Element anwenden — für alle Collections bereitstellt und direkt in Iterable implementiert ist."},
+    {cat:"Funktionen", q:"Wie werden sum und product zu einer gemeinsamen Funktion fold?", a:"Startwert (0 bzw. 1) und Operation (+ bzw. *) werden als Parameter übergeben, statt fest codiert zu sein."},
+    {cat:"Sets", q:"Was passiert bei Set(1,2,3) + 3?", a:"Nichts — das Set bleibt unverändert, Duplikate werden ignoriert."},
+    {cat:"Sets", q:"Was bedeutet: ein Set ist auch eine Funktion A => Boolean?", a:"Man kann das Set wie eine Funktion aufrufen, z. B. a(5), um zu prüfen, ob 5 enthalten ist."},
+    {cat:"Sets", q:"Was liefern intersect, union und diff auf Sets?", a:"intersect: gemeinsame Elemente. union: alle Elemente aus beiden Sets. diff: Elemente, die nur im ersten Set vorkommen."},
+    {cat:"Sets", q:"Kann map ein Set verkleinern?", a:"Ja — wenn mehrere Elemente nach der Abbildung auf denselben Wert fallen, verschwinden die Duplikate im Ergebnis."},
+    {cat:"Sets", q:"Verändert a.union(b) das Set a selbst?", a:"Nein — alle Set-Operationen liefern ein neues Set zurück, a bleibt unverändert."},
+    {cat:"Sets", q:"Wie prüft man, ob ein Element in einem Set enthalten ist?", a:"Mit contains, z. B. a.contains(2)."},
+    {cat:"Maps", q:"Was steckt syntaktisch hinter key -> value in einer Map?", a:"Nur Zucker für das Tupel (key, value)."},
+    {cat:"Maps", q:"Was liefert capitals.get bei einem fehlenden Schlüssel, im Unterschied zu capitals(key)?", a:"get liefert sicher None zurück; der direkte Zugriff capitals(key) wirft dagegen eine NoSuchElementException."},
+    {cat:"Maps", q:"Welche Datenstruktur bilden die Schlüssel einer Map?", a:"Ein Set — die Schlüssel einer Map sind immer eindeutig."},
+    {cat:"Maps", q:"Was macht getOrElse?", a:"Liefert den Wert zum Schlüssel oder einen Default-Wert, falls der Schlüssel fehlt — ohne Exception."},
+    {cat:"Maps", q:"Was passiert bei stock + (apple -> 4), wenn apple schon existiert?", a:"Der bestehende Wert für apple wird durch 4 ersetzt, es entsteht kein doppelter Eintrag."},
+    {cat:"Maps", q:"Wie sehen filter und map auf einer Map aus?", a:"Sie arbeiten auf (key, value)-Paaren, zum Beispiel stock.filter((k, v) => v > 0)."},
+    {cat:"Maps", q:"Verändert sich eine reguläre (immutable) Map bei + oder - selbst?", a:"Nein — jede Operation liefert eine neue Map zurück. Für Änderungen an Ort und Stelle braucht man explizit eine mutable.Map."},
+    {cat:"Maps", q:"Was macht groupBy?", a:"Baut aus einer Collection eine Map, die Elemente nach einem Kriterium in Gruppen einteilt, zum Beispiel nach Länge."},
+    {cat:"ScalaDoc", q:"Wie beginnt und endet ein Dokumentationskommentar?", a:"Mit /** (zwei Sternchen) und endet mit */."},
+    {cat:"ScalaDoc", q:"Was ist die Summary Sentence?", a:"Der erste Satz eines Doc-Kommentars — er erscheint in Übersichtstabellen und muss für sich allein verständlich sein."},
+    {cat:"ScalaDoc", q:"Was sind Block Tags?", a:"Zeilen am Ende eines Doc-Kommentars, die jeweils mit @ beginnen, zum Beispiel @param, @return oder @throws."},
+    {cat:"ScalaDoc", q:"Für welche zwei Kommentar-Ziele ist @param gedacht?", a:"Für Methoden und für Konstruktoren — pro Parameter ein eigenes @param-Tag mit Namen und Beschreibung."},
+    {cat:"ScalaDoc", q:"Wird @return auch bei void- bzw. Unit-Methoden verwendet?", a:"Nein — @return beschreibt den Rückgabewert; bei Unit gibt es keinen, deshalb entfällt das Tag."},
+    {cat:"ScalaDoc", q:"Wofür steht {@code ...} in JavaDoc?", a:"Zeigt Text in Monospace-Schrift, ohne ihn als HTML zu interpretieren."},
+    {cat:"ScalaDoc", q:"Größter Markup-Unterschied zwischen JavaDoc und ScalaDoc (Scala 3)?", a:"JavaDoc nutzt HTML im Beschreibungstext, ScalaDoc standardmäßig Markdown."},
+    {cat:"ScalaDoc", q:"Wie verlinkt man in ScalaDoc auf ein anderes API-Element?", a:"Mit doppelten eckigen Klammern, zum Beispiel [[Circle]] oder [[scala.collection.immutable.List]]."},
+    {cat:"ScalaDoc", q:"Was macht @tparam, das @param nicht kann?", a:"Dokumentiert einen Typparameter, zum Beispiel T in einer generischen Klasse oder Methode."},
+    {cat:"ScalaDoc", q:"Was beschreibt das @constructor-Tag und wo steht es?", a:"Im Klassenkommentar; es beschreibt den primären Konstruktor zusammenhängend, ergänzend zu den über @param dokumentierten Parametern."},
+    {cat:"ScalaDoc", q:"Was macht das @define-Tag?", a:"Definiert ein Makro (@define name text); an jeder Stelle im selben File ersetzt $name diesen Text — nützlich für wiederkehrende Begriffe, wie auch in der Scala-Standardbibliothek (z. B. bei Set.concat)."},
+    {cat:"ScalaDoc", q:"Welcher Befehl erzeugt die ScalaDoc-HTML-Ausgabe über sbt?", a:"sbt doc — alternativ generiert scala-cli doc Datei.scala -o docs dieselbe HTML-API-Dokumentation für ein einzelnes Scala-File."},
+    {cat:"ScalaDoc", q:"Welche scaladoc-Option zeigt @group-Tags in der generierten Doku an?", a:"-groups — ohne diese Option werden Mitglieder zwar dokumentiert, aber nicht nach den mit @group zugewiesenen Gruppen sortiert dargestellt."},
+    {cat:"ScalaDoc", q:"Unterschied zwischen @throws als Doc-Tag und @throws[...] als Annotation?", a:"Die Annotation wird vom Compiler und von Java-Aufrufern gesehen; der reine Doc-Tag landet nur in der generierten Dokumentation."}
+  ].map(function(c, i){ c.id = i; return c; });
+
+  var BASE_CATS = ["Grundlagen","Hierarchie","Funktionen","Sets","Maps","ScalaDoc"];
+  var STORE_KEY = "prog1-collections";
+  var knownIds = new Set(loadJSON(STORE_KEY + "-known", []));
+  var removedIds = new Set(loadJSON(STORE_KEY + "-removed", []));
+  var customCards = loadJSON(STORE_KEY + "-custom", []);
+  var overrides = loadJSON(STORE_KEY + "-overrides", {});
+  var ALL = [];
+  function refreshAll(){
+    customCards.forEach(function(c, i){ c.id = CARDS.length + i; });
+    ALL = CARDS.concat(customCards).map(function(c){
+      var o = overrides[c.id];
+      if(!o) return c;
+      return {id:c.id, cat:o.cat, q:o.q, a:o.a, expl:(o.expl !== undefined ? o.expl : c.expl)};
+    });
+  }
+  refreshAll();
+
+  function activeTotal(){ return ALL.length - removedIds.size; }
+  var activeCat = "Alle";
+  var onlyUnsure = false;
+  var order = [];
+  var pos = 0;
+  var flipped = false;
+
+  var catFiltersEl = document.getElementById("catFilters");
+  function currentCats(){
+    var extra = [];
+    ALL.forEach(function(c){ if(BASE_CATS.indexOf(c.cat) === -1 && extra.indexOf(c.cat) === -1) extra.push(c.cat); });
+    return ["Alle"].concat(BASE_CATS, extra);
+  }
+  function renderCatFilters(){
+    catFiltersEl.innerHTML = "";
+    currentCats().forEach(function(cat){
+      var b = document.createElement("button");
+      b.className = "chip" + (cat === activeCat ? " active" : "");
+      b.type = "button"; b.textContent = cat; b.dataset.cat = cat;
+      b.addEventListener("click", function(){
+        activeCat = cat;
+        Array.prototype.forEach.call(catFiltersEl.children, function(c){ c.classList.toggle("active", c.dataset.cat === cat); });
+        rebuildOrder();
+      });
+      catFiltersEl.appendChild(b);
+    });
+  }
+  renderCatFilters();
+  document.getElementById("onlyUnsure").addEventListener("change", function(e){
+    onlyUnsure = e.target.checked; rebuildOrder();
+  });
+
+  function shuffle(arr){
+    for(var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function rebuildOrder(){
+    var pool = ALL.filter(function(c){
+      if(removedIds.has(c.id)) return false;
+      if(activeCat !== "Alle" && c.cat !== activeCat) return false;
+      if(onlyUnsure && knownIds.has(c.id)) return false;
+      return true;
+    });
+    order = pool.map(function(c){ return c.id; });
+    pos = 0; flipped = false;
+    renderCard();
+  }
+
+  var flashcardEl = document.getElementById("flashcard");
+  var flashCat = document.getElementById("flashCat");
+  var flashFront = document.getElementById("flashFront");
+  var flashBack = document.getElementById("flashBack");
+  var flashHint = document.getElementById("flashHint");
+  var flashMeta = document.getElementById("flashMeta");
+  var flashExplainRow = document.getElementById("flashExplainRow");
+  var flashExplain = document.getElementById("flashExplain");
+  var btnExplain = document.getElementById("btnExplain");
+
+  function cardAt(id){
+    for(var i = 0; i < ALL.length; i++){ if(ALL[i].id === id) return ALL[i]; }
+    return null;
+  }
+
+  function resetExplain(){
+    flashExplain.hidden = true;
+    btnExplain.textContent = "🔎 Mehr erklären";
+  }
+
+  function renderCard(){
+    resetExplain();
+    if(order.length === 0){
+      flashCat.textContent = "";
+      flashFront.textContent = onlyUnsure ? "Alles in dieser Kategorie sitzt schon. 🎉" : "Keine Karten in dieser Auswahl.";
+      flashBack.hidden = true; flashFront.hidden = false;
+      flashExplainRow.hidden = true;
+      flashHint.textContent = "";
+      flashMeta.textContent = "Gewusst: " + knownIds.size + " / " + activeTotal();
+      return;
+    }
+    var card = cardAt(order[pos]);
+    flashCat.textContent = card.cat;
+    flashFront.textContent = card.q;
+    flashBack.textContent = card.a;
+    flashFront.hidden = flipped;
+    flashBack.hidden = !flipped;
+    flashExplainRow.hidden = !(flipped && card.expl);
+    flashHint.textContent = flipped ? "Antippen für die Frage" : "Antippen zum Umdrehen";
+    flashMeta.textContent = "Karte " + (pos+1) + " / " + order.length + " · Gewusst gesamt: " + knownIds.size + " / " + activeTotal();
+  }
+
+  btnExplain.addEventListener("click", function(){
+    var card = order.length ? cardAt(order[pos]) : null;
+    if(!card) return;
+    flashExplain.textContent = card.expl || "";
+    flashExplain.hidden = !flashExplain.hidden;
+    btnExplain.textContent = flashExplain.hidden ? "🔎 Mehr erklären" : "🔽 Erklärung ausblenden";
+  });
+
+  flashcardEl.addEventListener("click", function(){
+    if(order.length === 0) return;
+    flipped = !flipped; renderCard();
+  });
+  flashcardEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flashcardEl.click(); }
+  });
+
+  function advance(delta){
+    if(order.length === 0) return;
+    pos = (pos + delta + order.length) % order.length;
+    flipped = false; renderCard();
+  }
+  document.getElementById("btnPrev").addEventListener("click", function(){ advance(-1); });
+  document.getElementById("btnNext").addEventListener("click", function(){ advance(1); });
+  document.getElementById("btnShuffle").addEventListener("click", function(){ shuffle(order); pos = 0; flipped = false; renderCard(); });
+  document.getElementById("btnKnown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.add(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    if(onlyUnsure){ rebuildOrder(); } else { advance(1); }
+    maybeShowCheck();
+  });
+  document.getElementById("btnUnknown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.delete(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    advance(1);
+    maybeShowCheck();
+  });
+
+  function updateRestoreBtn(){
+    var btn = document.getElementById("btnRestoreRemoved");
+    var countEl = document.getElementById("removedCount");
+    if(countEl) countEl.textContent = removedIds.size;
+    btn.hidden = removedIds.size === 0;
+  }
+  document.getElementById("btnDeleteCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    if(!confirm("Diese Karte wirklich dauerhaft aus dem Lernset entfernen?\n\n„" + card.q + "“")) return;
+    removedIds.add(card.id);
+    knownIds.delete(card.id);
+    saveJSON(STORE_KEY + "-removed", Array.from(removedIds));
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  document.getElementById("btnRestoreRemoved").addEventListener("click", function(){
+    if(removedIds.size === 0) return;
+    if(!confirm("Alle " + removedIds.size + " entfernten Karten wiederherstellen?")) return;
+    removedIds.clear();
+    saveJSON(STORE_KEY + "-removed", []);
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  updateRestoreBtn();
+
+  // ---------- Add / edit own card ----------
+  var addCardForm = document.getElementById("addCardForm");
+  var addCardCat = document.getElementById("addCardCat");
+  var addCardCatNew = document.getElementById("addCardCatNew");
+  var addCardFormTitle = document.getElementById("addCardFormTitle");
+  var addCardFormLead = document.getElementById("addCardFormLead");
+  var btnSaveCard = document.getElementById("btnSaveCard");
+  var btnResetCard = document.getElementById("btnResetCard");
+  var NEW_CAT_VALUE = "__new__";
+  var editingId = null;
+
+  function populateAddCardCats(){
+    addCardCat.innerHTML = "";
+    BASE_CATS.concat(currentCats().filter(function(c){ return c !== "Alle" && BASE_CATS.indexOf(c) === -1; })).forEach(function(cat){
+      var o = document.createElement("option"); o.value = cat; o.textContent = cat;
+      addCardCat.appendChild(o);
+    });
+    var o2 = document.createElement("option"); o2.value = NEW_CAT_VALUE; o2.textContent = "Neue Kategorie…";
+    addCardCat.appendChild(o2);
+  }
+  addCardCat.addEventListener("change", function(){
+    addCardCatNew.hidden = addCardCat.value !== NEW_CAT_VALUE;
+  });
+
+  function closeAddCardForm(){
+    addCardForm.reset(); addCardCatNew.hidden = true; addCardForm.hidden = true;
+    editingId = null;
+  }
+
+  document.getElementById("btnAddCard").addEventListener("click", function(){
+    if(!addCardForm.hidden && editingId === null){ closeAddCardForm(); return; }
+    editingId = null;
+    populateAddCardCats();
+    document.getElementById("addCardQ").value = "";
+    document.getElementById("addCardA").value = "";
+    addCardFormTitle.textContent = "Eigene Karteikarte hinzufügen";
+    addCardFormLead.textContent = "Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.";
+    btnSaveCard.textContent = "Karte speichern";
+    btnResetCard.hidden = true;
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnEditCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    editingId = card.id;
+    populateAddCardCats();
+    addCardCat.value = card.cat;
+    addCardCatNew.hidden = true;
+    document.getElementById("addCardQ").value = card.q;
+    document.getElementById("addCardA").value = card.a;
+    addCardFormTitle.textContent = "Karte bearbeiten";
+    addCardFormLead.textContent = "Änderungen werden dauerhaft in diesem Lernset gespeichert (im Browser).";
+    btnSaveCard.textContent = "Änderungen speichern";
+    btnResetCard.hidden = !overrides[card.id];
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnCancelCard").addEventListener("click", closeAddCardForm);
+
+  btnResetCard.addEventListener("click", function(){
+    if(editingId === null) return;
+    if(!confirm("Diese Karte wirklich auf die ursprüngliche Version zurücksetzen?")) return;
+    delete overrides[editingId];
+    saveJSON(STORE_KEY + "-overrides", overrides);
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  addCardForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var q = document.getElementById("addCardQ").value.trim();
+    var a = document.getElementById("addCardA").value.trim();
+    var cat = addCardCat.value === NEW_CAT_VALUE ? addCardCatNew.value.trim() : addCardCat.value;
+    if(!q || !a || !cat){ alert("Bitte Kategorie, Frage und Antwort ausfüllen."); return; }
+    if(editingId !== null){
+      overrides[editingId] = {cat:cat, q:q, a:a};
+      saveJSON(STORE_KEY + "-overrides", overrides);
+    } else {
+      customCards.push({cat:cat, q:q, a:a, expl:""});
+      saveJSON(STORE_KEY + "-custom", customCards);
+    }
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  rebuildOrder();
+
+  // ======================================================
+  // VERSTÄNDNIS-CHECK — alle 6-8 Karten ein kurzer, geprüfter
+  // Ja/Nein- oder Kurztext-Check zu einem Thema, das gerade geübt wurde.
+  // ======================================================
+  var ABFRAGE = [
+    {type:"bool", q:"Ja oder Nein: Array ist immutable.", correct:false,
+     explain:"Falsch — Array ist mutable und erlaubt wahlfreien Zugriff per Index; List ist immutable."},
+    {type:"text", q:"Was ist die Default-Implementierung von Seq? (ein Wort)", answer:"List",
+     explain:"List ist die Standardimplementierung von Seq — optimiert für head/tail-Operationen."},
+    {type:"bool", q:"Ja oder Nein: in einem Set darf ein Element mehrfach vorkommen.", correct:false,
+     explain:"Falsch — jedes Element ist in einem Set höchstens einmal enthalten."},
+    {type:"text", q:"Welche Methode prüft, ob ein Element in einem Set enthalten ist? (ein Wort)", answer:"contains",
+     explain:"a.contains(2) — äquivalent dazu ist der Funktionsaufruf a(2)."},
+    {type:"bool", q:"Ja oder Nein: reduce braucht einen expliziten Startwert.", correct:false,
+     explain:"Falsch — reduce nutzt das erste Element der Collection als Start; fold braucht einen expliziten Startwert."},
+    {type:"text", q:"intersect, union, diff — welche liefert nur die gemeinsamen Elemente? (ein Wort)", answer:"intersect",
+     explain:"intersect liefert die Schnittmenge, union alle Elemente beider Sets, diff die Elemente nur im ersten Set."},
+    {type:"bool", q:"Ja oder Nein: capitals.get(\"FR\") wirft bei fehlendem Schlüssel eine Exception.", correct:false,
+     explain:"Falsch — get liefert sicher None zurück. Nur der direkte Zugriff capitals(\"FR\") würde eine Exception werfen."},
+    {type:"text", q:"Welche Datenstruktur bilden die Schlüssel einer Map? (ein Wort)", answer:"Set", accept:["set"],
+     explain:"Schlüssel einer Map sind immer eindeutig — sie bilden strukturell ein Set."},
+    {type:"bool", q:"Ja oder Nein: reguläre (immutable) Maps verändern sich bei + oder - selbst.", correct:false,
+     explain:"Falsch — jede Operation liefert eine neue Map zurück. Für Änderungen an Ort und Stelle braucht man mutable.Map."},
+    {type:"text", q:"Wie beginnt ein ScalaDoc/JavaDoc-Kommentar? (die Zeichenfolge)", answer:"/**",
+     explain:"Ein Dokumentationskommentar beginnt mit zwei Sternchen /** und endet mit */."},
+    {type:"bool", q:"Ja oder Nein: @return wird auch bei void- bzw. Unit-Methoden verwendet.", correct:false,
+     explain:"Falsch — bei Unit gibt es keinen Rückgabewert, deshalb entfällt das @return-Tag dort."},
+    {type:"text", q:"Welcher sbt-Befehl erzeugt die ScalaDoc-HTML-Ausgabe? (zwei Wörter)", answer:"sbt doc",
+     explain:"sbt doc generiert die HTML-API-Dokumentation; scala-cli doc ist die Alternative für ein einzelnes Scala-File."},
+    {type:"text", q:"Welche scaladoc-Option zeigt @group-Tags in der generierten Doku an? (das Flag)", answer:"-groups",
+     explain:"Ohne -groups werden Mitglieder zwar dokumentiert, aber nicht nach den mit @group zugewiesenen Gruppen sortiert dargestellt."},
+    {type:"bool", q:"Ja oder Nein: @throws existiert in Scala sowohl als Doc-Tag als auch als Annotation.", correct:true,
+     explain:"Richtig — die Annotation @throws[...] wird zusätzlich vom Compiler bzw. von Java-Aufrufern gesehen, der reine Doc-Tag nur in der Dokumentation."},
+    {type:"text", q:"Was liefert partition zurück? (ein Begriff)", answer:"Tupel", accept:["ein tupel","tuple"],
+     explain:"Ein Tupel aus zwei Collections: die Elemente, die die Bedingung erfüllen, und die, die sie nicht erfüllen."},
+    {type:"bool", q:"Ja oder Nein: ein Set lässt sich wie eine Funktion A => Boolean aufrufen.", correct:true,
+     explain:"Richtig — a(5) ist äquivalent zu a.contains(5)."}
+  ];
+
+  var checkCardEl = document.getElementById("checkCard");
+  var checkQEl = document.getElementById("checkQ");
+  var checkBoolEl = document.getElementById("checkBool");
+  var checkTextWrapEl = document.getElementById("checkTextWrap");
+  var checkInputEl = document.getElementById("checkInput");
+  var checkFeedbackEl = document.getElementById("checkFeedback");
+  var checkControlsEl = document.getElementById("checkControls");
+  var checkYesEl = document.getElementById("checkYes");
+  var checkNoEl = document.getElementById("checkNo");
+  var checkSubmitEl = document.getElementById("checkSubmit");
+  var flashControlsMain = document.getElementById("flashControlsMain");
+  var flashControlsShuffle = document.getElementById("flashControlsShuffle");
+  var flashControlsManage = document.getElementById("flashControlsManage");
+  var abfrageBag = [];
+  var currentCheckItem = null;
+
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  var cardsUntilCheck = randInt(6, 8);
+
+  function drawAbfrage(){
+    if(ABFRAGE.length === 0) return null;
+    if(abfrageBag.length === 0){ abfrageBag = shuffle(ABFRAGE.map(function(_, i){ return i; })); }
+    return ABFRAGE[abfrageBag.pop()];
+  }
+  function normalize(s){ return (s || "").toString().trim().toLowerCase().replace(/\s+/g, " "); }
+
+  function maybeShowCheck(){
+    cardsUntilCheck--;
+    if(cardsUntilCheck > 0) return;
+    cardsUntilCheck = randInt(6, 8);
+    var item = drawAbfrage();
+    if(!item) return;
+    currentCheckItem = item;
+    checkQEl.textContent = item.q;
+    checkBoolEl.hidden = item.type !== "bool";
+    checkTextWrapEl.hidden = item.type !== "text";
+    checkInputEl.value = "";
+    checkYesEl.disabled = checkNoEl.disabled = false;
+    checkSubmitEl.disabled = false;
+    checkFeedbackEl.hidden = true;
+    checkFeedbackEl.className = "check-feedback";
+    checkControlsEl.hidden = true;
+
+    flashcardEl.hidden = true;
+    flashControlsMain.hidden = true;
+    flashControlsShuffle.hidden = true;
+    flashControlsManage.hidden = true;
+    flashExplainRow.hidden = true;
+    flashExplain.hidden = true;
+    checkCardEl.hidden = false;
+  }
+
+  function finishCheck(isCorrect){
+    checkFeedbackEl.textContent = (isCorrect ? "✓ Richtig. " : "✗ Nicht ganz. ") + (currentCheckItem.explain || "");
+    checkFeedbackEl.className = "check-feedback " + (isCorrect ? "correct" : "wrong");
+    checkFeedbackEl.hidden = false;
+    checkYesEl.disabled = checkNoEl.disabled = true;
+    checkSubmitEl.disabled = true;
+    checkControlsEl.hidden = false;
+  }
+  checkYesEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === true); });
+  checkNoEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === false); });
+  checkSubmitEl.addEventListener("click", function(){
+    var val = normalize(checkInputEl.value);
+    var candidates = [currentCheckItem.answer].concat(currentCheckItem.accept || []).map(normalize);
+    finishCheck(candidates.indexOf(val) !== -1);
+  });
+  checkInputEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); checkSubmitEl.click(); }
+  });
+  document.getElementById("btnCheckDone").addEventListener("click", function(){
+    checkCardEl.hidden = true;
+    flashcardEl.hidden = false;
+    flashControlsMain.hidden = false;
+    flashControlsShuffle.hidden = false;
+    flashControlsManage.hidden = false;
+    renderCard();
+  });
+
+  // ======================================================
+  // QUIZ
+  // ======================================================
+  var QUIZ = [
+    {q:"Welche drei fundamentalen Collection-Typen beschreibt die Vorlesung?",
+     opts:["Seq, Set, Map","List, Array, Vector","Iterable, Traversable, Collection","Mutable, Immutable, Lazy"],
+     correct:0, explain:"Seq, Set und Map sind die drei fundamentalen Typen; List/Array/Vector sind konkrete Seq-Implementierungen."},
+    {q:"Welche Aussage zu Traits ist richtig?",
+     opts:["Traits können direkt instanziiert werden","Traits beschreiben nur gemeinsames Verhalten und lassen sich nicht direkt instanziieren","Ein Trait ist dasselbe wie eine case class","Traits existieren nur für Map"],
+     correct:1, explain:"Die vollständige Implementierung liefern Klassen; Traits beschreiben nur das gemeinsame Verhalten."},
+    {q:"Was haben alle Collections gemeinsam, weil sie Iterable implementieren?",
+     opts:["z. B. foreach, map, filter, fold","nur toString","eine feste Größe","nichts, Iterable ist leer"],
+     correct:0, explain:"Iterable stellt foreach, map, filter, fold/reduce, partition und mehr für alle Collections bereit."},
+    {q:"filterWith(List(5, 2, 3, 5, 3), _ % 2 == 0) liefert welches Ergebnis?",
+     opts:["List(2) — 1 Element","List(5, 3, 5, 3) — 4 Elemente","List() — 0 Elemente","Ein Compile-Fehler"],
+     correct:0, explain:"Nur die gerade Zahl 2 erfüllt die Bedingung _ % 2 == 0."},
+    {q:"Was liefert partition im Gegensatz zu filter?",
+     opts:["Nur die Elemente, die die Bedingung erfüllen","Ein Tupel aus zwei Listen: erfüllt und nicht erfüllt","Eine sortierte Liste","Die Anzahl der passenden Elemente"],
+     correct:1, explain:"partition gibt beide Teillisten als Tupel zurück, filter nur die passenden Elemente."},
+    {q:"Unterschied zwischen reduce und fold?",
+     opts:["reduce braucht einen Startwert, fold nicht","fold braucht einen Startwert, reduce nicht","Beide sind komplett identisch","reduce funktioniert nur auf Maps"],
+     correct:1, explain:"fold bekommt einen expliziten Startwert als Parameter; reduce nutzt das erste Element als Start."},
+    {q:"List(5, 2, 3, 5, 3).filter(_ % 2 != 0) — welches Ergebnis?",
+     opts:["List(5, 3, 5, 3)","List(2)","List(5, 2, 3, 5, 3)","List()"],
+     correct:0, explain:"Alle ungeraden Zahlen (5, 3, 5, 3) erfüllen _ % 2 != 0, in ihrer ursprünglichen Reihenfolge."},
+    {q:"Was passiert bei Set(1, 2, 3) + 3?",
+     opts:["Fehler, 3 ist schon enthalten","Set(1, 2, 3) bleibt unverändert, da 3 bereits enthalten ist","Set(1, 2, 3, 3) mit Duplikat","Das Set wird zu einer List"],
+     correct:1, explain:"Sets ignorieren Duplikate — das Hinzufügen eines bereits enthaltenen Elements ändert nichts."},
+    {q:"Was bedeutet es, dass ein Set auch eine Funktion A => Boolean ist?",
+     opts:["Man kann z. B. a(5) schreiben, um zu prüfen, ob 5 enthalten ist","Ein Set kann nie leer sein","Sets können nur Booleans enthalten","Man kann contains nicht mehr nutzen"],
+     correct:0, explain:"Ein Set lässt sich wie eine Funktion aufrufen; a(5) ist äquivalent zu a.contains(5)."},
+    {q:"capitals(\"FR\") bei fehlendem Schlüssel — was passiert?",
+     opts:["Gibt None zurück","Gibt null zurück","Wirft NoSuchElementException","Gibt automatisch einen leeren String zurück"],
+     correct:2, explain:"Der direkte Zugriff capitals(key) wirft bei fehlendem Schlüssel eine Exception; nur get ist sicher."},
+    {q:"Welche Datenstruktur bilden die Schlüssel einer Map?",
+     opts:["Eine List (mit Duplikaten möglich)","Ein Set (eindeutig)","Ein Array","Eine Range"],
+     correct:1, explain:"Schlüssel einer Map sind immer eindeutig — sie bilden ein Set."},
+    {q:"Wie beginnt ein Dokumentationskommentar in Java bzw. Scala?",
+     opts:["Mit //","Mit /* (ein Stern)","Mit /** (zwei Sterne)","Mit ###"],
+     correct:2, explain:"Ein Dokumentationskommentar beginnt mit zwei Sternchen /** und endet mit */."},
+    {q:"Größter Markup-Unterschied zwischen JavaDoc und ScalaDoc (Scala 3)?",
+     opts:["ScalaDoc erlaubt keine Tags","ScalaDoc nutzt Markdown statt HTML im Beschreibungstext","JavaDoc hat keine @param-Tags","ScalaDoc kann keine Codebeispiele zeigen"],
+     correct:1, explain:"JavaDoc-Beschreibungen nutzen HTML, ScalaDoc (Scala 3) standardmäßig Markdown."},
+    {q:"Wie verlinkt man in ScalaDoc auf eine andere Klasse, z. B. Circle?",
+     opts:["{@link Circle}","<a href=Circle>","[[Circle]]","#Circle"],
+     correct:2, explain:"ScalaDoc nutzt doppelte eckige Klammern für Links zu API-Elementen: [[Circle]]."},
+    {q:"Was liefert List(\"a\", \"bb\", \"cc\").groupBy(_.length)?",
+     opts:["Map(1 -> List(a), 2 -> List(bb, cc))","List(1, 2, 2)","Set(1, 2)","Map(a -> 1, bb -> 2, cc -> 2)"],
+     correct:0, explain:"groupBy gruppiert die Elemente nach ihrer Länge in eine Map von Länge auf Liste der Wörter."}
+  ];
+
+  var quizListEl = document.getElementById("quizList");
+  var quizScoreEl = document.getElementById("quizScore");
+  document.getElementById("quizIntro").textContent = QUIZ.length + " Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.";
+  var score = 0;
+
+  function renderQuiz(){
+    quizListEl.innerHTML = "";
+    score = 0; quizScoreEl.textContent = "0";
+    QUIZ.forEach(function(item, qi){
+      var wrap = document.createElement("div");
+      wrap.className = "q-item card";
+      var qText = document.createElement("p");
+      qText.className = "q-text";
+      qText.textContent = (qi+1) + ". " + item.q;
+      wrap.appendChild(qText);
+
+      var optsWrap = document.createElement("div");
+      optsWrap.className = "q-opts";
+      var explainEl = document.createElement("div");
+      explainEl.className = "q-explain";
+      explainEl.textContent = item.explain;
+
+      item.opts.forEach(function(optText, oi){
+        var b = document.createElement("button");
+        b.className = "opt"; b.type = "button"; b.textContent = optText;
+        b.addEventListener("click", function(){
+          if(wrap.dataset.answered) return;
+          wrap.dataset.answered = "1";
+          Array.prototype.forEach.call(optsWrap.children, function(o, idx){
+            o.disabled = true;
+            if(idx === item.correct) o.classList.add("correct");
+            else if(idx === oi) o.classList.add("incorrect");
+          });
+          explainEl.classList.add("shown");
+          if(oi === item.correct){ score++; quizScoreEl.textContent = String(score); }
+        });
+        optsWrap.appendChild(b);
+      });
+
+      wrap.appendChild(optsWrap);
+      wrap.appendChild(explainEl);
+      quizListEl.appendChild(wrap);
+    });
+  }
+  document.getElementById("btnQuizReset").addEventListener("click", renderQuiz);
+  renderQuiz();
+
+  // ======================================================
+  // TASKS (Vorlesungsaufgabe + ergänzende Übungen, inkl. der früher bei den
+  // Karteikarten eingestreuten Zwischenübungen — gehören inhaltlich hierher)
+  // ======================================================
+  var TASKS = [
+    {t:"CourseRegistry — die Original-Vorlesungsaufgabe",
+     d:"Schreibe eine Klasse CourseRegistry(enrollments: Map[Course, Set[Student]]) mit mindestens drei Methoden, die Collection-Methoden aus dieser Vorlesung nutzen: enroll(student, course), studentsIn(course) und inBoth(c1, c2). Dokumentiere Klasse und jede Methode vollständig mit ScalaDoc (Summary-Satz, @param, @return, ein @example) und generiere die Dokumentation mit mill __.docJar.",
+     tip:"Map ist immutable — enroll muss eine neue Registry zurückgeben, nicht die bestehende verändern. studentsIn nutzt getOrElse mit Set.empty als Default für unbekannte Kurse. inBoth nutzt intersect auf den beiden Student-Sets.",
+     sol:"case class Course(name: String)\ncase class Student(name: String)\n\n/** Verwaltet, welche Studierenden in welchen Kursen eingeschrieben sind. */\ncase class CourseRegistry(enrollments: Map[Course, Set[Student]]):\n\n  /** Schreibt einen Studierenden in einen Kurs ein.\n    * @param student der Studierende\n    * @param course der Kurs\n    * @return eine neue Registry mit dem Studierenden hinzugefügt\n    * @example registry.enroll(Student(\"Anakin\"), Course(\"Scala\"))\n    */\n  def enroll(student: Student, course: Course): CourseRegistry =\n    val current = enrollments.getOrElse(course, Set.empty[Student])\n    CourseRegistry(enrollments + (course -&gt; (current + student)))\n\n  /** Alle Studierenden eines Kurses.\n    * @param course der Kurs\n    * @return die Menge der eingeschriebenen Studierenden (leer, falls unbekannt)\n    */\n  def studentsIn(course: Course): Set[Student] =\n    enrollments.getOrElse(course, Set.empty[Student])\n\n  /** Studierende, die in beiden Kursen eingeschrieben sind.\n    * @param c1 der erste Kurs\n    * @param c2 der zweite Kurs\n    * @return der Schnitt beider Studierenden-Mengen\n    */\n  def inBoth(c1: Course, c2: Course): Set[Student] =\n    studentsIn(c1) intersect studentsIn(c2)"},
+    {t:"sumEven, productOdd — filter plus foldLeft",
+     d:"Schreibe sumEven(xs: List[Int]) (Summe der geraden Zahlen) und productOdd(xs: List[Int]) (Produkt der ungeraden Zahlen) jeweils als Kombination aus filter und foldLeft, ohne eigene match-Rekursion zu schreiben.",
+     tip:"Erst mit filter die passenden Zahlen auswählen (gerade bzw. ungerade), danach mit foldLeft zusammenfassen — Startwert und Operation sind wie bei sum/product aus der Vorlesung: 0 und plus für die Summe, 1 und mal für das Produkt.",
+     sol:"def sumEven(xs: List[Int]): Int =\n  xs.filter(_ % 2 == 0).foldLeft(0)(_ + _)\n\ndef productOdd(xs: List[Int]): Int =\n  xs.filter(_ % 2 != 0).foldLeft(1)(_ * _)"},
+    {t:"splitByLength — partition auf Strings",
+     d:"Teile eine List[String] mit partition in zwei Listen: Wörter mit mehr als fünf Zeichen und den Rest.",
+     tip:"people.partition(_.age &lt; 18) aus der Vorlesung ist das Vorbild — hier reicht als Bedingung _.length &gt; 5.",
+     sol:"def splitByLength(words: List[String]): (List[String], List[String]) =\n  words.partition(_.length &gt; 5)"},
+    {t:"wordFrequency — groupBy für eine Wortzählung",
+     d:"Zähle für eine List[String] (z. B. einen in Wörter gesplitteten Satz), wie oft jedes Wort vorkommt. Ergebnis: Map[String, Int].",
+     tip:"Erst groupBy(identity) liefert eine Map von Wort auf die Liste seiner Vorkommen; anschließend wird jede dieser Listen in ihre Länge umgewandelt, um die Zähl-Map zu erhalten.",
+     sol:"def wordFrequency(words: List[String]): Map[String, Int] =\n  words.groupBy(identity).map((k, v) =&gt; k -&gt; v.length)"},
+    {t:"invertMap — eine Map umdrehen",
+     d:"Schreibe invert(m: Map[String, Int]): Map[Int, String], die Schlüssel und Werte vertauscht. Kommt ein Wert mehrfach vor, darf irgendeiner der zugehörigen Schlüssel gewinnen.",
+     tip:"Für jedes (Schlüssel, Wert)-Paar einfach Wert und Schlüssel vertauscht zurückgeben — map arbeitet dabei auf dem ganzen Paar, nicht nur auf dem Wert.",
+     sol:"def invert(m: Map[String, Int]): Map[Int, String] =\n  m.map((k, v) =&gt; v -&gt; k)"},
+    {t:"Eine dokumentierte case class Rect",
+     d:"Schreibe case class Rect(width: Double, height: Double) mit Methode area, und dokumentiere Klasse und Methode vollständig im ScalaDoc-Stil, inklusive @param für die beiden Konstruktorparameter und @return für area.",
+     tip:"Die Konstruktorparameter werden im Klassenkommentar mit @param dokumentiert, nicht im Kommentar von area — area selbst bekommt nur @return.",
+     sol:"/** An axis-parallel rectangle.\n  *\n  * @param width the width\n  * @param height the height\n  */\ncase class Rect(width: Double, height: Double):\n  /** The area of this rectangle.\n    * @return width times height\n    */\n  def area: Double = width * height"},
+    {t:"Ein eigenes ScalaDoc-Makro mit @define",
+     d:"Schreibe ein object StringUtils mit einem @define-Makro für einen wiederkehrenden Begriff (z. B. den Eingabe-String) und nutze das Makro in zwei Methodenkommentaren.",
+     tip:"@define input der Eingabe-String in der Objekt-Doku definieren, danach in jedem Methodenkommentar als $input einsetzen.",
+     sol:"/** Hilfsfunktionen für Strings.\n  *\n  * @define input der Eingabe-String\n  */\nobject StringUtils:\n\n  /** Liefert $input in Großbuchstaben.\n    * @param s $input\n    * @return s in Großbuchstaben\n    */\n  def shout(s: String): String = s.toUpperCase\n\n  /** Liefert $input umgekehrt.\n    * @param s $input\n    * @return s mit vertauschter Zeichenreihenfolge\n    */\n  def reverse(s: String): String = s.reverse"},
+    {t:"onlyLongWords(xs: List[String], n: Int): List[String]",
+     d:"Gib alle Wörter zurück, die länger als n Zeichen sind — als Funktion mit n als Parameter, nicht fest codiert.",
+     tip:"Genau das Muster von filterWith: die Bedingung (hier die Längen-Schranke n) wird zum Parameter, nicht zu einer Konstante im Code.",
+     sol:"def onlyLongWords(xs: List[String], n: Int): List[String] =\n  xs.filter(_.length &gt; n)"},
+    {t:"minMax(xs: List[Int]): (Int, Int) — nur mit reduce",
+     d:"Berechne Minimum und Maximum einer nicht-leeren Liste als Tupel, jeweils mit reduce (kein eigenes match, kein fold mit Startwert).",
+     tip:"xs.reduce(_ min _) liefert das Minimum, xs.reduce(_ max _) das Maximum — reduce braucht keinen Startwert, weil die Liste garantiert nicht leer ist.",
+     sol:"def minMax(xs: List[Int]): (Int, Int) =\n  (xs.reduce(_ min _), xs.reduce(_ max _))"},
+    {t:"concatAll(xss: List[Set[Int]]): Set[Int]",
+     d:"Vereinige eine Liste von Sets zu einem einzigen Set, mit foldLeft und union (kein eigenes match).",
+     tip:"Startwert ist das leere Set, Set.empty[Int]; jeder Schritt vereinigt den Akkumulator mit dem nächsten Set aus der Liste — genau das Muster von sum/fold aus der Vorlesung, nur mit union statt +.",
+     sol:"def concatAll(xss: List[Set[Int]]): Set[Int] =\n  xss.foldLeft(Set.empty[Int])(_ union _)"},
+    {t:"commonKeys(a: Map[String, Int], b: Map[String, Int]): Set[String]",
+     d:"Finde alle Schlüssel, die in beiden Maps vorkommen.",
+     tip:"Die Schlüssel einer Map bilden ein Set — a.keySet und b.keySet lassen sich also direkt mit intersect verschneiden.",
+     sol:"def commonKeys(a: Map[String, Int], b: Map[String, Int]): Set[String] =\n  a.keySet intersect b.keySet"},
+    {t:"bumpPrices(stock: Map[String, Double], pct: Double): Map[String, Double]",
+     d:"Erhöhe jeden Preis in einer Map um einen Prozentsatz pct (z. B. 0.1 für 10%), ohne die ursprüngliche Map zu verändern.",
+     tip:"stock.map arbeitet auf (key, value)-Paaren — der Schlüssel bleibt gleich, nur der Wert wird mit (1 + pct) multipliziert.",
+     sol:"def bumpPrices(stock: Map[String, Double], pct: Double): Map[String, Double] =\n  stock.map((k, v) =&gt; k -&gt; v * (1 + pct))"},
+    {t:"Nur der Doc-Kommentar: withdraw(amount: Long): Long",
+     d:"Schreibe ausschließlich den ScalaDoc-Kommentar (keine Implementierung) für eine Methode withdraw(amount: Long): Long, die bei zu niedrigem Guthaben eine IllegalStateException wirft.",
+     tip:"Ein vollständiger Kommentar hier braucht mindestens: Summary-Satz, @param amount, @return, @throws IllegalStateException mit Bedingung.",
+     sol:"/** Withdraws money from this account.\n  *\n  * @param amount the amount in cents, must not exceed the current balance\n  * @return the new balance\n  * @throws IllegalStateException if the balance would become negative\n  */\ndef withdraw(amount: Long): Long"},
+    {t:"allowed(xs: List[Int], allowedSet: Set[Int]): List[Int]",
+     d:"Filtere eine Liste so, dass nur Elemente übrig bleiben, die in allowedSet enthalten sind — ohne dafür selbst eine Lambda-Funktion zu schreiben.",
+     tip:"Ein Set[A] ist selbst schon eine Funktion von A nach Boolean. xs.filter(allowedSet) funktioniert deshalb direkt, ganz ohne Lambda.",
+     sol:"def allowed(xs: List[Int], allowedSet: Set[Int]): List[Int] =\n  xs.filter(allowedSet)"}
+  ];
+  function taskBodyHtml(task){
+    return "<p>" + task.d + "</p>" +
+      '<div class="tip">💡 Tipp: ' + task.tip + "</div>" +
+      '<details class="sol"><summary>✅ Lösungsidee zum Gegenchecken</summary><pre class="code">' + task.sol + "</pre></details>";
+  }
+  var taskListEl = document.getElementById("taskList");
+  TASKS.forEach(function(task, i){
+    var det = document.createElement("details");
+    det.className = "task";
+    var summary = document.createElement("summary");
+    summary.innerHTML = '<span class="tnum">' + (i+1) + '</span> ' + task.t;
+    det.appendChild(summary);
+    var body = document.createElement("div");
+    body.className = "body";
+    body.innerHTML = taskBodyHtml(task);
+    det.appendChild(body);
+    taskListEl.appendChild(det);
+  });
+
+})();
+</script>

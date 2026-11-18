@@ -1,0 +1,1027 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Java-Collections-Lernset</title>
+<style>
+/* Layout: sticky header with a nested-container motif (Collection umschließt List/Queue/Deque umschließt
+   konkrete Klassen), tab bar below it, one panel "on top" at a time. */
+:root{
+  --bg:#f2f5f3;
+  --surface:#ffffff;
+  --surface-2:#e8ede9;
+  --fg:#162220;
+  --fg-muted:#52635d;
+  --border:#d7e0da;
+  --accent:#0f8f7c;      /* teal = sichere/nicht-werfende Variante, primär */
+  --accent-ink:#ffffff;
+  --accent-tint:#e3f3ef;
+  --accent-2:#b85c12;    /* amber/terracotta = werfende Variante, sekundär */
+  --accent-2-ink:#ffffff;
+  --accent-2-tint:#f8ead9;
+  --incorrect:#b23b3b;
+  --incorrect-tint:#fbe6e6;
+  --shadow:0 1px 2px rgba(15,30,25,.06), 0 6px 18px rgba(15,30,25,.07);
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1615;
+    --surface:#161f1e;
+    --surface-2:#1d2928;
+    --fg:#e7efec;
+    --fg-muted:#9db0aa;
+    --border:#2a3836;
+    --accent:#2bbfa3;
+    --accent-ink:#06211c;
+    --accent-tint:#133430;
+    --accent-2:#e2984c;
+    --accent-2-ink:#2a1703;
+    --accent-2-tint:#3a2a16;
+    --incorrect:#e2766e;
+    --incorrect-tint:#3a1f1d;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1615;
+  --surface:#161f1e;
+  --surface-2:#1d2928;
+  --fg:#e7efec;
+  --fg-muted:#9db0aa;
+  --border:#2a3836;
+  --accent:#2bbfa3;
+  --accent-ink:#06211c;
+  --accent-tint:#133430;
+  --accent-2:#e2984c;
+  --accent-2-ink:#2a1703;
+  --accent-2-tint:#3a2a16;
+  --incorrect:#e2766e;
+  --incorrect-tint:#3a1f1d;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;text-wrap:balance;margin:0}
+code,pre,.mono{font-family:var(--font-mono)}
+a{color:var(--accent)}
+
+.wrap{max-width:860px;margin:0 auto}
+
+/* ---------- Header ---------- */
+.page-head{
+  display:flex;align-items:center;gap:20px;
+  padding-block:28px 18px;
+  flex-wrap:wrap;
+}
+.nest-icon{position:relative;width:64px;height:64px;flex:0 0 auto}
+.nest-icon i{
+  position:absolute;display:block;border-radius:10px;
+  border:1.5px solid var(--accent-2);background:var(--accent-2-tint);
+}
+.nest-icon i:nth-child(1){width:60px;height:60px;left:2px;top:2px;opacity:.35}
+.nest-icon i:nth-child(2){width:44px;height:44px;left:10px;top:10px;opacity:.55}
+.nest-icon i:nth-child(3){width:28px;height:28px;left:18px;top:18px;opacity:.8}
+.nest-icon i:nth-child(4){width:14px;height:14px;left:25px;top:25px;border-color:var(--accent);background:var(--accent)}
+.head-text{flex:1 1 260px;min-width:0}
+.eyebrow{
+  margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--fg-muted);font-weight:600;
+}
+h1{font-size:clamp(28px,6vw,38px);letter-spacing:-.01em}
+.subtitle{margin:6px 0 0;color:var(--fg-muted);max-width:52ch}
+
+/* ---------- Tabs ---------- */
+.tabs{
+  display:flex;gap:6px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  padding-bottom:0;margin-bottom:22px;
+  position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;
+  padding-top:4px;
+}
+.tab-btn{
+  font-family:var(--font-body);font-weight:600;font-size:13.5px;
+  background:none;border:none;color:var(--fg-muted);cursor:pointer;
+  padding:10px 14px;border-bottom:2.5px solid transparent;border-radius:6px 6px 0 0;
+}
+.tab-btn:hover{color:var(--fg);background:var(--surface-2)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{padding-bottom:48px}
+.panel > section{margin-bottom:34px}
+.panel h2{font-size:21px;margin-bottom:4px}
+.panel h2 .n{color:var(--accent);font-family:var(--font-mono);font-size:15px;margin-right:8px}
+.lead{color:var(--fg-muted);margin:2px 0 14px;max-width:62ch}
+
+/* ---------- Reusable components ---------- */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);
+}
+
+pre.code{
+  background:var(--surface-2);border:1px solid var(--border);border-radius:9px;
+  padding:11px 13px;overflow-x:auto;font-size:12.5px;line-height:1.55;margin:8px 0;
+}
+
+/* ---------- Flashcards ---------- */
+.cat-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{
+  font-family:var(--font-body);font-size:12.5px;font-weight:600;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg-muted);
+  padding:6px 12px;cursor:pointer;
+}
+.chip.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.card-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg-muted);margin-bottom:14px}
+
+.flash-wrap{max-width:480px;margin:0 auto}
+.flashcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--border);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;display:flex;flex-direction:column;justify-content:center;
+  cursor:pointer;position:relative;
+}
+.flashcard[hidden]{display:none}
+.flash-cat{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--fg-muted);
+}
+.flash-side{font-size:16px;text-align:center}
+.flash-q{font-weight:600}
+.flash-a{color:var(--accent)}
+.flash-hint{
+  position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:var(--fg-muted);
+}
+.flash-explain-row{display:flex;justify-content:center;margin-top:12px}
+.flash-explain-row[hidden]{display:none}
+.flash-explain{
+  margin-top:10px;font-size:13px;color:var(--fg);border-left:3px solid var(--accent-2);
+  padding:10px 13px;background:var(--accent-2-tint);border-radius:0 8px 8px 0;text-align:left;
+}
+.flash-explain[hidden]{display:none}
+.flash-controls{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.flash-controls[hidden]{display:none}
+.btn{
+  font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg);padding:9px 14px;
+}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.warn{background:var(--incorrect-tint);border-color:var(--incorrect);color:var(--incorrect)}
+.flash-meta{text-align:center;color:var(--fg-muted);font-size:12.5px;margin-top:12px}
+
+.addcard-form{
+  margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);text-align:left;
+}
+.addcard-form[hidden]{display:none}
+.addcard-form h3{font-size:15px;margin-bottom:2px}
+.addcard-form label{display:block;font-size:12.5px;font-weight:600;color:var(--fg-muted);margin:12px 0 4px}
+.addcard-form select,.addcard-form input[type="text"],.addcard-form textarea{
+  width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:13.5px;resize:vertical;
+}
+.addcard-form .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.addcard-form .hint{font-size:11.5px;color:var(--fg-muted);margin-top:2px}
+
+/* ---------- Verständnis-Check (periodic interrupt card) ---------- */
+.checkcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--accent-2);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;position:relative;text-align:center;
+}
+.checkcard[hidden]{display:none}
+.check-label{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--accent-2);
+}
+.check-q{font-size:16px;font-weight:600;margin:18px 0 18px}
+.check-bool{display:flex;justify-content:center;gap:10px}
+.check-bool[hidden]{display:none}
+.check-text{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.check-text[hidden]{display:none}
+.check-text input{
+  flex:1 1 220px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;
+}
+.check-feedback{margin-top:14px;font-size:13.5px;text-align:left;border-radius:0 8px 8px 0;padding:9px 13px;border-left:3px solid var(--border)}
+.check-feedback[hidden]{display:none}
+.check-feedback.correct{color:var(--accent);border-left-color:var(--accent);background:var(--accent-tint)}
+.check-feedback.wrong{color:var(--incorrect);border-left-color:var(--incorrect);background:var(--incorrect-tint)}
+.check-controls{display:flex;justify-content:center;margin-top:14px}
+.check-controls[hidden]{display:none}
+
+/* ---------- Quiz ---------- */
+.quiz-score{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;
+}
+.quiz-score strong{color:var(--accent);font-family:var(--font-mono)}
+.q-item{margin-bottom:18px}
+.q-item p.q-text{font-weight:600;margin:0 0 9px}
+.q-opts{display:grid;gap:7px}
+.opt{
+  text-align:left;border:1px solid var(--border);background:var(--surface);border-radius:9px;
+  padding:9px 12px;font-family:var(--font-body);font-size:13.5px;cursor:pointer;color:var(--fg);
+}
+.opt:hover{background:var(--surface-2)}
+.opt.correct{background:var(--accent-tint);border-color:var(--accent)}
+.opt.incorrect{background:var(--incorrect-tint);border-color:var(--incorrect)}
+.opt[disabled]{cursor:default}
+.q-explain{
+  margin-top:7px;font-size:12.5px;color:var(--fg-muted);border-left:3px solid var(--accent);
+  padding:5px 10px;background:var(--surface-2);border-radius:0 8px 8px 0;display:none;
+}
+.q-explain.shown{display:block}
+
+/* ---------- Tasks ---------- */
+details.task{
+  background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:13px 16px;margin-bottom:10px;box-shadow:var(--shadow);
+}
+details.task summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.task summary::-webkit-details-marker{display:none}
+details.task summary .tnum{
+  font-family:var(--font-mono);color:var(--accent-ink);background:var(--accent);
+  border-radius:6px;padding:1px 7px;font-size:12px;flex:0 0 auto;
+}
+details.task .body{margin-top:10px;font-size:13.5px}
+details.task .tip{
+  margin-top:9px;font-size:12.5px;border-left:3px solid var(--accent-2);padding:6px 10px;
+  background:var(--accent-2-tint);border-radius:0 8px 8px 0;
+}
+details.task .sol summary{font-size:12.5px;font-weight:600;color:var(--fg-muted);margin-top:8px}
+.task-footnote{color:var(--fg-muted);font-size:12.5px;margin-top:14px}
+
+footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10px 0 30px}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <div class="nest-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="head-text">
+      <p class="eyebrow">Programmiertechnik II · Kapitel 6 · HTWG Konstanz</p>
+      <h1>Java Collections – Teil I</h1>
+      <p class="subtitle">Dein Lernset zu Collection, List, Queue &amp; Deque, ihren Implementierungen und den Fallstricken beim Elementtyp — zum Verstehen, Behalten und Anwenden.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Lernbereiche">
+    <button class="tab-btn active" data-tab="cards" role="tab" aria-selected="true" id="tabbtn-cards">Karteikarten</button>
+    <button class="tab-btn" data-tab="quiz" role="tab" aria-selected="false" id="tabbtn-quiz">Verständnisfragen</button>
+    <button class="tab-btn" data-tab="tasks" role="tab" aria-selected="false" id="tabbtn-tasks">Übungsaufgaben</button>
+  </nav>
+
+  <main>
+    <!-- ============ FLASHCARDS ============ -->
+    <div class="panel" id="panel-cards" role="tabpanel" aria-labelledby="tabbtn-cards">
+      <section>
+        <h2><span class="n">◆</span>Karteikarten</h2>
+        <p class="lead">Karte anklicken, um die Antwort zu sehen — ehrlich einschätzen, das bringt mehr als nur lesen. Nach dem Umdrehen gibt „🔎 Mehr erklären" bei Bedarf noch mehr Hintergrund. Alle 6–8 Karten kommt ein kurzer Verständnis-Check zwischendurch (Ja/Nein oder kurze Texteingabe). Über „➕ Eigene Karte" kannst du jederzeit eigene Karten ergänzen.</p>
+
+        <div class="cat-filters" id="catFilters"></div>
+        <label class="card-toggle"><input type="checkbox" id="onlyUnsure"> Nur Karten üben, die ich noch nicht sicher weiß</label>
+
+        <div class="flash-wrap">
+          <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Karte umdrehen">
+            <span class="flash-cat" id="flashCat"></span>
+            <div class="flash-side" id="flashFront"></div>
+            <div class="flash-side flash-a" id="flashBack" hidden></div>
+            <span class="flash-hint" id="flashHint">Antippen zum Umdrehen</span>
+          </div>
+
+          <div class="checkcard" id="checkCard" hidden>
+            <span class="check-label">Verständnis-Check</span>
+            <p class="check-q" id="checkQ"></p>
+            <div class="check-bool" id="checkBool">
+              <button class="btn" id="checkYes" type="button">Ja</button>
+              <button class="btn" id="checkNo" type="button">Nein</button>
+            </div>
+            <div class="check-text" id="checkTextWrap">
+              <input type="text" id="checkInput" placeholder="Deine Antwort …" autocomplete="off">
+              <button class="btn primary" id="checkSubmit" type="button">Prüfen</button>
+            </div>
+            <div class="check-feedback" id="checkFeedback" hidden></div>
+            <div class="check-controls" id="checkControls" hidden>
+              <button class="btn primary" id="btnCheckDone" type="button">Weiter mit Karteikarten ▶</button>
+            </div>
+          </div>
+
+          <div class="flash-explain-row" id="flashExplainRow" hidden>
+            <button class="btn" id="btnExplain" type="button">🔎 Mehr erklären</button>
+          </div>
+          <div class="flash-explain" id="flashExplain" hidden></div>
+
+          <div class="flash-controls" id="flashControlsMain">
+            <button class="btn" id="btnPrev" type="button">◀ Zurück</button>
+            <button class="btn warn" id="btnUnknown" type="button">↻ Nochmal üben</button>
+            <button class="btn primary" id="btnKnown" type="button">✓ Weiß ich</button>
+            <button class="btn" id="btnNext" type="button">Weiter ▶</button>
+          </div>
+          <div class="flash-controls" id="flashControlsShuffle">
+            <button class="btn" id="btnShuffle" type="button">⤨ Mischen</button>
+            <button class="btn" id="btnAddCard" type="button">➕ Eigene Karte</button>
+          </div>
+          <div class="flash-controls" id="flashControlsManage">
+            <button class="btn" id="btnEditCard" type="button">✏️ Karte bearbeiten</button>
+            <button class="btn" id="btnDeleteCard" type="button" style="border-color:var(--incorrect);color:var(--incorrect)">🗑 Karte entfernen</button>
+            <button class="btn" id="btnRestoreRemoved" type="button" hidden>↺ Entfernte Karten wiederherstellen (<span id="removedCount">0</span>)</button>
+          </div>
+          <p class="flash-meta" id="flashMeta"></p>
+
+          <form class="addcard-form" id="addCardForm" hidden>
+            <h3 id="addCardFormTitle">Eigene Karteikarte hinzufügen</h3>
+            <p class="lead" id="addCardFormLead" style="margin-bottom:0">Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.</p>
+
+            <label for="addCardCat">Kategorie</label>
+            <select id="addCardCat"></select>
+            <input type="text" id="addCardCatNew" placeholder="Neue Kategorie…" hidden>
+
+            <label for="addCardQ">Frage (Vorderseite)</label>
+            <textarea id="addCardQ" rows="2" placeholder="Was soll abgefragt werden?"></textarea>
+
+            <label for="addCardA">Antwort (Rückseite)</label>
+            <textarea id="addCardA" rows="3" placeholder="Die vollständige, gute Antwort"></textarea>
+
+            <p class="hint">Frage und Antwort sind Pflicht.</p>
+
+            <div class="row">
+              <button class="btn primary" id="btnSaveCard" type="submit">Karte speichern</button>
+              <button class="btn" id="btnCancelCard" type="button">Abbrechen</button>
+              <button class="btn" id="btnResetCard" type="button" hidden style="border-color:var(--incorrect);color:var(--incorrect)">↺ Original wiederherstellen</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ QUIZ ============ -->
+    <div class="panel" id="panel-quiz" role="tabpanel" aria-labelledby="tabbtn-quiz" hidden>
+      <section>
+        <h2><span class="n">?</span>Verständnisfragen</h2>
+        <p class="lead" id="quizIntro">Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.</p>
+        <div class="quiz-score">
+          <span>Ergebnis: <strong id="quizScore">0</strong> / <span id="quizTotal">0</span> richtig</span>
+          <button class="btn" id="btnQuizReset" type="button">Zurücksetzen</button>
+        </div>
+        <div id="quizList"></div>
+      </section>
+    </div>
+
+    <!-- ============ TASKS ============ -->
+    <div class="panel" id="panel-tasks" role="tabpanel" aria-labelledby="tabbtn-tasks" hidden>
+      <section>
+        <h2><span class="n">▸</span>Übungsaufgaben</h2>
+        <p class="lead">Aufgaben rund um Collection, List, Queue und Deque — zum echten Programmieren, nicht zum schnellen Abrufen. Erst selbst in Java probieren, dann Tipp bzw. Lösungsidee zum Gegenchecken aufklappen.</p>
+        <div id="taskList"></div>
+        <p class="task-footnote">Zum Nachschlagen: Java SE API-Dokumentation zu Collection, List, Queue, Deque und ArrayDeque.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="credit">Lernset zu Kapitel 6: Java Collection – Teil I, Programmiertechnik II</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Tabs ----------
+  var tabBtns = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  var panels = {
+    cards: document.getElementById("panel-cards"),
+    quiz: document.getElementById("panel-quiz"),
+    tasks: document.getElementById("panel-tasks")
+  };
+  tabBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabBtns.forEach(function(b){ b.classList.remove("active"); b.setAttribute("aria-selected","false"); });
+      btn.classList.add("active"); btn.setAttribute("aria-selected","true");
+      Object.keys(panels).forEach(function(k){ panels[k].hidden = (k !== btn.dataset.tab); });
+    });
+  });
+
+  // ---------- Storage helpers ----------
+  function loadJSON(key, fallback){
+    try{ var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function saveJSON(key, val){
+    try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+  }
+
+  // ======================================================
+  // FLASHCARDS — Frage vorne, vollständige gute Antwort hinten.
+  // ======================================================
+  var CARDS = [
+    {cat:"Hierarchie", q:"Von welchem Interface erbt Collection<E> (extends)?", a:"Von Iterable<E> — dadurch ist jede Collection automatisch in einer for-each-Schleife nutzbar."},
+    {cat:"Hierarchie", q:"Welche vier Container-Familien stehen in der Übersicht direkt unter bzw. neben Collection<E>?", a:"Queue<E>, List<E>, Set<E> und Map<K,V>."},
+    {cat:"Hierarchie", q:"Ist Map<K,V> ein Untertyp von Collection<E>?", a:"Nein — Map wird in der Übersicht nur als verwandte Container-Familie gezeigt, erweitert Collection aber nicht (andere Schlüssel-Wert-Semantik)."},
+    {cat:"Hierarchie", q:"Welche konkrete Klasse implementiert sowohl List<E> als auch Deque<E>?", a:"LinkedList<E> — sie steht in der Übersicht unter beiden Interfaces."},
+    {cat:"Hierarchie", q:"Welche konkrete Klasse realisiert Deque<E> als zirkuläres Feld statt als verkettete Liste?", a:"ArrayDeque<E>."},
+    {cat:"Hierarchie", q:"Welche zwei Verfeinerungsstufen zeigt die Übersicht für Set und für Map?", a:"Set<E> → SortedSet<E> → NavigableSet<E> (konkret: TreeSet, HashSet); Map<K,V> → SortedMap<K,V> → NavigableMap<K,V> (konkret: TreeMap, HashMap)."},
+    {cat:"Hierarchie", q:"Welche Klasse implementiert List<E> über ein dynamisches Feld (Array)?", a:"ArrayList<E>."},
+    {cat:"Collection", q:"Was liefert add(E e) zurück, und wann?", a:"true, falls sich die Collection durch den Aufruf verändert hat (sonst false)."},
+    {cat:"Collection", q:"Was macht addAll(Collection<? extends E> c)?", a:"Fügt alle Elemente von c zur eigenen Collection hinzu."},
+    {cat:"Collection", q:"Unterschied removeAll(c) vs. retainAll(c)?", a:"removeAll entfernt alle Elemente, die auch in c vorkommen. retainAll entfernt alle Elemente, die NICHT in c vorkommen (behält nur den Schnitt)."},
+    {cat:"Collection", q:"Was liefert remove(Object o), wenn o nicht enthalten ist?", a:"false — keine Exception."},
+    {cat:"Collection", q:"Unterschied toArray() und toArray(T[] t)?", a:"toArray() liefert ein Object[]; toArray(t) liefert ein T[] für einen beliebigen Typ T."},
+    {cat:"Collection", q:"Welche Collection-Methoden signalisieren per Rückgabewert, ob sich die Collection verändert hat?", a:"add, addAll, remove, removeAll und retainAll — sie liefern true, falls eine Änderung stattgefunden hat."},
+    {cat:"Collection", q:"Wie entfernt man sicher Elemente, während man eine Collection durchläuft?", a:"Mit dem von iterator() gelieferten Iterator<E> und dessen eigener remove()-Methode — nicht mit der Collection-remove()-Methode in einer for-each-Schleife."},
+    {cat:"Collection", q:"Collection<Integer> intCol enthält 4, 7, 3. Was passiert bei intCol.remove(Integer.valueOf(7))?", a:"Das Element 7 wird entfernt (equals-Treffer), übrig bleibt [4, 3]."},
+    {cat:"Listen", q:"Welche zusätzlichen, positionsbasierten Methoden bietet List<E> gegenüber Collection<E>?", a:"add(int idx, E e), set(idx, x), get(idx), remove(idx), indexOf(o), lastIndexOf(o), subList(from, to), listIterator()."},
+    {cat:"Listen", q:"Liefert subList(fromIdx, toIdx) eine Kopie oder eine Sicht?", a:"Eine Sicht (view) — keine Kopie. Änderungen auf der Teilliste schlagen auf die Originalliste durch."},
+    {cat:"Listen", q:"intList enthält 1..10. Was bewirkt intList.subList(4,8).clear()?", a:"Löscht die Elemente an Position 4 bis 7 (toIdx exklusiv) direkt aus intList → [1, 2, 3, 4, 9, 10]."},
+    {cat:"Listen", q:"Wie liest man eine Liste mit einem ListIterator rückwärts?", a:"Iterator mit listIterator(list.size()) ans Ende setzen, dann mit hasPrevious() und previous() rückwärts gehen."},
+    {cat:"Listen", q:"Warum kann LinkedList einen rückwärtslaufenden Iterator effizient anbieten?", a:"Weil sie als doppelt verkettete Liste realisiert ist — Vor- und Rückwärtsverweise sind direkt vorhanden."},
+    {cat:"Listen", q:"Was liefern die statischen Fabrikmethoden List.of(...) und List.copyOf(coll)?", a:"Unveränderliche (immutable) Listen. of(...) baut sie aus einzelnen Elementen, copyOf(coll) als Kopie der Elemente aus coll."},
+    {cat:"Listen", q:"Unterschied Arrays.asList(a) vs. List.of(a)?", a:"Arrays.asList(a) ist eine Sicht auf das Feld a mit fester Länge (Änderungen wirken in beide Richtungen). List.of(a) liefert eine immutable Kopie (Änderungen an a wirken sich nicht aus)."},
+    {cat:"Listen", q:"Was liefert c.toArray(new String[0])?", a:"Ein neues String[]-Feld mit einer Kopie der Elemente aus c."},
+    {cat:"Queue & Deque", q:"Woran erkennt man die 'sanfte' Methodenvariante bei Queue und Deque?", a:"Sie heißt offer…/poll…/peek… und liefert bei Misserfolg false bzw. null statt einer Exception."},
+    {cat:"Queue & Deque", q:"Welche Methode fügt bei Queue<E> am Ende ein und wirft bei Misserfolg eine Exception?", a:"add(E x) (Gegenstück ohne Exception: offer(E x))."},
+    {cat:"Queue & Deque", q:"Welche Methode löscht und liefert das vordere Element, wirft aber bei Misserfolg eine Exception?", a:"remove() (Gegenstück ohne Exception: poll())."},
+    {cat:"Queue & Deque", q:"Was ist ein Deque<E>?", a:"Eine 'double-ended queue' — eine Schlange, bei der an beiden Enden eingefügt und gelöscht werden kann."},
+    {cat:"Queue & Deque", q:"Wie kann man Deque<E> zusätzlich zur Schlange verwenden?", a:"Als Keller (Stack, LIFO)."},
+    {cat:"Queue & Deque", q:"Welche Deque-Methoden entsprechen den klassischen Stack-Operationen push, pop und peek?", a:"push = addFirst(E x), pop = removeFirst(), peek = peekFirst()."},
+    {cat:"Queue & Deque", q:"Warum sollte man die Klasse Stack<E> meiden?", a:"Sie ist veraltet (aus JDK 1.0) und synchronisiert, also langsamer. Deque<E> sollte vorgezogen werden."},
+    {cat:"Queue & Deque", q:"Welche zwei Klassen implementieren Deque<E>, und wie sind sie intern realisiert?", a:"LinkedList<E> (doppelt verkettete Liste) und ArrayDeque<E> (zirkuläres Feld)."},
+    {cat:"Queue & Deque", q:"Was liefert peekFirst() bzw. getFirst(), wenn das Deque leer ist?", a:"peekFirst() liefert null; getFirst() wirft eine Exception."},
+    {cat:"Queue & Deque", q:"Was ist der Unterschied zwischen offerLast(x) und addLast(x) im Erfolgsfall?", a:"Im Erfolgsfall nichts — beide fügen das Element gleichermaßen am Ende ein. Sie unterscheiden sich nur im Fehlerfall: offerLast liefert false, addLast wirft eine Exception."},
+    {cat:"Bemerkungen", q:"Welche vier JDK-1.0-Klassen werden in der modernen Übersicht bewusst weggelassen?", a:"Vector, Stack, Dictionary und Hashtable."},
+    {cat:"Bemerkungen", q:"Warum werden Vector, Stack, Dictionary und Hashtable gemieden?", a:"Sie sind synchronisiert (thread-tauglich), was nicht unerheblichen Overhead verursacht und sie weniger performant macht."},
+    {cat:"Bemerkungen", q:"Sind ArrayList, LinkedList und ArrayDeque (JDK 1.2) synchronisiert?", a:"Nein — nicht synchronisiert und daher performanter. Für Thread-Tauglichkeit gibt es eigene Collection-Typen (Kapitel 14)."},
+    {cat:"Bemerkungen", q:"Seit welcher Java-Version gibt es default-Methoden in Interfaces?", a:"Seit Java 8."},
+    {cat:"Bemerkungen", q:"Wofür sind abstrakte Klassen wie AbstractCollection, AbstractList und AbstractSequentialList da?", a:"Sie stellen Grundfunktionalität bereit, vermeiden Code-Redundanz und erleichtern das Erstellen eigener Container."},
+    {cat:"Bemerkungen", q:"Was kann in abgeleiteten Schnittstellen bezüglich der Spezifikation passieren — Beispiel remove(x)?", a:"Die Spezifikation kann verschärft werden: Collection.remove(x) löscht irgendein zu x gleiches Element, List.remove(x) löscht gezielt das erste Vorkommen von x."},
+    {cat:"Bemerkungen", q:"Wie sieht man in IntelliJ schnell die Javadoc zu einem Typ oder einer Methode?", a:"Mouseover über den Typ- bzw. Methodennamen."},
+    {cat:"Bemerkungen", q:"Welche Anforderung an den Elementtyp E gilt für ArrayList, LinkedList und ArrayDeque?", a:"E braucht eine passende equals-Methode; Immutabilität von E ist egal."},
+    {cat:"Bemerkungen", q:"Warum liefert persList.contains(new Person(...)) bei einer normalen Klasse Person ohne equals-Override nicht true, selbst mit gleichen Feldwerten?", a:"contains() nutzt equals(); die Standard-equals-Methode (Objektidentität) betrachtet zwei verschiedene Instanzen als ungleich, egal wie gleich ihre Felder sind."},
+    {cat:"Bemerkungen", q:"Warum löst ein record wie record Person(String name, int gebJahr) dieses Problem automatisch?", a:"record-Typen sind immutabel und bringen automatisch eine equals- und hashCode-Methode mit, die alle Komponenten vergleicht."},
+    {cat:"Bemerkungen", q:"Wie genau hängen contains() und equals() zusammen?", a:"contains(o) durchläuft die Collection und prüft für jedes Element e, ob e.equals(o) gilt — ohne eine sinnvolle equals-Methode liefert contains() deshalb nicht das erwartete Ergebnis."}
+  ].map(function(c, i){ c.id = i; return c; });
+
+  var BASE_CATS = ["Hierarchie","Collection","Listen","Queue & Deque","Bemerkungen"];
+  var STORE_KEY = "javacollections";
+  var knownIds = new Set(loadJSON(STORE_KEY + "-known", []));
+  var removedIds = new Set(loadJSON(STORE_KEY + "-removed", []));
+  var customCards = loadJSON(STORE_KEY + "-custom", []);
+  var overrides = loadJSON(STORE_KEY + "-overrides", {});
+  var ALL = [];
+  function refreshAll(){
+    customCards.forEach(function(c, i){ c.id = CARDS.length + i; });
+    ALL = CARDS.concat(customCards).map(function(c){
+      var o = overrides[c.id];
+      if(!o) return c;
+      return {id:c.id, cat:o.cat, q:o.q, a:o.a, expl:(o.expl !== undefined ? o.expl : c.expl)};
+    });
+  }
+  refreshAll();
+
+  function activeTotal(){ return ALL.length - removedIds.size; }
+  var activeCat = "Alle";
+  var onlyUnsure = false;
+  var order = [];
+  var pos = 0;
+  var flipped = false;
+
+  var catFiltersEl = document.getElementById("catFilters");
+  function currentCats(){
+    var extra = [];
+    ALL.forEach(function(c){ if(BASE_CATS.indexOf(c.cat) === -1 && extra.indexOf(c.cat) === -1) extra.push(c.cat); });
+    return ["Alle"].concat(BASE_CATS, extra);
+  }
+  function renderCatFilters(){
+    catFiltersEl.innerHTML = "";
+    currentCats().forEach(function(cat){
+      var b = document.createElement("button");
+      b.className = "chip" + (cat === activeCat ? " active" : "");
+      b.type = "button"; b.textContent = cat; b.dataset.cat = cat;
+      b.addEventListener("click", function(){
+        activeCat = cat;
+        Array.prototype.forEach.call(catFiltersEl.children, function(c){ c.classList.toggle("active", c.dataset.cat === cat); });
+        rebuildOrder();
+      });
+      catFiltersEl.appendChild(b);
+    });
+  }
+  renderCatFilters();
+  document.getElementById("onlyUnsure").addEventListener("change", function(e){
+    onlyUnsure = e.target.checked; rebuildOrder();
+  });
+
+  function shuffle(arr){
+    for(var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function rebuildOrder(){
+    var pool = ALL.filter(function(c){
+      if(removedIds.has(c.id)) return false;
+      if(activeCat !== "Alle" && c.cat !== activeCat) return false;
+      if(onlyUnsure && knownIds.has(c.id)) return false;
+      return true;
+    });
+    order = pool.map(function(c){ return c.id; });
+    pos = 0; flipped = false;
+    renderCard();
+  }
+
+  var flashcardEl = document.getElementById("flashcard");
+  var flashCat = document.getElementById("flashCat");
+  var flashFront = document.getElementById("flashFront");
+  var flashBack = document.getElementById("flashBack");
+  var flashHint = document.getElementById("flashHint");
+  var flashMeta = document.getElementById("flashMeta");
+  var flashExplainRow = document.getElementById("flashExplainRow");
+  var flashExplain = document.getElementById("flashExplain");
+  var btnExplain = document.getElementById("btnExplain");
+
+  function cardAt(id){
+    for(var i = 0; i < ALL.length; i++){ if(ALL[i].id === id) return ALL[i]; }
+    return null;
+  }
+
+  function resetExplain(){
+    flashExplain.hidden = true;
+    btnExplain.textContent = "🔎 Mehr erklären";
+  }
+
+  function renderCard(){
+    resetExplain();
+    if(order.length === 0){
+      flashCat.textContent = "";
+      flashFront.textContent = onlyUnsure ? "Alles in dieser Kategorie sitzt schon. 🎉" : "Keine Karten in dieser Auswahl.";
+      flashBack.hidden = true; flashFront.hidden = false;
+      flashExplainRow.hidden = true;
+      flashHint.textContent = "";
+      flashMeta.textContent = "Gewusst: " + knownIds.size + " / " + activeTotal();
+      return;
+    }
+    var card = cardAt(order[pos]);
+    flashCat.textContent = card.cat;
+    flashFront.textContent = card.q;
+    flashBack.textContent = card.a;
+    flashFront.hidden = flipped;
+    flashBack.hidden = !flipped;
+    flashExplainRow.hidden = !(flipped && card.expl);
+    flashHint.textContent = flipped ? "Antippen für die Frage" : "Antippen zum Umdrehen";
+    flashMeta.textContent = "Karte " + (pos+1) + " / " + order.length + " · Gewusst gesamt: " + knownIds.size + " / " + activeTotal();
+  }
+
+  btnExplain.addEventListener("click", function(){
+    var card = order.length ? cardAt(order[pos]) : null;
+    if(!card) return;
+    flashExplain.textContent = card.expl || "";
+    flashExplain.hidden = !flashExplain.hidden;
+    btnExplain.textContent = flashExplain.hidden ? "🔎 Mehr erklären" : "🔽 Erklärung ausblenden";
+  });
+
+  flashcardEl.addEventListener("click", function(){
+    if(order.length === 0) return;
+    flipped = !flipped; renderCard();
+  });
+  flashcardEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flashcardEl.click(); }
+  });
+
+  function advance(delta){
+    if(order.length === 0) return;
+    pos = (pos + delta + order.length) % order.length;
+    flipped = false; renderCard();
+  }
+  document.getElementById("btnPrev").addEventListener("click", function(){ advance(-1); });
+  document.getElementById("btnNext").addEventListener("click", function(){ advance(1); });
+  document.getElementById("btnShuffle").addEventListener("click", function(){ shuffle(order); pos = 0; flipped = false; renderCard(); });
+  document.getElementById("btnKnown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.add(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    if(onlyUnsure){ rebuildOrder(); } else { advance(1); }
+    maybeShowCheck();
+  });
+  document.getElementById("btnUnknown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.delete(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    advance(1);
+    maybeShowCheck();
+  });
+
+  function updateRestoreBtn(){
+    var btn = document.getElementById("btnRestoreRemoved");
+    var countEl = document.getElementById("removedCount");
+    if(countEl) countEl.textContent = removedIds.size;
+    btn.hidden = removedIds.size === 0;
+  }
+  document.getElementById("btnDeleteCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    if(!confirm("Diese Karte wirklich dauerhaft aus dem Lernset entfernen?\n\n„" + card.q + "“")) return;
+    removedIds.add(card.id);
+    knownIds.delete(card.id);
+    saveJSON(STORE_KEY + "-removed", Array.from(removedIds));
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  document.getElementById("btnRestoreRemoved").addEventListener("click", function(){
+    if(removedIds.size === 0) return;
+    if(!confirm("Alle " + removedIds.size + " entfernten Karten wiederherstellen?")) return;
+    removedIds.clear();
+    saveJSON(STORE_KEY + "-removed", []);
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  updateRestoreBtn();
+
+  // ---------- Add / edit own card ----------
+  var addCardForm = document.getElementById("addCardForm");
+  var addCardCat = document.getElementById("addCardCat");
+  var addCardCatNew = document.getElementById("addCardCatNew");
+  var addCardFormTitle = document.getElementById("addCardFormTitle");
+  var addCardFormLead = document.getElementById("addCardFormLead");
+  var btnSaveCard = document.getElementById("btnSaveCard");
+  var btnResetCard = document.getElementById("btnResetCard");
+  var NEW_CAT_VALUE = "__new__";
+  var editingId = null;
+
+  function populateAddCardCats(){
+    addCardCat.innerHTML = "";
+    BASE_CATS.concat(currentCats().filter(function(c){ return c !== "Alle" && BASE_CATS.indexOf(c) === -1; })).forEach(function(cat){
+      var o = document.createElement("option"); o.value = cat; o.textContent = cat;
+      addCardCat.appendChild(o);
+    });
+    var o2 = document.createElement("option"); o2.value = NEW_CAT_VALUE; o2.textContent = "Neue Kategorie…";
+    addCardCat.appendChild(o2);
+  }
+  addCardCat.addEventListener("change", function(){
+    addCardCatNew.hidden = addCardCat.value !== NEW_CAT_VALUE;
+  });
+
+  function closeAddCardForm(){
+    addCardForm.reset(); addCardCatNew.hidden = true; addCardForm.hidden = true;
+    editingId = null;
+  }
+
+  document.getElementById("btnAddCard").addEventListener("click", function(){
+    if(!addCardForm.hidden && editingId === null){ closeAddCardForm(); return; }
+    editingId = null;
+    populateAddCardCats();
+    document.getElementById("addCardQ").value = "";
+    document.getElementById("addCardA").value = "";
+    addCardFormTitle.textContent = "Eigene Karteikarte hinzufügen";
+    addCardFormLead.textContent = "Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.";
+    btnSaveCard.textContent = "Karte speichern";
+    btnResetCard.hidden = true;
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnEditCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    editingId = card.id;
+    populateAddCardCats();
+    addCardCat.value = card.cat;
+    addCardCatNew.hidden = true;
+    document.getElementById("addCardQ").value = card.q;
+    document.getElementById("addCardA").value = card.a;
+    addCardFormTitle.textContent = "Karte bearbeiten";
+    addCardFormLead.textContent = "Änderungen werden dauerhaft in diesem Lernset gespeichert (im Browser).";
+    btnSaveCard.textContent = "Änderungen speichern";
+    btnResetCard.hidden = !overrides[card.id];
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnCancelCard").addEventListener("click", closeAddCardForm);
+
+  btnResetCard.addEventListener("click", function(){
+    if(editingId === null) return;
+    if(!confirm("Diese Karte wirklich auf die ursprüngliche Version zurücksetzen?")) return;
+    delete overrides[editingId];
+    saveJSON(STORE_KEY + "-overrides", overrides);
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  addCardForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var q = document.getElementById("addCardQ").value.trim();
+    var a = document.getElementById("addCardA").value.trim();
+    var cat = addCardCat.value === NEW_CAT_VALUE ? addCardCatNew.value.trim() : addCardCat.value;
+    if(!q || !a || !cat){ alert("Bitte Kategorie, Frage und Antwort ausfüllen."); return; }
+    if(editingId !== null){
+      overrides[editingId] = {cat:cat, q:q, a:a};
+      saveJSON(STORE_KEY + "-overrides", overrides);
+    } else {
+      customCards.push({cat:cat, q:q, a:a, expl:""});
+      saveJSON(STORE_KEY + "-custom", customCards);
+    }
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  rebuildOrder();
+
+  // ======================================================
+  // VERSTÄNDNIS-CHECK — alle 6-8 Karten ein kurzer, geprüfter
+  // Ja/Nein- oder Kurztext-Check zu einem Thema, das gerade geübt wurde.
+  // ======================================================
+  var ABFRAGE = [
+    {type:"bool", q:"Ja oder Nein: Map<K,V> ist ein Untertyp von Collection<E>.", correct:false,
+     explain:"Falsch — Map wird nur als verwandte Container-Familie gezeigt, erweitert Collection aber nicht."},
+    {type:"text", q:"Welche Klasse implementiert List<E> über ein dynamisches Feld (Array)? (ein Name)", answer:"ArrayList", accept:["ArrayList<E>"],
+     explain:"ArrayList<E> speichert die Elemente intern in einem Array, das bei Bedarf automatisch wächst."},
+    {type:"bool", q:"Ja oder Nein: Map<K,V> hat eine eigene Verfeinerungskette analog zu Set (SortedMap, NavigableMap).", correct:true,
+     explain:"Richtig — Map<K,V> → SortedMap<K,V> → NavigableMap<K,V>, konkret TreeMap bzw. HashMap, parallel zur Set-Hierarchie."},
+    {type:"bool", q:"Ja oder Nein: remove(Object o) wirft eine Exception, wenn o nicht enthalten ist.", correct:false,
+     explain:"Falsch — remove(o) liefert einfach false, keine Exception."},
+    {type:"bool", q:"Ja oder Nein: subList(fromIdx, toIdx) liefert eine Kopie der Liste.", correct:false,
+     explain:"Falsch — es ist eine Sicht (view). Änderungen auf der Teilliste schlagen auf die Originalliste durch."},
+    {type:"bool", q:"Ja oder Nein: nach intList.subList(4,8).clear() (intList=[1..10]) bleiben noch 6 Elemente übrig.", correct:true,
+     explain:"Richtig — Positionen 4 bis 7 (4 Elemente) werden gelöscht, von 10 bleiben 6: [1,2,3,4,9,10]."},
+    {type:"bool", q:"Ja oder Nein: Arrays.asList(a) erlaubt das Hinzufügen neuer Elemente per add().", correct:false,
+     explain:"Falsch — feste Länge, add()/remove() werfen eine UnsupportedOperationException."},
+    {type:"text", q:"Deque steht für welchen englischen Begriff? (zwei Wörter)", answer:"double-ended queue", accept:["double ended queue"],
+     explain:"Der Name verrät die Eigenschaft: Elemente können an beiden Enden eingefügt und entfernt werden."},
+    {type:"bool", q:"Ja oder Nein: Ein Deque<E> kann auch als Keller (Stack, LIFO) verwendet werden.", correct:true,
+     explain:"Richtig — push=addFirst, pop=removeFirst, peek=peekFirst bilden die klassischen Stack-Operationen nach."},
+    {type:"text", q:"Welche Queue-Methode löscht und liefert das vordere Element, wirft aber bei leerer Queue eine Exception? (ein Name)", answer:"remove", accept:["remove()"],
+     explain:"Gegenstück ohne Exception: poll() liefert bei leerer Queue einfach null."},
+    {type:"bool", q:"Ja oder Nein: offerLast(x) und addLast(x) tun im Erfolgsfall dasselbe.", correct:true,
+     explain:"Richtig — sie unterscheiden sich nur im Fehlerfall (false vs. Exception)."},
+    {type:"bool", q:"Ja oder Nein: ArrayList, LinkedList und ArrayDeque sind synchronisiert.", correct:false,
+     explain:"Falsch — bewusst unsynchronisiert und dadurch performanter."},
+    {type:"text", q:"Seit welcher Java-Version gibt es default-Methoden in Interfaces? (nur die Zahl)", answer:"8",
+     explain:"Seit Java 8 — davor konnte ein Interface keine Methode mit Implementierung haben."},
+    {type:"bool", q:"Ja oder Nein: contains() nutzt equals() intern.", correct:true,
+     explain:"Richtig — contains(o) prüft für jedes Element e, ob e.equals(o) gilt."},
+    {type:"bool", q:"Ja oder Nein: ein record bringt automatisch eine equals-Methode mit, die alle Komponenten vergleicht.", correct:true,
+     explain:"Richtig — genau das löst das Problem, dass contains() bei normalen Klassen ohne equals-Override fehlschlägt."},
+    {type:"bool", q:"Ja oder Nein: LinkedList implementiert sowohl List<E> als auch Deque<E>.", correct:true,
+     explain:"Richtig — das macht LinkedList vielseitig einsetzbar, sowohl indexbasiert als auch als Deque."}
+  ];
+
+  var checkCardEl = document.getElementById("checkCard");
+  var checkQEl = document.getElementById("checkQ");
+  var checkBoolEl = document.getElementById("checkBool");
+  var checkTextWrapEl = document.getElementById("checkTextWrap");
+  var checkInputEl = document.getElementById("checkInput");
+  var checkFeedbackEl = document.getElementById("checkFeedback");
+  var checkControlsEl = document.getElementById("checkControls");
+  var checkYesEl = document.getElementById("checkYes");
+  var checkNoEl = document.getElementById("checkNo");
+  var checkSubmitEl = document.getElementById("checkSubmit");
+  var flashControlsMain = document.getElementById("flashControlsMain");
+  var flashControlsShuffle = document.getElementById("flashControlsShuffle");
+  var flashControlsManage = document.getElementById("flashControlsManage");
+  var abfrageBag = [];
+  var currentCheckItem = null;
+
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  var cardsUntilCheck = randInt(6, 8);
+
+  function drawAbfrage(){
+    if(ABFRAGE.length === 0) return null;
+    if(abfrageBag.length === 0){ abfrageBag = shuffle(ABFRAGE.map(function(_, i){ return i; })); }
+    return ABFRAGE[abfrageBag.pop()];
+  }
+  function normalize(s){ return (s || "").toString().trim().toLowerCase().replace(/\s+/g, " "); }
+
+  function maybeShowCheck(){
+    cardsUntilCheck--;
+    if(cardsUntilCheck > 0) return;
+    cardsUntilCheck = randInt(6, 8);
+    var item = drawAbfrage();
+    if(!item) return;
+    currentCheckItem = item;
+    checkQEl.textContent = item.q;
+    checkBoolEl.hidden = item.type !== "bool";
+    checkTextWrapEl.hidden = item.type !== "text";
+    checkInputEl.value = "";
+    checkYesEl.disabled = checkNoEl.disabled = false;
+    checkSubmitEl.disabled = false;
+    checkFeedbackEl.hidden = true;
+    checkFeedbackEl.className = "check-feedback";
+    checkControlsEl.hidden = true;
+
+    flashcardEl.hidden = true;
+    flashControlsMain.hidden = true;
+    flashControlsShuffle.hidden = true;
+    flashControlsManage.hidden = true;
+    flashExplainRow.hidden = true;
+    flashExplain.hidden = true;
+    checkCardEl.hidden = false;
+  }
+
+  function finishCheck(isCorrect){
+    checkFeedbackEl.textContent = (isCorrect ? "✓ Richtig. " : "✗ Nicht ganz. ") + (currentCheckItem.explain || "");
+    checkFeedbackEl.className = "check-feedback " + (isCorrect ? "correct" : "wrong");
+    checkFeedbackEl.hidden = false;
+    checkYesEl.disabled = checkNoEl.disabled = true;
+    checkSubmitEl.disabled = true;
+    checkControlsEl.hidden = false;
+  }
+  checkYesEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === true); });
+  checkNoEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === false); });
+  checkSubmitEl.addEventListener("click", function(){
+    var val = normalize(checkInputEl.value);
+    var candidates = [currentCheckItem.answer].concat(currentCheckItem.accept || []).map(normalize);
+    finishCheck(candidates.indexOf(val) !== -1);
+  });
+  checkInputEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); checkSubmitEl.click(); }
+  });
+  document.getElementById("btnCheckDone").addEventListener("click", function(){
+    checkCardEl.hidden = true;
+    flashcardEl.hidden = false;
+    flashControlsMain.hidden = false;
+    flashControlsShuffle.hidden = false;
+    flashControlsManage.hidden = false;
+    renderCard();
+  });
+
+  // ======================================================
+  // QUIZ
+  // ======================================================
+  var QUIZ = [
+    {q:"Welche Aussage über Collection<E> ist korrekt?",
+     opts:["Collection<E> erweitert List<E>","Collection<E> erweitert Iterable<E>","Collection<E> hat keine Methode zum Entfernen von Elementen","Collection<E> kann nicht iteriert werden"],
+     correct:1, explain:"Collection<E> extends Iterable<E> — deshalb kann jede Collection in einer for-each-Schleife verwendet werden."},
+    {q:"Was macht retainAll(c) mit einer Collection?",
+     opts:["Fügt alle Elemente aus c hinzu","Entfernt alle Elemente, die in c vorkommen","Entfernt alle Elemente, die NICHT in c vorkommen","Ersetzt die Collection komplett durch c"],
+     correct:2, explain:"retainAll behält nur den Schnitt mit c — alles, was nicht auch in c ist, wird entfernt."},
+    {q:"intList enthält [1..10]. Was liefert System.out.println(intList) direkt NACH intList.subList(4,8).clear()?",
+     opts:["[1, 2, 3, 4, 5, 6, 7, 8, 9, 10] — unverändert","[5, 6, 7, 8]","[1, 2, 3, 4, 9, 10]","Eine leere Liste"],
+     correct:2, explain:"subList(4,8) ist eine Sicht, keine Kopie — clear() auf der Sicht löscht Position 4 bis 7 direkt aus intList."},
+    {q:"Welche konkrete Klasse implementiert sowohl List<E> als auch Deque<E>?",
+     opts:["ArrayList<E>","ArrayDeque<E>","LinkedList<E>","TreeSet<E>"],
+     correct:2, explain:"LinkedList<E> taucht in der Hierarchie unter beiden Interfaces auf — List und Deque."},
+    {q:"Welche Deque-Methode entspricht der klassischen Stack-Operation push?",
+     opts:["addLast(E x)","offerFirst(E x)","addFirst(E x)","peekFirst()"],
+     correct:2, explain:"push = addFirst(E x) — ein push wirft bei Misserfolg eine Exception, genau wie addFirst."},
+    {q:"Was liefert offer(E x) im Gegensatz zu add(E x), falls das Einfügen fehlschlägt?",
+     opts:["Beide werfen eine Exception","offer liefert false, add wirft eine Exception","offer wirft eine Exception, add liefert false","Beide liefern false"],
+     correct:1, explain:"offer/poll/peek sind die sanfte Variante (false/null bei Misserfolg), add/remove/element die werfende Variante (Exception)."},
+    {q:"Warum ist die Klasse Stack<E> aus der Java-API nicht die empfohlene Wahl für einen Keller?",
+     opts:["Sie unterstützt kein pop()","Sie ist veraltet und synchronisiert, also langsamer als Deque<E>","Sie kann nur Integer speichern","Es gibt sie seit Java 8 nicht mehr"],
+     correct:1, explain:"Stack<E> stammt aus JDK 1.0 und ist synchronisiert — Deque<E> (z. B. ArrayDeque) sollte vorgezogen werden."},
+    {q:"Unterschied Arrays.asList(a) und List.of(a)?",
+     opts:["Beide liefern unveränderliche Kopien","Arrays.asList(a) ist eine Sicht auf a, List.of(a) ist eine unveränderliche Kopie","Arrays.asList(a) ist eine Kopie, List.of(a) ist eine Sicht","Es gibt keinen Unterschied"],
+     correct:1, explain:"Arrays.asList(a) liefert eine Sicht mit fester Länge (Änderungen an a wirken sich aus); List.of(a) liefert eine immutable Kopie."},
+    {q:"Warum werden Vector, Stack, Dictionary und Hashtable in der modernen Collection-Hierarchie weggelassen?",
+     opts:["Sie existieren nicht mehr in aktuellem Java","Sie sind synchronisiert und dadurch wenig performant","Sie unterstützen keine Generics","Sie gehören nicht zum Collection-Framework"],
+     correct:1, explain:"Diese JDK-1.0-Klassen sind synchronisiert (thread-tauglich), was Overhead verursacht — die JDK-1.2-Typen sind unsynchronisiert und performanter."},
+    {q:"Eine normale Klasse Person (ohne equals-Override) wird in einer List<Person> gespeichert. Was liefert list.contains(...) mit einem inhaltlich gleichen, aber neuen Person-Objekt?",
+     opts:["true, weil Java automatisch Feldwerte vergleicht","false, weil die Standard-equals-Methode Objektidentität prüft","Eine Exception zur Laufzeit","Einen Kompilierfehler"],
+     correct:1, explain:"Ohne eigene equals()-Methode vergleicht contains() über Objektidentität — zwei verschiedene Instanzen sind dann ungleich, auch mit identischen Feldwerten."},
+    {q:"Warum liefert dieselbe Abfrage true, wenn Person als record Person(String name, int gebJahr) definiert ist?",
+     opts:["record-Typen werden nicht wirklich verglichen","records sind immer leer","record-Typen bringen automatisch eine equals-Methode mit, die alle Komponenten vergleicht","contains() funktioniert bei records anders als bei normalen Klassen"],
+     correct:2, explain:"records generieren equals() und hashCode() automatisch anhand aller Komponenten — genau das nutzt contains()."},
+    {q:"Wie wird die remove(x)-Spezifikation von Collection<E> zu List<E> verschärft?",
+     opts:["List<E> verbietet remove(x) komplett","Collection.remove(x) löscht irgendein zu x gleiches Element, List.remove(x) löscht gezielt das erste Vorkommen","List<E> kann nur per Index löschen","Es gibt keinen Unterschied zwischen beiden"],
+     correct:1, explain:"Abgeleitete Interfaces können die Spezifikation verschärfen — List<E> legt fest, dass remove(x) genau das erste Vorkommen löscht."},
+    {q:"nums ist eine ArrayList<Integer> mit [10, 20, 30]. Was macht nums.remove(1)?",
+     opts:["Entfernt den Wert 1 (kommt nicht vor, keine Änderung)","Entfernt das Element an Index 1, also den Wert 20","Entfernt den Wert 1 aus Versehen durch Autoboxing","Wirft einen Kompilierfehler wegen Mehrdeutigkeit"],
+     correct:1, explain:"Für ein int-Literal wird die konkretere Überladung remove(int idx) gewählt — das entfernt per Index, nicht per Wert. Für den Wert 20 bräuchte man remove(Integer.valueOf(20))."}
+  ];
+
+  var quizListEl = document.getElementById("quizList");
+  var quizScoreEl = document.getElementById("quizScore");
+  var quizTotalEl = document.getElementById("quizTotal");
+  document.getElementById("quizIntro").textContent = QUIZ.length + " Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.";
+  quizTotalEl.textContent = String(QUIZ.length);
+  var score = 0;
+
+  function renderQuiz(){
+    quizListEl.innerHTML = "";
+    score = 0; quizScoreEl.textContent = "0";
+    QUIZ.forEach(function(item, qi){
+      var wrap = document.createElement("div");
+      wrap.className = "q-item card";
+      var qText = document.createElement("p");
+      qText.className = "q-text";
+      qText.textContent = (qi+1) + ". " + item.q;
+      wrap.appendChild(qText);
+
+      var optsWrap = document.createElement("div");
+      optsWrap.className = "q-opts";
+      var explainEl = document.createElement("div");
+      explainEl.className = "q-explain";
+      explainEl.textContent = item.explain;
+
+      item.opts.forEach(function(optText, oi){
+        var b = document.createElement("button");
+        b.className = "opt"; b.type = "button"; b.textContent = optText;
+        b.addEventListener("click", function(){
+          if(wrap.dataset.answered) return;
+          wrap.dataset.answered = "1";
+          Array.prototype.forEach.call(optsWrap.children, function(o, idx){
+            o.disabled = true;
+            if(idx === item.correct) o.classList.add("correct");
+            else if(idx === oi) o.classList.add("incorrect");
+          });
+          explainEl.classList.add("shown");
+          if(oi === item.correct){ score++; quizScoreEl.textContent = String(score); }
+        });
+        optsWrap.appendChild(b);
+      });
+
+      wrap.appendChild(optsWrap);
+      wrap.appendChild(explainEl);
+      quizListEl.appendChild(wrap);
+    });
+  }
+  document.getElementById("btnQuizReset").addEventListener("click", renderQuiz);
+  renderQuiz();
+
+  // ======================================================
+  // TASKS (ursprüngliche Übungsaufgaben + die früher bei den Karteikarten
+  // eingestreuten Zwischenübungen — gehören inhaltlich hierher)
+  // ======================================================
+  var TASKS = [
+    {t:"safeRemoveEvens(Collection&lt;Integer&gt; c): void", d:"Entferne alle geraden Zahlen aus c, während du einmal mit einem Iterator durchläufst – ohne ConcurrentModificationException.",
+     tip:"Nutze c.iterator() direkt, nicht die for-each-Schleife zusammen mit c.remove(...). Lösche nur über it.remove().",
+     sol:"void safeRemoveEvens(Collection&lt;Integer&gt; c) {\n  Iterator&lt;Integer&gt; it = c.iterator();\n  while (it.hasNext()) {\n    if (it.next() % 2 == 0) it.remove();\n  }\n}"},
+    {t:"subList-Löschung: Teilbereich einer Liste leeren", d:"Gegeben eine Liste mit den Zahlen 1 bis 10. Lösche mit einem einzigen Aufruf die Elemente an den Positionen 4 bis 7 (0-basiert, toIdx exklusiv) direkt aus der Originalliste.",
+     tip:"subList(fromIdx, toIdx) liefert eine Sicht (view), keine Kopie – ruf darauf clear() auf.",
+     sol:"List&lt;Integer&gt; intList = new LinkedList&lt;&gt;();\nfor (int i = 1; i &lt;= 10; i++) intList.add(i);\n\nintList.subList(4, 8).clear();\nSystem.out.println(intList); // [1, 2, 3, 4, 9, 10]"},
+    {t:"record Person &amp; contains() – equals() automatisch nutzen", d:"Schreibe ein record Person(String name, int gebJahr) und zeige, dass eine List&lt;Person&gt; mit contains() ein logisch gleiches Person-Objekt findet, obwohl es eine andere Instanz ist.",
+     tip:"record-Typen bringen automatisch eine equals()-Methode mit, die alle Komponenten vergleicht – contains() nutzt genau diese equals().",
+     sol:"record Person(String name, int gebJahr) {}\n\nList&lt;Person&gt; persList = new LinkedList&lt;&gt;();\npersList.add(new Person(\"Peter\", 2001));\n\nboolean found = persList.contains(new Person(\"Peter\", 2001));\nSystem.out.println(found); // true"},
+    {t:"swapFirstLast(List&lt;E&gt; list)", d:"Schreibe eine generische Methode, die das erste und letzte Element einer Liste vertauscht (in-place, mit set()).",
+     tip:"Nutze list.get(0), list.get(list.size()-1) und zweimal list.set(idx, x). Funktioniert nicht auf einer unmodifiable Liste wie List.of(...).",
+     sol:"static &lt;E&gt; void swapFirstLast(List&lt;E&gt; list) {\n  int last = list.size() - 1;\n  E tmp = list.get(0);\n  list.set(0, list.get(last));\n  list.set(last, tmp);\n}"},
+    {t:"Keller mit Deque&lt;Integer&gt; (push/pop/peek)", d:"Baue mit einem ArrayDeque&lt;Integer&gt; einen Keller (Stack): lege 1 bis 10 ab und gib sie anschließend in umgekehrter Reihenfolge aus.",
+     tip:"push = addFirst, pop = removeFirst. Die Klasse Stack&lt;E&gt; ist veraltet – nimm Deque&lt;E&gt;.",
+     sol:"Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;();\nfor (int i = 1; i &lt;= 10; i++) stack.push(i);\n\nwhile (!stack.isEmpty()) {\n  System.out.print(stack.pop() + \", \");\n}\n// 10, 9, 8, 7, 6, 5, 4, 3, 2, 1,"},
+    {t:"FIFO-Puffer mit Queue&lt;Integer&gt; (ArrayDeque)", d:"Baue mit derselben Klasse ArrayDeque eine Schlange (FIFO): füge 1 bis 10 ein und gib sie in der ursprünglichen Reihenfolge wieder aus.",
+     tip:"Queue&lt;Integer&gt; queue = new ArrayDeque&lt;&gt;(); add() fügt am Ende ein, remove() löscht und liefert das vordere Element.",
+     sol:"Queue&lt;Integer&gt; queue = new ArrayDeque&lt;&gt;();\nfor (int i = 1; i &lt;= 10; i++) queue.add(i);\n\nwhile (!queue.isEmpty()) {\n  System.out.print(queue.remove() + \", \");\n}\n// 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,"},
+    {t:"list.remove(...) – Index oder Wert?", d:"Gegeben eine ArrayList&lt;Integer&gt; mit den Werten [10, 20, 30]. Entferne den WERT 20 (nicht das Element an Index 1).",
+     tip:"list.remove(int idx) entfernt per Index – das ist die konkretere Überladung und gewinnt bei einem int-Literal. Für den Wert brauchst du ein Integer-Objekt.",
+     sol:"ArrayList&lt;Integer&gt; nums = new ArrayList&lt;&gt;(List.of(10, 20, 30));\n\nnums.remove(1);                  // entfernt Index 1 -&gt; [10, 30] (FALSCH, falls Wert 20 gemeint war)\nnums.remove(Integer.valueOf(20)); // entfernt den WERT 20\n// alternativ: nums.remove((Integer) 20);"},
+    {t:"Arrays.asList vs. List.of – Sicht oder Kopie?", d:"Zeige den Unterschied: wandle ein String[]-Feld einmal mit Arrays.asList (Sicht) und einmal mit List.of (Kopie) in eine Liste um und ändere danach das Originalfeld.",
+     tip:"Arrays.asList(a) ist eine Sicht mit fester Länge – Änderungen an a wirken sich auf die Liste aus. List.of(a) liefert eine unveränderliche Kopie.",
+     sol:"String[] a = {\"abc\", \"def\", \"xyz\"};\n\nList&lt;String&gt; view = Arrays.asList(a);\nList&lt;String&gt; copy = List.of(a);\n\na[0] = \"NEU\";\nSystem.out.println(view); // [NEU, def, xyz]  -&gt; Sicht ändert sich mit\nSystem.out.println(copy); // [abc, def, xyz]  -&gt; Kopie bleibt gleich"},
+    {t:"hasDuplicate(List&lt;String&gt; list) – Duplikate ganz ohne Set erkennen", d:"Schreibe eine Methode, die true liefert, falls irgendein Element mindestens doppelt in der Liste vorkommt – nur mit den Methoden aus List&lt;E&gt;, kein Set erlaubt.",
+     tip:"Für jedes Element gilt: kommt es mehr als einmal vor, dann ist indexOf(x) != lastIndexOf(x).",
+     sol:"boolean hasDuplicate(List&lt;String&gt; list) {\n  for (String x : list) {\n    if (list.indexOf(x) != list.lastIndexOf(x)) return true;\n  }\n  return false;\n}"},
+    {t:"printReverse(LinkedList&lt;Integer&gt; list) – rückwärts mit ListIterator", d:"Gib eine LinkedList&lt;Integer&gt; mit den Zahlen 3, 7, 1, 9, 4 in umgekehrter Reihenfolge aus – ohne Collections.reverse, nur mit ListIterator.",
+     tip:"listIterator(list.size()) setzt den Iterator ans Ende; dann mit hasPrevious()/previous() rückwärts durchlaufen.",
+     sol:"LinkedList&lt;Integer&gt; list = new LinkedList&lt;&gt;(List.of(3, 7, 1, 9, 4));\n\nListIterator&lt;Integer&gt; it = list.listIterator(list.size());\nwhile (it.hasPrevious()) {\n  System.out.print(it.previous() + \", \");\n}\n// 4, 9, 1, 7, 3,"},
+    {t:"average(Collection&lt;Integer&gt; c) – nur mit der Collection-API", d:"Berechne den Durchschnitt der Elemente einer Collection&lt;Integer&gt; – nur mit iterator() und size(), keine Streams.",
+     tip:"Summe über den Iterator aufbauen, am Ende durch c.size() teilen (als double, sonst Ganzzahl-Division).",
+     sol:"double average(Collection&lt;Integer&gt; c) {\n  int sum = 0;\n  Iterator&lt;Integer&gt; it = c.iterator();\n  while (it.hasNext()) sum += it.next();\n  return (double) sum / c.size();\n}"},
+    {t:"Deque als Undo-Puffer – nur die letzten 3 Einträge behalten", d:"Baue mit einem Deque&lt;String&gt; einen Puffer, der immer nur die letzten 3 eingefügten Werte behält (ältere fallen automatisch raus).",
+     tip:"offerLast(x) einfügen; danach prüfen: if (deque.size() &gt; 3) deque.pollFirst().",
+     sol:"Deque&lt;String&gt; buffer = new ArrayDeque&lt;&gt;();\n\nvoid push(String x) {\n  buffer.offerLast(x);\n  if (buffer.size() &gt; 3) buffer.pollFirst();\n}"},
+    {t:"isPalindrome(String s) – Zeichen-für-Zeichen mit einem Deque als Keller", d:"Prüfe mit einem Deque&lt;Character&gt; als Keller, ob ein String ein Palindrom ist (z. B. OTTO).",
+     tip:"Alle Zeichen pushen, dann wieder poppen und mit den Zeichen des Strings von vorne vergleichen.",
+     sol:"boolean isPalindrome(String s) {\n  Deque&lt;Character&gt; stack = new ArrayDeque&lt;&gt;();\n  for (char c : s.toCharArray()) stack.push(c);\n\n  for (char c : s.toCharArray()) {\n    if (c != stack.pop()) return false;\n  }\n  return true;\n}"},
+    {t:"ConcurrentModificationException reparieren", d:"Dieser Code wirft eine ConcurrentModificationException: for (Integer x : list) { if (x &lt; 0) list.remove(x); } — finde den Fehler und schreibe ihn sicher um.",
+     tip:"for-each nutzt intern einen Iterator, der nicht weiß, dass list sich gerade verändert. Lösche stattdessen über den Iterator selbst.",
+     sol:"Iterator&lt;Integer&gt; it = list.iterator();\nwhile (it.hasNext()) {\n  if (it.next() &lt; 0) it.remove();\n}"},
+    {t:"findPersonByName(List&lt;Person&gt; list, String name) – equals() im Hintergrund", d:"Schreibe eine Methode, die die erste Person mit einem bestimmten Namen liefert (oder null, falls keine existiert) – nutze dabei eine einfache Schleife über die Liste, kein indexOf.",
+     tip:"Mit get(i) oder direkt per for-each über die Person-Objekte gehen und p.name().equals(name) prüfen.",
+     sol:"Person findPersonByName(List&lt;Person&gt; list, String name) {\n  for (Person p : list) {\n    if (p.name().equals(name)) return p;\n  }\n  return null;\n}"},
+    {t:"removeValue(ArrayList&lt;Integer&gt; nums, int value) – Wert statt Index entfernen", d:"Schreibe eine kleine Hilfsmethode, die garantiert den WERT value aus einer ArrayList&lt;Integer&gt; entfernt – unabhängig davon, wie value aufgerufen wird.",
+     tip:"Erzwinge die Object-Überladung, z. B. mit Integer.valueOf(value) statt remove(int idx).",
+     sol:"boolean removeValue(ArrayList&lt;Integer&gt; nums, int value) {\n  return nums.remove(Integer.valueOf(value)); // ruft remove(Object), nicht remove(int idx)\n}"}
+  ];
+  function taskBodyHtml(task){
+    return "<p>" + task.d + "</p>" +
+      '<div class="tip">💡 Tipp: ' + task.tip + "</div>" +
+      '<details class="sol"><summary>✅ Lösungsidee zum Gegenchecken</summary><pre class="code">' + task.sol + "</pre></details>";
+  }
+  var taskListEl = document.getElementById("taskList");
+  TASKS.forEach(function(task, i){
+    var det = document.createElement("details");
+    det.className = "task";
+    var summary = document.createElement("summary");
+    summary.innerHTML = '<span class="tnum">' + (i+1) + '</span> ' + task.t;
+    det.appendChild(summary);
+    var body = document.createElement("div");
+    body.className = "body";
+    body.innerHTML = taskBodyHtml(task);
+    det.appendChild(body);
+    taskListEl.appendChild(det);
+  });
+
+})();
+</script>

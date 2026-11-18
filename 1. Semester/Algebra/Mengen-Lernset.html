@@ -1,0 +1,1038 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Mengen-Lernset</title>
+<style>
+/* Layout: sticky header with a 3-circle Venn motif, tab bar below, one panel "on top" at a time —
+   the same overlap/union idea the lecture itself teaches, reused as the page's own structure. */
+:root{
+  --bg:#f2f5f3;
+  --surface:#ffffff;
+  --surface-2:#e8ede9;
+  --fg:#162220;
+  --fg-muted:#52635d;
+  --border:#d7e0da;
+  --accent:#0f8f7c;      /* teal = Definition / Satz / richtig */
+  --accent-ink:#ffffff;
+  --accent-tint:#e3f3ef;
+  --accent-2:#b85c12;    /* amber/terracotta = Beispiel / Übung */
+  --accent-2-ink:#ffffff;
+  --accent-2-tint:#f8ead9;
+  --incorrect:#b23b3b;
+  --incorrect-tint:#fbe6e6;
+  --shadow:0 1px 2px rgba(15,30,25,.06), 0 6px 18px rgba(15,30,25,.07);
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1615;
+    --surface:#161f1e;
+    --surface-2:#1d2928;
+    --fg:#e7efec;
+    --fg-muted:#9db0aa;
+    --border:#2a3836;
+    --accent:#2bbfa3;
+    --accent-ink:#06211c;
+    --accent-tint:#133430;
+    --accent-2:#e2984c;
+    --accent-2-ink:#2a1703;
+    --accent-2-tint:#3a2a16;
+    --incorrect:#e2766e;
+    --incorrect-tint:#3a1f1d;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1615;
+  --surface:#161f1e;
+  --surface-2:#1d2928;
+  --fg:#e7efec;
+  --fg-muted:#9db0aa;
+  --border:#2a3836;
+  --accent:#2bbfa3;
+  --accent-ink:#06211c;
+  --accent-tint:#133430;
+  --accent-2:#e2984c;
+  --accent-2-ink:#2a1703;
+  --accent-2-tint:#3a2a16;
+  --incorrect:#e2766e;
+  --incorrect-tint:#3a1f1d;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;text-wrap:balance;margin:0}
+code,pre,.mono{font-family:var(--font-mono)}
+a{color:var(--accent)}
+sup{font-size:.7em}
+
+.wrap{max-width:860px;margin:0 auto}
+
+/* ---------- Header ---------- */
+.page-head{
+  display:flex;align-items:center;gap:22px;
+  padding-block:28px 18px;
+  flex-wrap:wrap;
+}
+.venn-deco{position:relative;width:70px;height:56px;flex:0 0 auto}
+.venn-deco i{
+  position:absolute;top:4px;width:40px;height:40px;border-radius:50%;
+  border:1.5px solid var(--accent);background:var(--accent-tint);opacity:.75;
+}
+.venn-deco i:nth-child(1){left:0}
+.venn-deco i:nth-child(2){left:16px;border-color:var(--accent-2);background:var(--accent-2-tint)}
+.venn-deco i:nth-child(3){left:8px;top:16px;border-color:var(--fg-muted);background:transparent;opacity:.5}
+.head-text{flex:1 1 260px;min-width:0}
+.eyebrow{
+  margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--fg-muted);font-weight:600;
+}
+h1{font-size:clamp(28px,6vw,38px);letter-spacing:-.01em}
+.subtitle{margin:6px 0 0;color:var(--fg-muted);max-width:52ch}
+
+/* ---------- Tabs ---------- */
+.tabs{
+  display:flex;gap:6px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  padding-bottom:0;margin-bottom:22px;
+  position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;
+  padding-top:4px;
+}
+.tab-btn{
+  font-family:var(--font-body);font-weight:600;font-size:13.5px;
+  background:none;border:none;color:var(--fg-muted);cursor:pointer;
+  padding:10px 14px;border-bottom:2.5px solid transparent;border-radius:6px 6px 0 0;
+}
+.tab-btn:hover{color:var(--fg);background:var(--surface-2)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{padding-bottom:48px}
+.panel > section{margin-bottom:34px}
+.panel h2{font-size:21px;margin-bottom:4px}
+.panel h2 .n{color:var(--accent);font-family:var(--font-mono);font-size:15px;margin-right:8px}
+.lead{color:var(--fg-muted);margin:2px 0 14px;max-width:64ch}
+
+/* ---------- Reusable components ---------- */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);
+}
+
+pre.code{
+  background:var(--surface-2);border:1px solid var(--border);border-radius:9px;
+  padding:11px 13px;overflow-x:auto;font-size:13px;line-height:1.6;margin:8px 0;
+}
+
+.callout{
+  border:1px solid var(--accent-2);background:var(--accent-2-tint);border-radius:10px;
+  padding:10px 14px;font-size:13px;margin:12px 0;
+}
+.callout b{color:var(--accent-2)}
+
+/* ---------- Flashcards ---------- */
+.cat-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{
+  font-family:var(--font-body);font-size:12.5px;font-weight:600;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg-muted);
+  padding:6px 12px;cursor:pointer;
+}
+.chip.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.card-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg-muted);margin-bottom:14px}
+
+.flash-wrap{max-width:500px;margin:0 auto}
+.flashcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--border);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;display:flex;flex-direction:column;justify-content:center;
+  cursor:pointer;position:relative;
+}
+.flashcard[hidden]{display:none}
+.flash-cat{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--fg-muted);
+}
+.flash-side{font-size:16px;text-align:center}
+.flash-q{font-weight:600}
+.flash-a{color:var(--accent)}
+.flash-hint{
+  position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:var(--fg-muted);
+}
+.flash-explain-row{display:flex;justify-content:center;margin-top:12px}
+.flash-explain-row[hidden]{display:none}
+.flash-explain{
+  margin-top:10px;font-size:13px;color:var(--fg);border-left:3px solid var(--accent-2);
+  padding:10px 13px;background:var(--accent-2-tint);border-radius:0 8px 8px 0;text-align:left;
+}
+.flash-explain[hidden]{display:none}
+.flash-controls{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.flash-controls[hidden]{display:none}
+.btn{
+  font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg);padding:9px 14px;
+}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.warn{background:var(--incorrect-tint);border-color:var(--incorrect);color:var(--incorrect)}
+.flash-meta{text-align:center;color:var(--fg-muted);font-size:12.5px;margin-top:12px}
+
+.addcard-form{
+  margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);text-align:left;
+}
+.addcard-form[hidden]{display:none}
+.addcard-form h3{font-size:15px;margin-bottom:2px}
+.addcard-form label{display:block;font-size:12.5px;font-weight:600;color:var(--fg-muted);margin:12px 0 4px}
+.addcard-form select,.addcard-form input[type="text"],.addcard-form textarea{
+  width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:13.5px;resize:vertical;
+}
+.addcard-form .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.addcard-form .hint{font-size:11.5px;color:var(--fg-muted);margin-top:2px}
+
+/* ---------- Verständnis-Check (periodic interrupt card) ---------- */
+.checkcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--accent-2);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;position:relative;text-align:center;
+}
+.checkcard[hidden]{display:none}
+.check-label{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--accent-2);
+}
+.check-q{font-size:16px;font-weight:600;margin:18px 0 18px}
+.check-bool{display:flex;justify-content:center;gap:10px}
+.check-bool[hidden]{display:none}
+.check-text{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.check-text[hidden]{display:none}
+.check-text input{
+  flex:1 1 220px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;
+}
+.check-feedback{margin-top:14px;font-size:13.5px;text-align:left;border-radius:0 8px 8px 0;padding:9px 13px;border-left:3px solid var(--border)}
+.check-feedback[hidden]{display:none}
+.check-feedback.correct{color:var(--accent);border-left-color:var(--accent);background:var(--accent-tint)}
+.check-feedback.wrong{color:var(--incorrect);border-left-color:var(--incorrect);background:var(--incorrect-tint)}
+.check-controls{display:flex;justify-content:center;margin-top:14px}
+.check-controls[hidden]{display:none}
+
+/* ---------- Quiz ---------- */
+.quiz-score{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;
+}
+.quiz-score strong{color:var(--accent);font-family:var(--font-mono)}
+.q-item{margin-bottom:18px}
+.q-item p.q-text{font-weight:600;margin:0 0 9px;white-space:pre-line}
+.q-opts{display:grid;gap:7px}
+.opt{
+  text-align:left;border:1px solid var(--border);background:var(--surface);border-radius:9px;
+  padding:9px 12px;font-family:var(--font-body);font-size:13.5px;cursor:pointer;color:var(--fg);
+}
+.opt:hover{background:var(--surface-2)}
+.opt.correct{background:var(--accent-tint);border-color:var(--accent)}
+.opt.incorrect{background:var(--incorrect-tint);border-color:var(--incorrect)}
+.opt[disabled]{cursor:default}
+.q-explain{
+  margin-top:7px;font-size:12.5px;color:var(--fg-muted);border-left:3px solid var(--accent);
+  padding:5px 10px;background:var(--surface-2);border-radius:0 8px 8px 0;display:none;
+}
+.q-explain.shown{display:block}
+
+/* ---------- Tasks ---------- */
+details.task{
+  background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:13px 16px;margin-bottom:10px;box-shadow:var(--shadow);
+}
+details.task summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.task summary::-webkit-details-marker{display:none}
+details.task summary .tnum{
+  font-family:var(--font-mono);color:var(--accent-ink);background:var(--accent);
+  border-radius:6px;padding:1px 7px;font-size:12px;flex:0 0 auto;
+}
+details.task .body{margin-top:10px;font-size:13.5px}
+details.task .tip{
+  margin-top:9px;font-size:12.5px;border-left:3px solid var(--accent-2);padding:6px 10px;
+  background:var(--accent-2-tint);border-radius:0 8px 8px 0;
+}
+details.task .sol summary{font-size:12.5px;font-weight:600;color:var(--fg-muted);margin-top:8px}
+details.task .sol pre.code{white-space:pre-wrap}
+.task-footnote{color:var(--fg-muted);font-size:12.5px;margin-top:14px}
+
+footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10px 0 30px}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <div class="venn-deco" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="head-text">
+      <p class="eyebrow">Mathe I · HTWG Konstanz · Prof. Dr. R. Axthelm — 1 Elementare Algebra</p>
+      <h1>Mengen &amp; Zahlmengen</h1>
+      <p class="subtitle">1.1 Mengen &amp; Schreibweisen, 1.2 Zahlmengen — Definitionen, Venn-Diagramme, Quantoren, Intervalle, Produktmengen und komplexe Zahlen zum Verstehen, Behalten und Anwenden.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Lernbereiche">
+    <button class="tab-btn active" data-tab="cards" role="tab" aria-selected="true" id="tabbtn-cards">Karteikarten</button>
+    <button class="tab-btn" data-tab="quiz" role="tab" aria-selected="false" id="tabbtn-quiz">Verständnisfragen</button>
+    <button class="tab-btn" data-tab="tasks" role="tab" aria-selected="false" id="tabbtn-tasks">Übungsaufgaben</button>
+  </nav>
+
+  <main>
+    <!-- ============ FLASHCARDS ============ -->
+    <div class="panel" id="panel-cards" role="tabpanel" aria-labelledby="tabbtn-cards">
+      <section>
+        <h2><span class="n">◆</span>Karteikarten</h2>
+        <p class="lead">Karte anklicken, um die Antwort zu sehen — ehrlich einschätzen, das bringt mehr als nur lesen. Nach dem Umdrehen gibt „🔎 Mehr erklären" bei Bedarf noch mehr Hintergrund. Alle 6–8 Karten kommt ein kurzer Verständnis-Check zwischendurch (Ja/Nein oder kurze Texteingabe). Über „➕ Eigene Karte" kannst du jederzeit eigene Karten ergänzen.</p>
+
+        <div class="cat-filters" id="catFilters"></div>
+        <label class="card-toggle"><input type="checkbox" id="onlyUnsure"> Nur Karten üben, die ich noch nicht sicher weiß</label>
+
+        <div class="flash-wrap">
+          <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Karte umdrehen">
+            <span class="flash-cat" id="flashCat"></span>
+            <div class="flash-side" id="flashFront"></div>
+            <div class="flash-side flash-a" id="flashBack" hidden></div>
+            <span class="flash-hint" id="flashHint">Antippen zum Umdrehen</span>
+          </div>
+
+          <div class="checkcard" id="checkCard" hidden>
+            <span class="check-label">Verständnis-Check</span>
+            <p class="check-q" id="checkQ"></p>
+            <div class="check-bool" id="checkBool">
+              <button class="btn" id="checkYes" type="button">Ja</button>
+              <button class="btn" id="checkNo" type="button">Nein</button>
+            </div>
+            <div class="check-text" id="checkTextWrap">
+              <input type="text" id="checkInput" placeholder="Deine Antwort …" autocomplete="off">
+              <button class="btn primary" id="checkSubmit" type="button">Prüfen</button>
+            </div>
+            <div class="check-feedback" id="checkFeedback" hidden></div>
+            <div class="check-controls" id="checkControls" hidden>
+              <button class="btn primary" id="btnCheckDone" type="button">Weiter mit Karteikarten ▶</button>
+            </div>
+          </div>
+
+          <div class="flash-explain-row" id="flashExplainRow" hidden>
+            <button class="btn" id="btnExplain" type="button">🔎 Mehr erklären</button>
+          </div>
+          <div class="flash-explain" id="flashExplain" hidden></div>
+
+          <div class="flash-controls" id="flashControlsMain">
+            <button class="btn" id="btnPrev" type="button">◀ Zurück</button>
+            <button class="btn warn" id="btnUnknown" type="button">↻ Nochmal üben</button>
+            <button class="btn primary" id="btnKnown" type="button">✓ Weiß ich</button>
+            <button class="btn" id="btnNext" type="button">Weiter ▶</button>
+          </div>
+          <div class="flash-controls" id="flashControlsShuffle">
+            <button class="btn" id="btnShuffle" type="button">⤨ Mischen</button>
+            <button class="btn" id="btnAddCard" type="button">➕ Eigene Karte</button>
+          </div>
+          <div class="flash-controls" id="flashControlsManage">
+            <button class="btn" id="btnEditCard" type="button">✏️ Karte bearbeiten</button>
+            <button class="btn" id="btnDeleteCard" type="button" style="border-color:var(--incorrect);color:var(--incorrect)">🗑 Karte entfernen</button>
+            <button class="btn" id="btnRestoreRemoved" type="button" hidden>↺ Entfernte Karten wiederherstellen (<span id="removedCount">0</span>)</button>
+          </div>
+          <p class="flash-meta" id="flashMeta"></p>
+
+          <form class="addcard-form" id="addCardForm" hidden>
+            <h3 id="addCardFormTitle">Eigene Karteikarte hinzufügen</h3>
+            <p class="lead" id="addCardFormLead" style="margin-bottom:0">Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.</p>
+
+            <label for="addCardCat">Kategorie</label>
+            <select id="addCardCat"></select>
+            <input type="text" id="addCardCatNew" placeholder="Neue Kategorie…" hidden>
+
+            <label for="addCardQ">Frage (Vorderseite)</label>
+            <textarea id="addCardQ" rows="2" placeholder="Was soll abgefragt werden?"></textarea>
+
+            <label for="addCardA">Antwort (Rückseite)</label>
+            <textarea id="addCardA" rows="3" placeholder="Die vollständige, gute Antwort"></textarea>
+
+            <p class="hint">Frage und Antwort sind Pflicht.</p>
+
+            <div class="row">
+              <button class="btn primary" id="btnSaveCard" type="submit">Karte speichern</button>
+              <button class="btn" id="btnCancelCard" type="button">Abbrechen</button>
+              <button class="btn" id="btnResetCard" type="button" hidden style="border-color:var(--incorrect);color:var(--incorrect)">↺ Original wiederherstellen</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ QUIZ ============ -->
+    <div class="panel" id="panel-quiz" role="tabpanel" aria-labelledby="tabbtn-quiz" hidden>
+      <section>
+        <h2><span class="n">?</span>Verständnisfragen</h2>
+        <p class="lead" id="quizIntro">Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.</p>
+        <div class="quiz-score">
+          <span>Ergebnis: <strong id="quizScore">0</strong> / <span id="quizTotal">0</span> richtig</span>
+          <button class="btn" id="btnQuizReset" type="button">Zurücksetzen</button>
+        </div>
+        <div id="quizList"></div>
+      </section>
+    </div>
+
+    <!-- ============ TASKS ============ -->
+    <div class="panel" id="panel-tasks" role="tabpanel" aria-labelledby="tabbtn-tasks" hidden>
+      <section>
+        <h2><span class="n">▸</span>Übungsaufgaben</h2>
+        <p class="lead">Saalaufgaben aus der Vorlesung plus ergänzende Übungen im selben Schwierigkeitsgrad — zum echten Rechnen, nicht zum schnellen Abrufen. Erst selbst auf Papier rechnen, dann Tipp bzw. Lösung zum Gegenchecken aufklappen.</p>
+        <div id="taskList"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="credit">Lernset zu Prof. Dr. R. Axthelm, Mathe I — 1 Elementare Algebra: 1.1 Mengen &amp; Schreibweisen, 1.2 Zahlmengen</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Tabs ----------
+  var tabBtns = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  var panels = {
+    cards: document.getElementById("panel-cards"),
+    quiz: document.getElementById("panel-quiz"),
+    tasks: document.getElementById("panel-tasks")
+  };
+  tabBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabBtns.forEach(function(b){ b.classList.remove("active"); b.setAttribute("aria-selected","false"); });
+      btn.classList.add("active"); btn.setAttribute("aria-selected","true");
+      Object.keys(panels).forEach(function(k){ panels[k].hidden = (k !== btn.dataset.tab); });
+    });
+  });
+
+  // ---------- Storage helpers ----------
+  function loadJSON(key, fallback){
+    try{ var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function saveJSON(key, val){
+    try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+  }
+
+  // ======================================================
+  // FLASHCARDS — Frage vorne, vollständige gute Antwort hinten.
+  // ======================================================
+  var CARDS = [
+    {cat:"Grundlagen", q:"Wie lautet die Definition einer Menge?", a:"Eine Zusammenfassung von bestimmten, wohlunterschiedenen Objekten unserer Anschauung oder unseres Denkens zu einem Ganzen. Die Objekte heißen Elemente."},
+    {cat:"Grundlagen", q:"Welche zwei Darstellungsformen einer Menge gibt es?", a:"Aufzählende Form (z. B. M={1,2,3}) und beschreibende Form (M={Grundmenge | Eigenschaft})."},
+    {cat:"Grundlagen", q:"Wie schreibt man die leere Menge?", a:"∅ := {} — eine Menge ohne Elemente."},
+    {cat:"Grundlagen", q:"Was bedeuten a∈M und a∉M?", a:"a ∈ M: a ist Element von M. a ∉ M: a ist nicht Element von M."},
+    {cat:"Grundlagen", q:"Ist {1,1,2} dasselbe wie {1,2}?", a:"Ja — Mengen enthalten jedes Element nur einmal, Wiederholungen fallen weg."},
+    {cat:"Grundlagen", q:"Was bedeutet N ⊆ M?", a:"N ist Teilmenge von M: jedes Element von N ist auch Element von M (N=M ist erlaubt)."},
+    {cat:"Grundlagen", q:"Unterschied zwischen N⊆M und N⊂M (bzw. N⊊M)?", a:"N⊂M verlangt zusätzlich, dass N und M nicht gleich sind — es muss mindestens ein Element in M geben, das nicht in N liegt."},
+    {cat:"Grundlagen", q:"Wie liest man N⊂M mit Quantoren?", a:"(∀x∈N : x∈M) ∧ (∃x∈M : x∉N)."},
+    {cat:"Grundlagen", q:"Was bedeutet ¬∀ im Gegensatz zu ∀?", a:"¬∀ ist die Verneinung von \"für alle\" — \"nicht für alle\", es gibt also mindestens eine Ausnahme von der Regel."},
+    {cat:"Grundlagen", q:"Wofür stehen \":\" bzw. \"|\" in einer Schreibweise wie {x∈M | Eigenschaft}?", a:"Für \"mit\" bzw. \"mit der Eigenschaft, dass\" — sie trennen die Objektvariable von der Bedingung, die sie erfüllen muss."},
+    {cat:"Mengenoperationen", q:"Was ist M∩N?", a:"Der Schnitt: alle Elemente, die sowohl in M als auch in N liegen."},
+    {cat:"Mengenoperationen", q:"Wann heißen zwei Mengen disjunkt?", a:"Wenn ihr Schnitt leer ist: M∩N=∅."},
+    {cat:"Mengenoperationen", q:"Was ist M∪N?", a:"Die Vereinigung: alle Elemente aus M und N zusammen (Doppelungen nur einmal)."},
+    {cat:"Mengenoperationen", q:"Was ist M\\N?", a:"\"M ohne N\": alle Elemente von M, die nicht auch in N liegen."},
+    {cat:"Mengenoperationen", q:"Was ist das Komplement M^C?", a:"Alles, was nicht Element von M ist — bezogen auf eine Übergeordnete Menge A mit M⊆A."},
+    {cat:"Mengenoperationen", q:"Wie lautet die Vorfahrtsregel für Mengenoperationen?", a:"Komplement (^C) vor ∩ vor ∪ vor \\ — Komplement bindet am stärksten, \\ am schwächsten."},
+    {cat:"Mengenoperationen", q:"Gilt A∪(B∩C) = (A∪B)∩C?", a:"Nein — per Venn-Diagramm zeigt sich, dass beide Seiten unterschiedliche Mengen sein können. Klammern sorgfältig setzen!"},
+    {cat:"Mengenoperationen", q:"Ist Mengendifferenz \\ assoziativ, also (A\\B)\\C = A\\(B\\C)?", a:"Nein, im Allgemeinen nicht — Gegenbeispiel A={1,2}, B={1}, C={2}: (A\\B)\\C={2}\\{2}=∅, aber A\\(B\\C)={1,2}\\∅={1,2}."},
+    {cat:"Mengenoperationen", q:"Wie liest man unverklammertes M1\\M2\\M3 laut Vorlesungskonvention?", a:"Als M1\\(M2\\M3) — so in der Vorlesung festgelegt, weil \\ nicht assoziativ ist."},
+    {cat:"Quantoren", q:"Was bedeutet ∀?", a:"Allquantor: \"für alle\"."},
+    {cat:"Quantoren", q:"Was bedeutet ∃?", a:"Existenzquantor: \"es existiert (mindestens) ein\"."},
+    {cat:"Quantoren", q:"Unterschied zwischen ∃ und ∃! (bzw. ∃₁)?", a:"∃ = \"es gibt mindestens ein\", ∃! = \"es gibt genau ein\"."},
+    {cat:"Quantoren", q:"Was bedeutet ∃ₙ?", a:"\"Es existieren genau n (Stück)\" — verallgemeinert ∃! (=∃₁) auf eine beliebige feste Anzahl n."},
+    {cat:"Quantoren", q:"Was bedeutet ∄?", a:"\"Es existiert kein.\""},
+    {cat:"Quantoren", q:"Was bedeuten ∧ und ∨?", a:"∧ = \"und\" (Konjunktion), ∨ = \"oder\" (Disjunktion)."},
+    {cat:"Quantoren", q:"Unterschied zwischen ⇔ und :⇔?", a:"⇔ = \"ist gleichbedeutend mit\" zwischen bekannten Aussagen; :⇔ = \"ist per Definition gleichbedeutend mit\", führt eine neue Bezeichnung ein."},
+    {cat:"Quantoren", q:"Wie liest man M⊆N \"matheartig\" mit Quantoren?", a:"∀x∈M : x∈N — für alle Elemente x in M gilt: x ist Element von N."},
+    {cat:"Zahlmengen", q:"Was ist ℕ, was ℕ₀?", a:"ℕ={1,2,3,4,…} ohne 0; ℕ₀=ℕ∪{0}={0,1,2,3,…}."},
+    {cat:"Zahlmengen", q:"Was ist ℤ?", a:"Die ganzen Zahlen: {…,−2,−1,0,1,2,…}."},
+    {cat:"Zahlmengen", q:"Wie ist ℚ definiert?", a:"ℚ = {p/q | p∈ℤ ∧ q∈ℕ} — rationale Zahlen (Brüche aus ganzer Zahl durch natürliche Zahl)."},
+    {cat:"Zahlmengen", q:"Was sind irrationale Zahlen?", a:"ℝ\\ℚ — reelle Zahlen, die sich nicht als Bruch schreiben lassen, z. B. e, √2, π."},
+    {cat:"Zahlmengen", q:"Nenne die Teilmengenkette aller Zahlmengen.", a:"ℕ ⊂ ℕ₀ ⊂ ℤ ⊂ ℚ ⊂ ℝ ⊂ ℂ."},
+    {cat:"Zahlmengen", q:"Unterschied zwischen [a,b] und (a,b)?", a:"[a,b] ist abgeschlossen (Randpunkte gehören dazu), (a,b) ist offen (Randpunkte gehören nicht dazu)."},
+    {cat:"Zahlmengen", q:"Darf an der ∞-Seite eines Intervalls eine eckige Klammer stehen, z. B. [a,∞]?", a:"Nein, nie — ∞ ist kein erreichbarer Punkt. Immer offene Klammer: [a,∞) bzw. (−∞,b]."},
+    {cat:"Zahlmengen", q:"Was ist ℝ⁺ und was ℝ₀⁺?", a:"ℝ⁺=(0,∞) (streng positiv, 0 ausgeschlossen); ℝ₀⁺=[0,∞) (nicht negativ, 0 eingeschlossen)."},
+    {cat:"Produktmenge", q:"Was ist M×N?", a:"Die Produktmenge/das kartesische Produkt: {(a,b) | a∈M ∧ b∈N} — alle geordneten Paare."},
+    {cat:"Produktmenge", q:"Was ist Mⁿ?", a:"M×M×⋯×M (n-mal) — die Menge aller n-Tupel aus M."},
+    {cat:"Produktmenge", q:"Was ist ℝ² geometrisch?", a:"Die Gaußsche/Euklidsche Ebene: alle Punkte (x,y) mit x,y∈ℝ."},
+    {cat:"Produktmenge", q:"Wie viele Elemente hat {1,2,3}×{a,b,c}?", a:"9 (3·3) — jede Kombination eines Elements aus der ersten mit der zweiten Menge."},
+    {cat:"Produktmenge", q:"Ist M×N dasselbe wie N×M?", a:"Nein im Allgemeinen — die Reihenfolge in den Paaren zählt, z. B. (1,a)≠(a,1). Produktmengen sind nicht kommutativ."},
+    {cat:"Produktmenge", q:"Wie viele Eckpunkte hat der Einheitswürfel [0,1]³?", a:"8 — alle Kombinationen aus {0,1}³ = {0,1}×{0,1}×{0,1}."},
+    {cat:"Komplexe Zahlen", q:"Warum reicht ℝ nicht für x²=−1?", a:"Weil das Quadrat einer reellen Zahl nie negativ ist — in ℝ gibt es keine Lösung."},
+    {cat:"Komplexe Zahlen", q:"Wie ist die imaginäre Einheit i definiert?", a:"Durch die Eigenschaft i² = −1."},
+    {cat:"Komplexe Zahlen", q:"Wie ist ℂ definiert?", a:"ℂ = {x+iy | x,y∈ℝ ∧ i²=−1} — komplexe Zahlen in kartesischer Form."},
+    {cat:"Komplexe Zahlen", q:"Was bedeuten Re(c) und Im(c) für c=x+iy?", a:"Re(c):=x (Realteil), Im(c):=y (Imaginärteil)."},
+    {cat:"Komplexe Zahlen", q:"Was ist das konjugiert Komplexe von c=x+iy?", a:"c̄ := x−iy — das Vorzeichen des Imaginärteils wird umgedreht."},
+    {cat:"Komplexe Zahlen", q:"Wie addiert/subtrahiert man z=a+ib und w=c+id?", a:"Komponentenweise: z±w = (a±c) + i(b±d)."},
+    {cat:"Komplexe Zahlen", q:"Wie multipliziert man z=a+ib und w=c+id?", a:"z·w = (ac−bd) + i(bc+ad)."},
+    {cat:"Komplexe Zahlen", q:"Wie dividiert man z=a+ib durch w=c+id?", a:"Man erweitert mit dem konjugiert Komplexen des Nenners: z/w = (ac+bd)/(c²+d²) + i·(bc−ad)/(c²+d²)."},
+    {cat:"Komplexe Zahlen", q:"Wie berechnet man den Betrag |z| von z=a+ib?", a:"|z| = √(a²+b²)."},
+    {cat:"Komplexe Zahlen", q:"Was ist |3+4i|?", a:"5 — denn √(3²+4²)=√25=5, das klassische 3-4-5-Dreieck."},
+    {cat:"Komplexe Zahlen", q:"Was ist z·z̄ für eine komplexe Zahl z=a+ib?", a:"z·z̄ = a²+b² = |z|² — immer reell und nicht-negativ, der Imaginärteil hebt sich beim Ausmultiplizieren immer auf."}
+  ].map(function(c, i){ c.id = i; return c; });
+
+  var BASE_CATS = ["Grundlagen","Mengenoperationen","Quantoren","Zahlmengen","Produktmenge","Komplexe Zahlen"];
+  var STORE_KEY = "algebra-mengen";
+  var knownIds = new Set(loadJSON(STORE_KEY + "-known", []));
+  var removedIds = new Set(loadJSON(STORE_KEY + "-removed", []));
+  var customCards = loadJSON(STORE_KEY + "-custom", []);
+  var overrides = loadJSON(STORE_KEY + "-overrides", {});
+  var ALL = [];
+  function refreshAll(){
+    customCards.forEach(function(c, i){ c.id = CARDS.length + i; });
+    ALL = CARDS.concat(customCards).map(function(c){
+      var o = overrides[c.id];
+      if(!o) return c;
+      return {id:c.id, cat:o.cat, q:o.q, a:o.a, expl:(o.expl !== undefined ? o.expl : c.expl)};
+    });
+  }
+  refreshAll();
+
+  function activeTotal(){ return ALL.length - removedIds.size; }
+  var activeCat = "Alle";
+  var onlyUnsure = false;
+  var order = [];
+  var pos = 0;
+  var flipped = false;
+
+  var catFiltersEl = document.getElementById("catFilters");
+  function currentCats(){
+    var extra = [];
+    ALL.forEach(function(c){ if(BASE_CATS.indexOf(c.cat) === -1 && extra.indexOf(c.cat) === -1) extra.push(c.cat); });
+    return ["Alle"].concat(BASE_CATS, extra);
+  }
+  function renderCatFilters(){
+    catFiltersEl.innerHTML = "";
+    currentCats().forEach(function(cat){
+      var b = document.createElement("button");
+      b.className = "chip" + (cat === activeCat ? " active" : "");
+      b.type = "button"; b.textContent = cat; b.dataset.cat = cat;
+      b.addEventListener("click", function(){
+        activeCat = cat;
+        Array.prototype.forEach.call(catFiltersEl.children, function(c){ c.classList.toggle("active", c.dataset.cat === cat); });
+        rebuildOrder();
+      });
+      catFiltersEl.appendChild(b);
+    });
+  }
+  renderCatFilters();
+  document.getElementById("onlyUnsure").addEventListener("change", function(e){
+    onlyUnsure = e.target.checked; rebuildOrder();
+  });
+
+  function shuffle(arr){
+    for(var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function rebuildOrder(){
+    var pool = ALL.filter(function(c){
+      if(removedIds.has(c.id)) return false;
+      if(activeCat !== "Alle" && c.cat !== activeCat) return false;
+      if(onlyUnsure && knownIds.has(c.id)) return false;
+      return true;
+    });
+    order = pool.map(function(c){ return c.id; });
+    pos = 0; flipped = false;
+    renderCard();
+  }
+
+  var flashcardEl = document.getElementById("flashcard");
+  var flashCat = document.getElementById("flashCat");
+  var flashFront = document.getElementById("flashFront");
+  var flashBack = document.getElementById("flashBack");
+  var flashHint = document.getElementById("flashHint");
+  var flashMeta = document.getElementById("flashMeta");
+  var flashExplainRow = document.getElementById("flashExplainRow");
+  var flashExplain = document.getElementById("flashExplain");
+  var btnExplain = document.getElementById("btnExplain");
+
+  function cardAt(id){
+    for(var i = 0; i < ALL.length; i++){ if(ALL[i].id === id) return ALL[i]; }
+    return null;
+  }
+
+  function resetExplain(){
+    flashExplain.hidden = true;
+    btnExplain.textContent = "🔎 Mehr erklären";
+  }
+
+  function renderCard(){
+    resetExplain();
+    if(order.length === 0){
+      flashCat.textContent = "";
+      flashFront.textContent = onlyUnsure ? "Alles in dieser Kategorie sitzt schon. 🎉" : "Keine Karten in dieser Auswahl.";
+      flashBack.hidden = true; flashFront.hidden = false;
+      flashExplainRow.hidden = true;
+      flashHint.textContent = "";
+      flashMeta.textContent = "Gewusst: " + knownIds.size + " / " + activeTotal();
+      return;
+    }
+    var card = cardAt(order[pos]);
+    flashCat.textContent = card.cat;
+    flashFront.textContent = card.q;
+    flashBack.textContent = card.a;
+    flashFront.hidden = flipped;
+    flashBack.hidden = !flipped;
+    flashExplainRow.hidden = !(flipped && card.expl);
+    flashHint.textContent = flipped ? "Antippen für die Frage" : "Antippen zum Umdrehen";
+    flashMeta.textContent = "Karte " + (pos+1) + " / " + order.length + " · Gewusst gesamt: " + knownIds.size + " / " + activeTotal();
+  }
+
+  btnExplain.addEventListener("click", function(){
+    var card = order.length ? cardAt(order[pos]) : null;
+    if(!card) return;
+    flashExplain.textContent = card.expl || "";
+    flashExplain.hidden = !flashExplain.hidden;
+    btnExplain.textContent = flashExplain.hidden ? "🔎 Mehr erklären" : "🔽 Erklärung ausblenden";
+  });
+
+  flashcardEl.addEventListener("click", function(){
+    if(order.length === 0) return;
+    flipped = !flipped; renderCard();
+  });
+  flashcardEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flashcardEl.click(); }
+  });
+
+  function advance(delta){
+    if(order.length === 0) return;
+    pos = (pos + delta + order.length) % order.length;
+    flipped = false; renderCard();
+  }
+  document.getElementById("btnPrev").addEventListener("click", function(){ advance(-1); });
+  document.getElementById("btnNext").addEventListener("click", function(){ advance(1); });
+  document.getElementById("btnShuffle").addEventListener("click", function(){ shuffle(order); pos = 0; flipped = false; renderCard(); });
+  document.getElementById("btnKnown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.add(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    if(onlyUnsure){ rebuildOrder(); } else { advance(1); }
+    maybeShowCheck();
+  });
+  document.getElementById("btnUnknown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.delete(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    advance(1);
+    maybeShowCheck();
+  });
+
+  function updateRestoreBtn(){
+    var btn = document.getElementById("btnRestoreRemoved");
+    var countEl = document.getElementById("removedCount");
+    if(countEl) countEl.textContent = removedIds.size;
+    btn.hidden = removedIds.size === 0;
+  }
+  document.getElementById("btnDeleteCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    if(!confirm("Diese Karte wirklich dauerhaft aus dem Lernset entfernen?\n\n„" + card.q + "“")) return;
+    removedIds.add(card.id);
+    knownIds.delete(card.id);
+    saveJSON(STORE_KEY + "-removed", Array.from(removedIds));
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  document.getElementById("btnRestoreRemoved").addEventListener("click", function(){
+    if(removedIds.size === 0) return;
+    if(!confirm("Alle " + removedIds.size + " entfernten Karten wiederherstellen?")) return;
+    removedIds.clear();
+    saveJSON(STORE_KEY + "-removed", []);
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  updateRestoreBtn();
+
+  // ---------- Add / edit own card ----------
+  var addCardForm = document.getElementById("addCardForm");
+  var addCardCat = document.getElementById("addCardCat");
+  var addCardCatNew = document.getElementById("addCardCatNew");
+  var addCardFormTitle = document.getElementById("addCardFormTitle");
+  var addCardFormLead = document.getElementById("addCardFormLead");
+  var btnSaveCard = document.getElementById("btnSaveCard");
+  var btnResetCard = document.getElementById("btnResetCard");
+  var NEW_CAT_VALUE = "__new__";
+  var editingId = null;
+
+  function populateAddCardCats(){
+    addCardCat.innerHTML = "";
+    BASE_CATS.concat(currentCats().filter(function(c){ return c !== "Alle" && BASE_CATS.indexOf(c) === -1; })).forEach(function(cat){
+      var o = document.createElement("option"); o.value = cat; o.textContent = cat;
+      addCardCat.appendChild(o);
+    });
+    var o2 = document.createElement("option"); o2.value = NEW_CAT_VALUE; o2.textContent = "Neue Kategorie…";
+    addCardCat.appendChild(o2);
+  }
+  addCardCat.addEventListener("change", function(){
+    addCardCatNew.hidden = addCardCat.value !== NEW_CAT_VALUE;
+  });
+
+  function closeAddCardForm(){
+    addCardForm.reset(); addCardCatNew.hidden = true; addCardForm.hidden = true;
+    editingId = null;
+  }
+
+  document.getElementById("btnAddCard").addEventListener("click", function(){
+    if(!addCardForm.hidden && editingId === null){ closeAddCardForm(); return; }
+    editingId = null;
+    populateAddCardCats();
+    document.getElementById("addCardQ").value = "";
+    document.getElementById("addCardA").value = "";
+    addCardFormTitle.textContent = "Eigene Karteikarte hinzufügen";
+    addCardFormLead.textContent = "Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.";
+    btnSaveCard.textContent = "Karte speichern";
+    btnResetCard.hidden = true;
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnEditCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    editingId = card.id;
+    populateAddCardCats();
+    addCardCat.value = card.cat;
+    addCardCatNew.hidden = true;
+    document.getElementById("addCardQ").value = card.q;
+    document.getElementById("addCardA").value = card.a;
+    addCardFormTitle.textContent = "Karte bearbeiten";
+    addCardFormLead.textContent = "Änderungen werden dauerhaft in diesem Lernset gespeichert (im Browser).";
+    btnSaveCard.textContent = "Änderungen speichern";
+    btnResetCard.hidden = !overrides[card.id];
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnCancelCard").addEventListener("click", closeAddCardForm);
+
+  btnResetCard.addEventListener("click", function(){
+    if(editingId === null) return;
+    if(!confirm("Diese Karte wirklich auf die ursprüngliche Version zurücksetzen?")) return;
+    delete overrides[editingId];
+    saveJSON(STORE_KEY + "-overrides", overrides);
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  addCardForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var q = document.getElementById("addCardQ").value.trim();
+    var a = document.getElementById("addCardA").value.trim();
+    var cat = addCardCat.value === NEW_CAT_VALUE ? addCardCatNew.value.trim() : addCardCat.value;
+    if(!q || !a || !cat){ alert("Bitte Kategorie, Frage und Antwort ausfüllen."); return; }
+    if(editingId !== null){
+      overrides[editingId] = {cat:cat, q:q, a:a};
+      saveJSON(STORE_KEY + "-overrides", overrides);
+    } else {
+      customCards.push({cat:cat, q:q, a:a, expl:""});
+      saveJSON(STORE_KEY + "-custom", customCards);
+    }
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  rebuildOrder();
+
+  // ======================================================
+  // VERSTÄNDNIS-CHECK — alle 6-8 Karten ein kurzer, geprüfter
+  // Ja/Nein- oder Kurztext-Check zu einem Thema, das gerade geübt wurde.
+  // ======================================================
+  var ABFRAGE = [
+    {type:"bool", q:"Ja oder Nein: ∅⊆M gilt für jede Menge M, auch für M=∅.", correct:true,
+     explain:"Richtig — ∀x∈∅: x∈M ist \"leer wahr\", weil ∅ gar kein Element enthält, das die Bedingung verletzen könnte."},
+    {type:"bool", q:"Ja oder Nein: A∪(B∩C) = (A∪B)∩C gilt immer.", correct:false,
+     explain:"Falsch — ein Venn-Diagramm zeigt, dass beide Seiten unterschiedliche Mengen sein können. Klammerung ist hier entscheidend."},
+    {type:"text", q:"{1,2,3}×{a,b,c} hat wie viele Elemente? (nur die Zahl)", answer:"9",
+     explain:"9 = 3·3 — jede Kombination eines Elements aus der ersten mit der zweiten Menge."},
+    {type:"bool", q:"Ja oder Nein: (A\\B)\\C = A\\(B\\C) gilt immer.", correct:false,
+     explain:"Falsch — Gegenbeispiel A={1,2}, B={1}, C={2}: (A\\B)\\C=∅, aber A\\(B\\C)={1,2}. Mengendifferenz ist nicht assoziativ."},
+    {type:"text", q:"Was ist |3+4i|? (nur die Zahl)", answer:"5",
+     explain:"√(3²+4²)=√25=5 — das klassische 3-4-5-Dreieck."},
+    {type:"bool", q:"Ja oder Nein: z·z̄ ist für jede komplexe Zahl z immer reell und nicht-negativ.", correct:true,
+     explain:"Richtig — z·z̄=a²+b²=|z|², der Imaginärteil hebt sich beim Ausmultiplizieren immer auf."},
+    {type:"text", q:"Wie viele Eckpunkte hat der Einheitswürfel [0,1]³? (nur die Zahl)", answer:"8",
+     explain:"8 = 2·2·2 — alle Kombinationen aus {0,1}³."},
+    {type:"bool", q:"Ja oder Nein: M×N = N×M gilt immer.", correct:false,
+     explain:"Falsch — die Reihenfolge in den Paaren zählt, z. B. (1,a)≠(a,1). Produktmengen sind nicht kommutativ."},
+    {type:"text", q:"M={1,2,3,4}, N={3,4,5,6}. Wie viele Elemente hat M∩N? (nur die Zahl)", answer:"2",
+     explain:"M∩N={3,4} — genau 2 gemeinsame Elemente."},
+    {type:"bool", q:"Ja oder Nein: √2 ist eine rationale Zahl.", correct:false,
+     explain:"Falsch — √2 lässt sich nicht als Bruch schreiben, es ist irrational (ℝ\\ℚ)."},
+    {type:"bool", q:"Ja oder Nein: Darf an der ∞-Seite eines Intervalls eine eckige Klammer stehen, z. B. [a,∞]?", correct:false,
+     explain:"Nein — ∞ ist kein erreichbarer Punkt, deshalb immer offene Klammer: [a,∞) bzw. (−∞,b]."},
+    {type:"text", q:"i² = ? (nur die Zahl, mit Vorzeichen)", answer:"-1", accept:["−1"],
+     explain:"i ist per Definition die Zahl mit i²=−1."},
+    {type:"bool", q:"Ja oder Nein: ℕ enthält in dieser Vorlesung die Zahl 0.", correct:false,
+     explain:"Nein — ℕ={1,2,3,…} ohne 0. Mit 0 heißt die Menge ℕ₀."},
+    {type:"bool", q:"Ja oder Nein: N⊂M erlaubt N=M.", correct:false,
+     explain:"Nein — ⊂ (echte Teilmenge) schließt Gleichheit ausdrücklich aus, im Unterschied zu ⊆."},
+    {type:"text", q:"{1,2}×{a,b}×{+,−} hat wie viele Elemente? (nur die Zahl)", answer:"8",
+     explain:"2·2·2=8 Tripel — jede Kombination eines Elements aus jeder der drei Mengen."}
+  ];
+
+  var checkCardEl = document.getElementById("checkCard");
+  var checkQEl = document.getElementById("checkQ");
+  var checkBoolEl = document.getElementById("checkBool");
+  var checkTextWrapEl = document.getElementById("checkTextWrap");
+  var checkInputEl = document.getElementById("checkInput");
+  var checkFeedbackEl = document.getElementById("checkFeedback");
+  var checkControlsEl = document.getElementById("checkControls");
+  var checkYesEl = document.getElementById("checkYes");
+  var checkNoEl = document.getElementById("checkNo");
+  var checkSubmitEl = document.getElementById("checkSubmit");
+  var flashControlsMain = document.getElementById("flashControlsMain");
+  var flashControlsShuffle = document.getElementById("flashControlsShuffle");
+  var flashControlsManage = document.getElementById("flashControlsManage");
+  var abfrageBag = [];
+  var currentCheckItem = null;
+
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  var cardsUntilCheck = randInt(6, 8);
+
+  function drawAbfrage(){
+    if(ABFRAGE.length === 0) return null;
+    if(abfrageBag.length === 0){ abfrageBag = shuffle(ABFRAGE.map(function(_, i){ return i; })); }
+    return ABFRAGE[abfrageBag.pop()];
+  }
+  function normalize(s){ return (s || "").toString().trim().toLowerCase().replace(/\s+/g, " "); }
+
+  function maybeShowCheck(){
+    cardsUntilCheck--;
+    if(cardsUntilCheck > 0) return;
+    cardsUntilCheck = randInt(6, 8);
+    var item = drawAbfrage();
+    if(!item) return;
+    currentCheckItem = item;
+    checkQEl.textContent = item.q;
+    checkBoolEl.hidden = item.type !== "bool";
+    checkTextWrapEl.hidden = item.type !== "text";
+    checkInputEl.value = "";
+    checkYesEl.disabled = checkNoEl.disabled = false;
+    checkSubmitEl.disabled = false;
+    checkFeedbackEl.hidden = true;
+    checkFeedbackEl.className = "check-feedback";
+    checkControlsEl.hidden = true;
+
+    flashcardEl.hidden = true;
+    flashControlsMain.hidden = true;
+    flashControlsShuffle.hidden = true;
+    flashControlsManage.hidden = true;
+    flashExplainRow.hidden = true;
+    flashExplain.hidden = true;
+    checkCardEl.hidden = false;
+  }
+
+  function finishCheck(isCorrect){
+    checkFeedbackEl.textContent = (isCorrect ? "✓ Richtig. " : "✗ Nicht ganz. ") + (currentCheckItem.explain || "");
+    checkFeedbackEl.className = "check-feedback " + (isCorrect ? "correct" : "wrong");
+    checkFeedbackEl.hidden = false;
+    checkYesEl.disabled = checkNoEl.disabled = true;
+    checkSubmitEl.disabled = true;
+    checkControlsEl.hidden = false;
+  }
+  checkYesEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === true); });
+  checkNoEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === false); });
+  checkSubmitEl.addEventListener("click", function(){
+    var val = normalize(checkInputEl.value);
+    var candidates = [currentCheckItem.answer].concat(currentCheckItem.accept || []).map(normalize);
+    finishCheck(candidates.indexOf(val) !== -1);
+  });
+  checkInputEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); checkSubmitEl.click(); }
+  });
+  document.getElementById("btnCheckDone").addEventListener("click", function(){
+    checkCardEl.hidden = true;
+    flashcardEl.hidden = false;
+    flashControlsMain.hidden = false;
+    flashControlsShuffle.hidden = false;
+    flashControlsManage.hidden = false;
+    renderCard();
+  });
+
+  // ======================================================
+  // QUIZ
+  // ======================================================
+  var QUIZ = [
+    {q:"Welche Aussage ist korrekt?",
+     opts:["{1,1,2} hat drei Elemente","{1,1,2} = {1,2}, denn Mengen enthalten jedes Element nur einmal","{} und {0} sind dieselbe Menge","{1,2} ≠ {2,1}, weil die Reihenfolge wichtig ist"],
+     correct:1, explain:"Mengen sind ungeordnet und jedes Element zählt nur einmal — {1,1,2}={1,2} und {1,2}={2,1}."},
+    {q:"Für welchen Fall gilt N⊆M, aber NICHT N⊂M?",
+     opts:["Für gar keinen Fall","Wenn N=M gilt","Wenn N=∅","Wenn M und N disjunkt sind"],
+     correct:1, explain:"⊆ erlaubt Gleichheit, ⊂ (echte Teilmenge) schließt sie aus. N⊆M ohne N⊂M gilt also genau dann, wenn N=M."},
+    {q:"M={1,2,3,4}, N={3,4,5,6}. Was ist M∩N?",
+     opts:["{1,2,3,4,5,6}","{3,4}","{1,2}","∅"],
+     correct:1, explain:"Der Schnitt enthält die gemeinsamen Elemente von M und N — hier 3 und 4."},
+    {q:"Welche Aussage über A∪(B∩C) und (A∪B)∩C ist richtig?",
+     opts:["Sie sind immer gleich, Klammern sind egal","Sie können unterschiedliche Mengen sein — die Klammerung verändert das Ergebnis","Sie sind nur bei leeren Mengen gleich","∩ hat hier keine höhere Priorität als ∪"],
+     correct:1, explain:"Ein Venn-Diagramm zeigt unterschiedliche Flächen — deshalb die Vorfahrtsregel (ᶜ vor ∩ vor ∪ vor \\) und sorgfältiges Klammern."},
+    {q:"Wie ist A∪B∩C\\D laut Vorfahrtsregel korrekt geklammert?",
+     opts:["(A∪B)∩(C\\D)","(A∪(B∩C))\\D","A∪(B∩(C\\D))","((A∪B)∩C)\\D"],
+     correct:1, explain:"∩ bindet stärker als ∪, das wiederum stärker als \\: zuerst B∩C, dann mit A vereinigen, zuletzt \\D."},
+    {q:"Ist (A\\B)\\C dasselbe wie A\\(B\\C)?",
+     opts:["Ja, \\ ist assoziativ","Nein, im Allgemeinen nicht","Nur wenn A,B,C disjunkt sind","Nur wenn B=C"],
+     correct:1, explain:"Die Vorlesung zeigt per Venn-Diagramm, dass beide Klammerungen unterschiedliche Mengen liefern können."},
+    {q:"Was bedeutet ∃!x∈ℕ : x²=4 ∧ x>0?",
+     opts:["Es gibt mindestens eine positive natürliche Zahl mit x²=4","Es gibt genau eine positive natürliche Zahl mit x²=4","Für alle positiven natürlichen Zahlen gilt x²=4","Es gibt keine solche Zahl"],
+     correct:1, explain:"∃! (bzw. ∃₁) heißt \"es existiert genau ein\" — hier x=2."},
+    {q:"Welche Symbolik beschreibt korrekt \"N ist Teilmenge von M\"?",
+     opts:["∃x∈N : x∈M","∀x∈N : x∈M","∀x∈M : x∈N","∃x∈M : x∉N"],
+     correct:1, explain:"Teilmenge heißt: JEDES (∀) Element von N liegt auch in M — nicht nur irgendeins."},
+    {q:"Welche Zahlenmenge ist KEINE Teilmenge von ℝ?",
+     opts:["ℚ","ℤ","ℂ","ℕ"],
+     correct:2, explain:"ℂ enthält ℝ als Teilmenge (reelle Zahlen = komplexe Zahlen mit Im=0), aber ℂ selbst ist größer als ℝ, also keine Teilmenge davon."},
+    {q:"Welches Intervall ist korrekt notiert?",
+     opts:["[2,∞]","[2,∞)","(2,∞]","[−∞,2]"],
+     correct:1, explain:"An der Unendlich-Seite steht nie eine eckige (geschlossene) Klammer — ∞ ist kein erreichbarer Punkt."},
+    {q:"Wie viele Elemente hat {1,2}×{a,b}×{+,−}?",
+     opts:["6","8","3","2"],
+     correct:1, explain:"2·2·2=8 Tripel — jede Kombination eines Elements aus jeder der drei Mengen."},
+    {q:"Für c=3−4i: was sind Re(c) und Im(c)?",
+     opts:["Re(c)=3, Im(c)=−4","Re(c)=3, Im(c)=4","Re(c)=−4, Im(c)=3","Re(c)=3−4i, Im(c)=0"],
+     correct:0, explain:"Bei c=x+iy liest man Re(c)=x und Im(c)=y direkt ab — hier x=3, y=−4."},
+    {q:"Was ist das konjugiert Komplexe von z=2+3i?",
+     opts:["−2−3i","2−3i","−2+3i","3+2i"],
+     correct:1, explain:"Konjugation dreht nur das Vorzeichen des Imaginärteils um: z̄=x−iy."},
+    {q:"Was ist |3+4i|?",
+     opts:["7","5","12","25"],
+     correct:1, explain:"|z|=√(a²+b²)=√(9+16)=√25=5 — das klassische 3-4-5-Dreieck."},
+    {q:"Warum wurde ℂ überhaupt eingeführt?",
+     opts:["Um Brüche darzustellen","Weil Gleichungen wie x²=−1 in ℝ keine Lösung haben","Um negative Zahlen zu definieren","Um Mengenoperationen zu vereinfachen"],
+     correct:1, explain:"In ℝ ist jedes Quadrat ≥0, x²=−1 ist dort unlösbar. Mit i, wo i²=−1, wird es lösbar."}
+  ];
+
+  var quizListEl = document.getElementById("quizList");
+  var quizScoreEl = document.getElementById("quizScore");
+  var quizTotalEl = document.getElementById("quizTotal");
+  document.getElementById("quizIntro").textContent = QUIZ.length + " Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.";
+  quizTotalEl.textContent = String(QUIZ.length);
+  var score = 0;
+
+  function renderQuiz(){
+    quizListEl.innerHTML = "";
+    score = 0; quizScoreEl.textContent = "0";
+    QUIZ.forEach(function(item, qi){
+      var wrap = document.createElement("div");
+      wrap.className = "q-item card";
+      var qText = document.createElement("p");
+      qText.className = "q-text";
+      qText.textContent = (qi+1) + ". " + item.q;
+      wrap.appendChild(qText);
+
+      var optsWrap = document.createElement("div");
+      optsWrap.className = "q-opts";
+      var explainEl = document.createElement("div");
+      explainEl.className = "q-explain";
+      explainEl.textContent = item.explain;
+
+      item.opts.forEach(function(optText, oi){
+        var b = document.createElement("button");
+        b.className = "opt"; b.type = "button"; b.textContent = optText;
+        b.addEventListener("click", function(){
+          if(wrap.dataset.answered) return;
+          wrap.dataset.answered = "1";
+          Array.prototype.forEach.call(optsWrap.children, function(o, idx){
+            o.disabled = true;
+            if(idx === item.correct) o.classList.add("correct");
+            else if(idx === oi) o.classList.add("incorrect");
+          });
+          explainEl.classList.add("shown");
+          if(oi === item.correct){ score++; quizScoreEl.textContent = String(score); }
+        });
+        optsWrap.appendChild(b);
+      });
+
+      wrap.appendChild(optsWrap);
+      wrap.appendChild(explainEl);
+      quizListEl.appendChild(wrap);
+    });
+  }
+  document.getElementById("btnQuizReset").addEventListener("click", renderQuiz);
+  renderQuiz();
+
+  // ======================================================
+  // TASKS
+  // ======================================================
+  var TASKS = [
+    {t:"Klammerung bestimmen (Saalaufgabe)", d:"Gegeben: A<sup>C</sup> ∩ C ∪ B \\ D<sup>C</sup>. Welche Klammerung ist laut Vorfahrtsregel korrekt?<br>(A) (((A<sup>C</sup>)∩C)∪(B\\D)<sup>C</sup>)<br>(B) ((A<sup>C</sup>)∩((C∪B)\\D))<sup>C</sup><br>(C) ((((A<sup>C</sup>)∩C)∪B)\\(D<sup>C</sup>))<br>(D) (((A<sup>C</sup>)∩(C∪B))\\(D<sup>C</sup>))",
+     tip:"Wende die Vorfahrtsregel Schritt für Schritt an: zuerst alle Komplemente (A<sup>C</sup>, D<sup>C</sup>), dann ∩, dann ∪, zuletzt \\.",
+     sol:"Komplemente zuerst: A<sup>C</sup> und D<sup>C</sup>. Dann ∩: A<sup>C</sup> ∩ C. Dann ∪: (A<sup>C</sup>∩C) ∪ B. Zuletzt \\: ((A<sup>C</sup>∩C)∪B) \\ D<sup>C</sup>.\n\n→ Antwort (C) ist korrekt: ((((A<sup>C</sup>)∩C)∪B)\\(D<sup>C</sup>))."},
+    {t:"Primzahl formalisieren (Saalaufgabe)", d:"x ist eine Primzahl. Beschreibe x in mathematischer Symbolik (∀, ∃, ∈, ∧, \\, etc.).",
+     tip:"Überlege: welche Eigenschaften hat eine Primzahl? (1) natürliche Zahl größer 1, (2) kein k außer 1 und x teilt x. Verbinde beide mit ∧.",
+     sol:"(x ∈ ℕ\\{1}) ∧ (∀k ∈ ℕ\\{1,x} : x/k ∉ ℕ)\n\nx ist eine natürliche Zahl größer 1, und für jede natürliche Zahl k außer 1 und x gilt: x/k ist keine natürliche Zahl (also kein Teiler)."},
+    {t:"Kantenpunkte eines Quadrats (Saalaufgabe)", d:"Beschreibe die Menge K, bestehend aus allen Kantenpunkten eines Quadrats W = [0,1]², als Produktmenge(n).",
+     tip:"Ein Quadrat hat 4 Kanten: links (x=0), rechts (x=1), unten (y=0), oben (y=1). Jede Kante lässt sich als Produktmenge schreiben.",
+     sol:"K = ({0,1} × [0,1]) ∪ ([0,1] × {0,1})\n\nDer erste Teil liefert die linke und rechte Kante (x∈{0,1}, y beliebig in [0,1]), der zweite die untere und obere Kante (x beliebig in [0,1], y∈{0,1})."},
+    {t:"Intervalle, Produktmengen &amp; Mengenoperationen (Saalaufgabe)", d:"Gegeben: I₁=[1,3], I₂=(2,5), I₃=(0,4]. M₁=I₁×I₂, M₂=I₂×I₃, M₃=I₃×I₁. Berechne M₁∩M₂ und (M₁∩M₂)\\M₃.",
+     tip:"Bilde zuerst M₁, M₂, M₃ explizit als Produktmengen. Schneide dann komponentenweise (erste Komponente mit erster, zweite mit zweiter) und achte penibel auf offene/geschlossene Klammern.",
+     sol:"M₁ = [1,3]×(2,5), M₂ = (2,5)×(0,4], M₃ = (0,4]×[1,3].\n\nM₁∩M₂ = ([1,3]∩(2,5)) × ((2,5)∩(0,4]) = (2,3] × (2,4].\n\n(M₁∩M₂)\\M₃: da x∈(2,3] automatisch in (0,4] liegt, bleibt nur die Bedingung y∉[1,3] übrig — kombiniert mit y∈(2,4] bleibt y∈(3,4].\n→ (M₁∩M₂)\\M₃ = (2,3] × (3,4].\n\nBonus: unverklammertes M₁\\M₂\\M₃ ist als M₁\\(M₂\\M₃) zu lesen — feste Konvention der Vorlesung, weil \\ nicht assoziativ ist."},
+    {t:"Distributivgesetz zeigen", d:"Zeige: A∩(B∪C) = (A∩B)∪(A∩C). Begründe mit einer Fallunterscheidung über ein beliebiges Element x.",
+     tip:"Prüfe für ein beliebiges x: wann ist x∈A∩(B∪C)? Wann ist x∈(A∩B)∪(A∩C)? Zeige, dass beide Bedingungen logisch gleichwertig sind.",
+     sol:"x∈A∩(B∪C) ⇔ x∈A ∧ (x∈B ∨ x∈C)\n⇔ (x∈A ∧ x∈B) ∨ (x∈A ∧ x∈C)   [Distributivgesetz der Aussagenlogik]\n⇔ x∈(A∩B) ∨ x∈(A∩C)\n⇔ x∈(A∩B)∪(A∩C)\n\nDa das für jedes x gilt, sind die Mengen gleich. Achtung, nicht verwechseln: das ist etwas anderes als die (falsche) Vereinfachung A∪(B∩C) → (A∪B)∩C — DAS ist nicht gleich. Hier dagegen stimmt die Gleichheit wirklich."},
+    {t:"Mit komplexen Zahlen rechnen", d:"Gegeben: z=2+3i, w=−4−2i (dieselben Zahlen wie in der Vorlesung). Berechne z+w, z·w, |z| und z̄.",
+     tip:"Nutze die Formeln: Addition komponentenweise, Multiplikation mit (ac−bd)+i(bc+ad), Betrag √(a²+b²).",
+     sol:"z+w = (2−4) + (3−2)i = −2 + i\n\nz·w = (2·(−4) − 3·(−2)) + i(3·(−4) + 2·(−2)) = (−8+6) + i(−12−4) = −2 − 16i\n\n|z| = √(2²+3²) = √13 ≈ 3.61 (nicht √12 — auf der Vorlesungsfolie steht an dieser Stelle fälschlich √12, richtig ist √13)\n\nz̄ = 2 − 3i\n\nZur Kontrolle: z−w = (2−(−4)) + (3−(−2))i = 6+5i — das deckt sich mit dem Beispiel aus der Vorlesung."},
+    {t:"Zahlen der richtigen Menge zuordnen", d:"Ordne jede Zahl der kleinsten passenden Zahlenmenge zu (ℕ, ℕ₀, ℤ, ℚ, ℝ oder ℂ): a) 7  b) −3  c) 0.5  d) √2  e) −5/2  f) 0  g) 3+2i  h) √(−4)",
+     tip:"Gehe die Teilmengenkette ℕ⊂ℕ₀⊂ℤ⊂ℚ⊂ℝ⊂ℂ von innen nach außen durch: passt die Zahl schon in die kleinste Menge?",
+     sol:"a) 7 → ℕ\nb) −3 → ℤ (negativ, also nicht in ℕ/ℕ₀)\nc) 0.5 = 1/2 → ℚ\nd) √2 → ℝ (irrational, kein Bruch möglich, also nicht in ℚ)\ne) −5/2 → ℚ\nf) 0 → ℕ₀ (0 ist in dieser Vorlesung nicht in ℕ enthalten)\ng) 3+2i → ℂ (echter Imaginärteil ≠0, also nicht reell)\nh) √(−4) = 2i → ℂ (−4&lt;0 hat in ℝ keine Wurzel; √(−4)=√4·√(−1)=2i, rein imaginär)"},
+    {t:"Teilmengenbeziehungen bestimmen", d:"Gegeben: M={1,2,3,4,5}, N={2,4}, P={2,4,6}. Welche der folgenden Aussagen sind wahr: N⊆M, N⊂M, P⊆M, P⊂M, M⊆M?",
+     tip:"⊆ erlaubt Gleichheit, ⊂ verlangt echte Teilmenge. Prüfe bei P besonders genau, ob wirklich jedes Element von P auch in M liegt.",
+     sol:"N⊆M: wahr (2,4∈M). N⊂M: wahr (M hat zusätzlich 1,3,5).\nP⊆M: FALSCH — 6∉M, also ist P keine Teilmenge von M.\nP⊂M: ebenfalls falsch (aus demselben Grund).\nM⊆M: wahr — ⊆ erlaubt Gleichheit."},
+    {t:"Mengenoperationen mit konkreten Mengen", d:"Gegeben: M={1,2,3,4,5,6}, N={4,5,6,7,8}, Grundmenge A={0,1,...,9}. Berechne M∩N, M∪N, M\\N, N\\M und das Komplement M^C (bzgl. A).",
+     tip:"Schnitt = gemeinsame Elemente, Vereinigung = alle zusammen (ohne Doppelung), M\\N = Elemente aus M, die nicht auch in N sind.",
+     sol:"M∩N = {4,5,6}\nM∪N = {1,2,3,4,5,6,7,8}\nM\\N = {1,2,3}\nN\\M = {7,8}\nM^C = A\\M = {0,7,8,9}"},
+    {t:"Macht die Reihenfolge von ∀ und ∃ einen Unterschied?", d:"Übersetze beide Aussagen mit Quantoren und bestimme, ob sie wahr sind (für x,y∈ℝ): (a) Für jedes x gibt es ein y mit x+y=0. (b) Es gibt ein y, sodass für jedes x gilt x+y=0.",
+     tip:"Bei (a) darf y von x abhängen (y=−x funktioniert immer). Bei (b) muss EIN festes y für ALLE x gleichzeitig funktionieren.",
+     sol:"(a) ∀x∃y: x+y=0 → wahr, denn zu jedem x passt y=−x.\n(b) ∃y∀x: x+y=0 → falsch, kein festes y erfüllt x+y=0 für alle x gleichzeitig (x=1 und x=2 bräuchten unterschiedliche y).\n\nMerke: ∀∃ und ∃∀ sind NICHT dasselbe — die Reihenfolge der Quantoren ändert die Bedeutung!"},
+    {t:"Bedingungen in Intervallnotation übersetzen", d:"Schreibe als Intervall: (a) alle reellen x mit −2 &lt; x ≤ 5. (b) alle reellen x mit x ≥ 3. (c) alle reellen x mit x &lt; 0 oder x > 10.",
+     tip:"Runde Klammer = offen (Wert nicht dabei), eckige Klammer = geschlossen (Wert dabei). Bei ∞ immer offene Klammer, nie eckig.",
+     sol:"(a) (−2, 5]\n(b) [3, ∞)\n(c) (−∞, 0) ∪ (10, ∞)"},
+    {t:"Kartesisches Produkt explizit auflisten", d:"Gegeben M={1,2}, N={a,b,c}. Liste M×N vollständig auf. Ist M×N = N×M?",
+     tip:"M×N enthält Paare (m,n) mit m∈M zuerst. Zähle zuerst, wie viele Paare es geben muss (|M|·|N|).",
+     sol:"M×N = {(1,a),(1,b),(1,c),(2,a),(2,b),(2,c)} — 6 Elemente.\nN×M hat ebenfalls 6 Elemente, aber die Paare sehen anders aus, z. B. (a,1) statt (1,a).\nM×N ≠ N×M — die Reihenfolge in den Paaren zählt, das Produkt ist nicht kommutativ."},
+    {t:"Zusammenhang zwischen z·z̄ und |z|² zeigen", d:"Zeige für eine beliebige komplexe Zahl z=a+ib: z·z̄ = |z|² (und damit ist z·z̄ immer reell und nicht-negativ).",
+     tip:"Setze z̄=a−ib ein und nutze die Multiplikationsformel (ac−bd)+i(bc+ad). Was passiert mit dem Imaginärteil?",
+     sol:"z·z̄ = (a+ib)(a−ib) = (a·a − b·(−b)) + i(b·a + a·(−b)) = (a²+b²) + i·0 = a²+b²\n\nUnd |z|² = (√(a²+b²))² = a²+b².\n\nAlso z·z̄ = a²+b² = |z|² — der Imaginärteil verschwindet immer, das Ergebnis ist reell und ≥0."},
+    {t:"Stimmt das? Die leere Menge als Teilmenge", d:"Ist ∅⊆M für JEDE Menge M (auch für M=∅ selbst)? Begründe mit der Quantoren-Definition von ⊆.",
+     tip:"N⊆M bedeutet ∀x∈N: x∈M. Was passiert mit dieser Aussage, wenn N=∅ ist — gibt es überhaupt ein x, das die Bedingung verletzen könnte?",
+     sol:"Ja, ∅⊆M gilt immer. Die Definition ∀x∈∅: x∈M ist eine Aussage über ALLE Elemente von ∅ — da ∅ aber gar kein Element enthält, gibt es kein x, das die Bedingung verletzen könnte. Die Aussage ist \"leer wahr\" (vacuously true). Das gilt auch für M=∅ selbst: ∅⊆∅ ist wahr."}
+  ];
+  function taskBodyHtml(task){
+    return "<p>" + task.d + "</p>" +
+      '<div class="tip">💡 Tipp: ' + task.tip + "</div>" +
+      '<details class="sol"><summary>✅ Lösung zum Gegenchecken</summary><pre class="code">' + task.sol + "</pre></details>";
+  }
+  var taskListEl = document.getElementById("taskList");
+  TASKS.forEach(function(task, i){
+    var det = document.createElement("details");
+    det.className = "task";
+    var summary = document.createElement("summary");
+    summary.innerHTML = '<span class="tnum">' + (i+1) + '</span> ' + task.t;
+    det.appendChild(summary);
+    var body = document.createElement("div");
+    body.className = "body";
+    body.innerHTML = taskBodyHtml(task);
+    det.appendChild(body);
+    taskListEl.appendChild(det);
+  });
+
+})();
+</script>

@@ -1,0 +1,1000 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Git-Lernset</title>
+<style>
+/* Layout: sticky header with a branch/merge motif, tab bar below it, one panel "on top" at a time —
+   the same branch-out-and-merge-back idea that the lecture itself teaches. */
+:root{
+  --bg:#f2f5f3;
+  --surface:#ffffff;
+  --surface-2:#e8ede9;
+  --fg:#162220;
+  --fg-muted:#52635d;
+  --border:#d7e0da;
+  --accent:#0f8f7c;      /* teal = main / richtig */
+  --accent-ink:#ffffff;
+  --accent-tint:#e3f3ef;
+  --accent-2:#b85c12;    /* amber/terracotta = feature branch / sekundär */
+  --accent-2-ink:#ffffff;
+  --accent-2-tint:#f8ead9;
+  --incorrect:#b23b3b;
+  --incorrect-tint:#fbe6e6;
+  --shadow:0 1px 2px rgba(15,30,25,.06), 0 6px 18px rgba(15,30,25,.07);
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1615;
+    --surface:#161f1e;
+    --surface-2:#1d2928;
+    --fg:#e7efec;
+    --fg-muted:#9db0aa;
+    --border:#2a3836;
+    --accent:#2bbfa3;
+    --accent-ink:#06211c;
+    --accent-tint:#133430;
+    --accent-2:#e2984c;
+    --accent-2-ink:#2a1703;
+    --accent-2-tint:#3a2a16;
+    --incorrect:#e2766e;
+    --incorrect-tint:#3a1f1d;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1615;
+  --surface:#161f1e;
+  --surface-2:#1d2928;
+  --fg:#e7efec;
+  --fg-muted:#9db0aa;
+  --border:#2a3836;
+  --accent:#2bbfa3;
+  --accent-ink:#06211c;
+  --accent-tint:#133430;
+  --accent-2:#e2984c;
+  --accent-2-ink:#2a1703;
+  --accent-2-tint:#3a2a16;
+  --incorrect:#e2766e;
+  --incorrect-tint:#3a1f1d;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;text-wrap:balance;margin:0}
+code,pre,.mono{font-family:var(--font-mono)}
+a{color:var(--accent)}
+
+.wrap{max-width:860px;margin:0 auto}
+
+/* ---------- Header ---------- */
+.page-head{
+  display:flex;align-items:center;gap:20px;
+  padding-block:28px 18px;
+  flex-wrap:wrap;
+}
+.branch-deco{position:relative;width:60px;height:64px;flex:0 0 auto}
+.branch-deco svg{position:absolute;inset:0}
+.branch-deco .dot{position:absolute;width:11px;height:11px;border-radius:50%;box-sizing:border-box}
+.branch-deco .dot.main{border:1.5px solid var(--accent);background:var(--accent-tint)}
+.branch-deco .dot.feat{border:1.5px solid var(--accent-2);background:var(--accent-2-tint)}
+.head-text{flex:1 1 260px;min-width:0}
+.eyebrow{
+  margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--fg-muted);font-weight:600;
+}
+h1{font-size:clamp(28px,6vw,38px);letter-spacing:-.01em}
+.subtitle{margin:6px 0 0;color:var(--fg-muted);max-width:52ch}
+
+/* ---------- Tabs ---------- */
+.tabs{
+  display:flex;gap:6px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  padding-bottom:0;margin-bottom:22px;
+  position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;
+  padding-top:4px;
+}
+.tab-btn{
+  font-family:var(--font-body);font-weight:600;font-size:13.5px;
+  background:none;border:none;color:var(--fg-muted);cursor:pointer;
+  padding:10px 14px;border-bottom:2.5px solid transparent;border-radius:6px 6px 0 0;
+}
+.tab-btn:hover{color:var(--fg);background:var(--surface-2)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{padding-bottom:48px}
+.panel > section{margin-bottom:34px}
+.panel h2{font-size:21px;margin-bottom:4px}
+.panel h2 .n{color:var(--accent);font-family:var(--font-mono);font-size:15px;margin-right:8px}
+.lead{color:var(--fg-muted);margin:2px 0 14px;max-width:62ch}
+
+/* ---------- Reusable components ---------- */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);
+}
+
+pre.code{
+  background:var(--surface-2);border:1px solid var(--border);border-radius:9px;
+  padding:11px 13px;overflow-x:auto;font-size:12.5px;line-height:1.55;margin:8px 0;
+}
+
+/* ---------- Flashcards ---------- */
+.cat-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{
+  font-family:var(--font-body);font-size:12.5px;font-weight:600;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg-muted);
+  padding:6px 12px;cursor:pointer;
+}
+.chip.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.card-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg-muted);margin-bottom:14px}
+
+.flash-wrap{max-width:480px;margin:0 auto}
+.flashcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--border);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;display:flex;flex-direction:column;justify-content:center;
+  cursor:pointer;position:relative;
+}
+.flashcard[hidden]{display:none}
+.flash-cat{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--fg-muted);
+}
+.flash-side{font-size:16px;text-align:center}
+.flash-q{font-weight:600}
+.flash-a{color:var(--accent);font-weight:600}
+.flash-hint{
+  position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:var(--fg-muted);
+}
+.flash-explain-row{display:flex;justify-content:center;margin-top:12px}
+.flash-explain-row[hidden]{display:none}
+.flash-explain{
+  margin-top:10px;font-size:13px;color:var(--fg);border-left:3px solid var(--accent-2);
+  padding:10px 13px;background:var(--accent-2-tint);border-radius:0 8px 8px 0;text-align:left;
+}
+.flash-explain[hidden]{display:none}
+.flash-controls{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.flash-controls[hidden]{display:none}
+.btn{
+  font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg);padding:9px 14px;
+}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.warn{background:var(--incorrect-tint);border-color:var(--incorrect);color:var(--incorrect)}
+.flash-meta{text-align:center;color:var(--fg-muted);font-size:12.5px;margin-top:12px}
+
+.addcard-form{
+  margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);text-align:left;
+}
+.addcard-form[hidden]{display:none}
+.addcard-form h3{font-size:15px;margin-bottom:2px}
+.addcard-form label{display:block;font-size:12.5px;font-weight:600;color:var(--fg-muted);margin:12px 0 4px}
+.addcard-form select,.addcard-form input[type="text"],.addcard-form textarea{
+  width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:13.5px;resize:vertical;
+}
+.addcard-form .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.addcard-form .hint{font-size:11.5px;color:var(--fg-muted);margin-top:2px}
+
+/* ---------- Verständnis-Check (periodic interrupt card) ---------- */
+.checkcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--accent-2);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;position:relative;text-align:center;
+}
+.checkcard[hidden]{display:none}
+.check-label{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--accent-2);
+}
+.check-q{font-size:16px;font-weight:600;margin:18px 0 18px}
+.check-bool{display:flex;justify-content:center;gap:10px}
+.check-bool[hidden]{display:none}
+.check-text{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.check-text[hidden]{display:none}
+.check-text input{
+  flex:1 1 220px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;
+}
+.check-feedback{margin-top:14px;font-size:13.5px;text-align:left;border-radius:0 8px 8px 0;padding:9px 13px;border-left:3px solid var(--border)}
+.check-feedback[hidden]{display:none}
+.check-feedback.correct{color:var(--accent);border-left-color:var(--accent);background:var(--accent-tint)}
+.check-feedback.wrong{color:var(--incorrect);border-left-color:var(--incorrect);background:var(--incorrect-tint)}
+.check-controls{display:flex;justify-content:center;margin-top:14px}
+.check-controls[hidden]{display:none}
+
+/* ---------- Quiz ---------- */
+.quiz-score{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;
+}
+.quiz-score strong{color:var(--accent);font-family:var(--font-mono)}
+.q-item{margin-bottom:18px}
+.q-item p.q-text{font-weight:600;margin:0 0 9px;white-space:pre-line}
+.q-opts{display:grid;gap:7px}
+.opt{
+  text-align:left;border:1px solid var(--border);background:var(--surface);border-radius:9px;
+  padding:9px 12px;font-family:var(--font-body);font-size:13.5px;cursor:pointer;color:var(--fg);
+}
+.opt:hover{background:var(--surface-2)}
+.opt.correct{background:var(--accent-tint);border-color:var(--accent)}
+.opt.incorrect{background:var(--incorrect-tint);border-color:var(--incorrect)}
+.opt[disabled]{cursor:default}
+.q-explain{
+  margin-top:7px;font-size:12.5px;color:var(--fg-muted);border-left:3px solid var(--accent);
+  padding:5px 10px;background:var(--surface-2);border-radius:0 8px 8px 0;display:none;
+}
+.q-explain.shown{display:block}
+
+/* ---------- Tasks ---------- */
+details.task{
+  background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:13px 16px;margin-bottom:10px;box-shadow:var(--shadow);
+}
+details.task summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.task summary::-webkit-details-marker{display:none}
+details.task summary .tnum{
+  font-family:var(--font-mono);color:var(--accent-ink);background:var(--accent);
+  border-radius:6px;padding:1px 7px;font-size:12px;flex:0 0 auto;
+}
+details.task .body{margin-top:10px;font-size:13.5px}
+details.task .tip{
+  margin-top:9px;font-size:12.5px;border-left:3px solid var(--accent-2);padding:6px 10px;
+  background:var(--accent-2-tint);border-radius:0 8px 8px 0;
+}
+details.task .sol summary{font-size:12.5px;font-weight:600;color:var(--fg-muted);margin-top:8px}
+.task-footnote{color:var(--fg-muted);font-size:12.5px;margin-top:14px}
+
+footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10px 0 30px}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <div class="branch-deco" aria-hidden="true">
+      <svg viewBox="0 0 60 64" width="60" height="64">
+        <path d="M18 10 L18 54" stroke="var(--border)" stroke-width="2" fill="none"/>
+        <path d="M18 20 C 30 20, 42 22, 42 32 C 42 42, 30 46, 18 50" stroke="var(--accent-2)" stroke-width="2" fill="none" opacity="0.85"/>
+      </svg>
+      <i class="dot main" style="left:12.5px;top:4.5px"></i>
+      <i class="dot feat" style="left:36.5px;top:26.5px"></i>
+      <i class="dot main" style="left:12.5px;top:48.5px"></i>
+    </div>
+    <div class="head-text">
+      <p class="eyebrow">Programmiertechnik I · Vorlesung 11 von 30 · HTWG Konstanz</p>
+      <h1>Version Control mit Git</h1>
+      <p class="subtitle">Dein Lernset zu Git-Grundlagen, GitHub-Workflow (Branch, Merge, Rebase, Fork) und Versionskontrolle in Cursor/VS Code — zum Verstehen, Behalten und Anwenden.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Lernbereiche">
+    <button class="tab-btn active" data-tab="cards" role="tab" aria-selected="true" id="tabbtn-cards">Karteikarten</button>
+    <button class="tab-btn" data-tab="quiz" role="tab" aria-selected="false" id="tabbtn-quiz">Verständnisfragen</button>
+    <button class="tab-btn" data-tab="tasks" role="tab" aria-selected="false" id="tabbtn-tasks">Übungsaufgaben</button>
+  </nav>
+
+  <main>
+    <!-- ============ FLASHCARDS ============ -->
+    <div class="panel" id="panel-cards" role="tabpanel" aria-labelledby="tabbtn-cards">
+      <section>
+        <h2><span class="n">◆</span>Karteikarten</h2>
+        <p class="lead">Karte anklicken, um die Antwort zu sehen — ehrlich einschätzen, das bringt mehr als nur lesen. Nach dem Umdrehen gibt „🔎 Mehr erklären" bei Bedarf noch mehr Hintergrund. Alle 6–8 Karten kommt ein kurzer Verständnis-Check zwischendurch (Ja/Nein oder kurze Texteingabe). Über „➕ Eigene Karte" kannst du jederzeit eigene Karten ergänzen.</p>
+
+        <div class="cat-filters" id="catFilters"></div>
+        <label class="card-toggle"><input type="checkbox" id="onlyUnsure"> Nur Karten üben, die ich noch nicht sicher weiß</label>
+
+        <div class="flash-wrap">
+          <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Karte umdrehen">
+            <span class="flash-cat" id="flashCat"></span>
+            <div class="flash-side" id="flashFront"></div>
+            <div class="flash-side flash-a" id="flashBack" hidden></div>
+            <span class="flash-hint" id="flashHint">Antippen zum Umdrehen</span>
+          </div>
+
+          <div class="checkcard" id="checkCard" hidden>
+            <span class="check-label">Verständnis-Check</span>
+            <p class="check-q" id="checkQ"></p>
+            <div class="check-bool" id="checkBool">
+              <button class="btn" id="checkYes" type="button">Ja</button>
+              <button class="btn" id="checkNo" type="button">Nein</button>
+            </div>
+            <div class="check-text" id="checkTextWrap">
+              <input type="text" id="checkInput" placeholder="Deine Antwort …" autocomplete="off">
+              <button class="btn primary" id="checkSubmit" type="button">Prüfen</button>
+            </div>
+            <div class="check-feedback" id="checkFeedback" hidden></div>
+            <div class="check-controls" id="checkControls" hidden>
+              <button class="btn primary" id="btnCheckDone" type="button">Weiter mit Karteikarten ▶</button>
+            </div>
+          </div>
+
+          <div class="flash-explain-row" id="flashExplainRow" hidden>
+            <button class="btn" id="btnExplain" type="button">🔎 Mehr erklären</button>
+          </div>
+          <div class="flash-explain" id="flashExplain" hidden></div>
+
+          <div class="flash-controls" id="flashControlsMain">
+            <button class="btn" id="btnPrev" type="button">◀ Zurück</button>
+            <button class="btn warn" id="btnUnknown" type="button">↻ Nochmal üben</button>
+            <button class="btn primary" id="btnKnown" type="button">✓ Weiß ich</button>
+            <button class="btn" id="btnNext" type="button">Weiter ▶</button>
+          </div>
+          <div class="flash-controls" id="flashControlsShuffle">
+            <button class="btn" id="btnShuffle" type="button">⤨ Mischen</button>
+            <button class="btn" id="btnAddCard" type="button">➕ Eigene Karte</button>
+          </div>
+          <div class="flash-controls" id="flashControlsManage">
+            <button class="btn" id="btnEditCard" type="button">✏️ Karte bearbeiten</button>
+            <button class="btn" id="btnDeleteCard" type="button" style="border-color:var(--incorrect);color:var(--incorrect)">🗑 Karte entfernen</button>
+            <button class="btn" id="btnRestoreRemoved" type="button" hidden>↺ Entfernte Karten wiederherstellen (<span id="removedCount">0</span>)</button>
+          </div>
+          <p class="flash-meta" id="flashMeta"></p>
+
+          <form class="addcard-form" id="addCardForm" hidden>
+            <h3 id="addCardFormTitle">Eigene Karteikarte hinzufügen</h3>
+            <p class="lead" id="addCardFormLead" style="margin-bottom:0">Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.</p>
+
+            <label for="addCardCat">Kategorie</label>
+            <select id="addCardCat"></select>
+            <input type="text" id="addCardCatNew" placeholder="Neue Kategorie…" hidden>
+
+            <label for="addCardQ">Frage (Vorderseite)</label>
+            <textarea id="addCardQ" rows="2" placeholder="Was soll abgefragt werden?"></textarea>
+
+            <label for="addCardA">Antwort (Rückseite)</label>
+            <textarea id="addCardA" rows="3" placeholder="Die vollständige, gute Antwort"></textarea>
+
+            <p class="hint">Frage und Antwort sind Pflicht.</p>
+
+            <div class="row">
+              <button class="btn primary" id="btnSaveCard" type="submit">Karte speichern</button>
+              <button class="btn" id="btnCancelCard" type="button">Abbrechen</button>
+              <button class="btn" id="btnResetCard" type="button" hidden style="border-color:var(--incorrect);color:var(--incorrect)">↺ Original wiederherstellen</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ QUIZ ============ -->
+    <div class="panel" id="panel-quiz" role="tabpanel" aria-labelledby="tabbtn-quiz" hidden>
+      <section>
+        <h2><span class="n">?</span>Verständnisfragen</h2>
+        <p class="lead">13 Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.</p>
+        <div class="quiz-score">
+          <span>Ergebnis: <strong id="quizScore">0</strong> / 13 richtig</span>
+          <button class="btn" id="btnQuizReset" type="button">Zurücksetzen</button>
+        </div>
+        <div id="quizList"></div>
+      </section>
+    </div>
+
+    <!-- ============ TASKS ============ -->
+    <div class="panel" id="panel-tasks" role="tabpanel" aria-labelledby="tabbtn-tasks" hidden>
+      <section>
+        <h2><span class="n">▸</span>Übungsaufgaben</h2>
+        <p class="lead">Übe die Befehle am besten zuerst in einem eigenen Test-Repository. Erst selbst in der Kommandozeile probieren, dann Tipp bzw. Lösung zum Gegenchecken aufklappen.</p>
+        <div id="taskList"></div>
+        <p class="task-footnote">Die letzte Aufgabe ist die Original-Aufgabe aus der Vorlesung: ein echter Team-Workflow mit bewusst erzeugtem und gelöstem Merge-Konflikt.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="credit">Lernset zu Prof. Dr. Boger / Prof. Dr. Laube, Programmiertechnik I — Vorlesung 11: Version Control with Git</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Tabs ----------
+  var tabBtns = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  var panels = {
+    cards: document.getElementById("panel-cards"),
+    quiz: document.getElementById("panel-quiz"),
+    tasks: document.getElementById("panel-tasks")
+  };
+  tabBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabBtns.forEach(function(b){ b.classList.remove("active"); b.setAttribute("aria-selected","false"); });
+      btn.classList.add("active"); btn.setAttribute("aria-selected","true");
+      Object.keys(panels).forEach(function(k){ panels[k].hidden = (k !== btn.dataset.tab); });
+    });
+  });
+
+  // ---------- Storage helpers ----------
+  function loadJSON(key, fallback){
+    try{ var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function saveJSON(key, val){
+    try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+  }
+
+  // ======================================================
+  // FLASHCARDS — Frage vorne, vollständige gute Antwort hinten.
+  // ======================================================
+  var CARDS = [
+    {cat:"Grundlagen", q:"Warum braucht Software-Entwicklung Versionskontrolle?", a:"Fast kein Projekt entsteht isoliert; Teams brauchen eine Strategie, um Zugriffe zu synchronisieren und Änderungsverlust zu vermeiden."},
+    {cat:"Grundlagen", q:"Warum ist Versionskontrolle mit KI-Unterstützung noch wichtiger?", a:"Sie lässt dich jede Änderung von KI-Assistenten/Coding-Agents reviewen, vergleichen und zurückrollen."},
+    {cat:"Grundlagen", q:"Welche drei historischen Phasen der Versionskontrolle gibt es?", a:"Lokal (z. B. RCS), Zentral (z. B. CVS, SVN), Verteilt (z. B. Git, Mercurial)."},
+    {cat:"Grundlagen", q:"Wie arbeitet lokale Versionskontrolle (RCS, 1982)?", a:"Historie einzelner Dateien auf einem Computer, mit Locking: nur eine Person bearbeitet eine Datei gleichzeitig."},
+    {cat:"Grundlagen", q:"Wie arbeitet zentrale Versionskontrolle (CVS/SVN)?", a:"Ein Server hält die komplette Historie; Commit/Log/Branch brauchen den Server; Revisionsnummern 1,2,3,…"},
+    {cat:"Grundlagen", q:"Wie arbeitet verteilte Versionskontrolle (Git/Mercurial)?", a:"Jeder Klon ist ein vollständiges Repository; Server und lokale Kopie sind gleichwertig; Commits werden über den Hash ihres Inhalts identifiziert, nicht über fortlaufende Nummern."},
+    {cat:"Grundlagen", q:"Drei Gründe, warum sich Git durchgesetzt hat?", a:"Funktioniert offline (Commit/Historie/Diff laufen lokal & schnell), Branching & Merging sind billig genug für einen Branch pro Feature, GitHub (2008) macht Teilen/Forks/Pull Requests einfach."},
+    {cat:"Geschichte", q:"Welches Versionskontrollsystem nutzte das Linux-Kernel-Projekt vor Git, und warum hat Linus Torvalds 2005 Git selbst geschrieben?", a:"Das proprietäre BitKeeper — als dessen kostenlose Lizenz für das Linux-Projekt entzogen wurde, schrieb Torvalds sein eigenes Tool."},
+    {cat:"Geschichte", q:"Was waren Torvalds' Design-Ziele für Git?", a:"Geschwindigkeit, einfaches Design, voll verteilt, starke Unterstützung für nicht-lineare Entwicklung, große Projekte wie den Linux-Kernel handhaben können."},
+    {cat:"Geschichte", q:"Wer übernahm die Git-Wartung von Torvalds, und wann kam Git 1.0?", a:"Junio Hamano; Git 1.0 im Dezember 2005."},
+    {cat:"Geschichte", q:"Wofür sorgt die SHA-1-Hash-Identifikation jedes Objekts?", a:"Für Integrität — jedes Objekt (Blob, Tree, Commit) wird über den Hash seines Inhalts eindeutig identifiziert; jede Änderung am Inhalt erzeugt einen anderen Hash, Manipulationen fallen auf."},
+    {cat:"Geschichte", q:"Welche drei Hosting-Plattformen entstanden 2008–2011 rund um Git?", a:"GitHub (2008), Bitbucket (2008, ab 2010 bei Atlassian), GitLab (2011)."},
+    {cat:"Geschichte", q:"Was geschah 2018 mit GitHub?", a:"Microsoft übernahm GitHub für 7,5 Milliarden US-Dollar."},
+    {cat:"Geschichte", q:"Welches Release war 2014 der bisher letzte Breaking Change von Git?", a:"Git 2.0 — seither entwickelt sich Git überwiegend abwärtskompatibel weiter."},
+    {cat:"Geschichte", q:"Was änderte sich 2020 am Standard-Branchnamen?", a:"Git 2.28 machte ihn konfigurierbar (init.defaultBranch); neue GitHub-Repos nutzen seit 1. Oktober 2020 main statt master."},
+    {cat:"Geschichte", q:"Welches Git-Release führte 2022 experimentell SHA-256-Repositories ein, und warum?", a:"Git 2.29 — als stärkere Alternative zum klassischen SHA-1, der kryptografisch als angreifbar gilt."},
+    {cat:"Geschichte", q:"Wie stark ist Git laut Stack-Overflow-Survey 2022 verbreitet?", a:"93% aller Befragten, 96,65% der professionellen Entwickler (SVN auf Platz 2 mit nur 5,96%)."},
+    {cat:"Geschichte", q:"Wie verändert KI seit 2022/2025 den Git-Workflow?", a:"GitHub Copilot wird 2022 allgemein verfügbar; seit 2025 arbeiten Coding-Agents (z. B. GitHub Copilot, Cursors Cloud-Agents) selbstständig auf eigenen Branches und reichen ihre Änderungen als Pull Requests ein — zu reviewen wie jede menschliche Änderung."},
+    {cat:"Geschichte", q:"Was ist für Git 3.0 geplant?", a:"SHA-256 als Standard-Hash-Algorithmus, main als Standard-Branchname, das „reftable\"-Referenzformat, und Rust wird Pflicht zum Bauen von Git."},
+    {cat:"Objekte & Workflow", q:"Welche drei zentralen Git-Objekttypen gibt es?", a:"Blob (reiner Dateiinhalt), Tree (wie ein Verzeichnis, verweist auf Blobs/Trees), Commit (verweist auf einen Snapshot/Tree + Elterncommit). Ein Commit ist ein vollständiger Snapshot, kein Diff."},
+    {cat:"Objekte & Workflow", q:"Was ist ein Blob?", a:"Ein Binary Large OBject — der reine Inhalt einer Datei, ohne Dateinamen oder Struktur (die trägt der Tree bei)."},
+    {cat:"Objekte & Workflow", q:"Was ist ein Tree?", a:"Ähnlich einem Verzeichnis: er listet Dateinamen mit Verweisen auf die zugehörigen Blobs (oder weitere Trees für Unterordner)."},
+    {cat:"Objekte & Workflow", q:"Worauf verweist ein Commit?", a:"Auf einen Snapshot (einen Tree) sowie seinen/seine Elterncommit(s) — dadurch bildet sich eine Kette/ein Graph aus Commits, die Historie des Projekts."},
+    {cat:"Objekte & Workflow", q:"Welche drei Arten von Referenzen auf Commits gibt es, und sind Branches dabei fest oder beweglich?", a:"Branches, Tags, HEAD. Branches sind bewegliche Zeiger (rücken bei jedem neuen Commit automatisch mit), Tags sind feste Markierungen (z. B. für Releases)."},
+    {cat:"Objekte & Workflow", q:"Was ist HEAD?", a:"Eine Referenz, die zeigt, auf welchem Commit/Branch du aktuell arbeitest."},
+    {cat:"Objekte & Workflow", q:"Welche vier Bereiche durchläuft eine Änderung in Git?", a:"Working Directory (deine Dateien auf der Festplatte) → Staging Area/Index (mit git add vorbereiteter nächster Commit) → Local Repository (.git, alle lokalen Commits) → Remote Repository (z. B. origin auf GitHub)."},
+    {cat:"Befehle", q:"Was macht git add?", a:"Änderungen auf die Stage legen — bereitet sie für den nächsten Commit vor, ohne sie schon zu speichern."},
+    {cat:"Befehle", q:"Unterschied git commit vs. git commit -a?", a:"commit speichert die bereits gestageten Änderungen als Snapshot. commit -a stagt zusätzlich automatisch alle bereits getrackten, geänderten Dateien mit — brandneue, bisher ungetrackte Dateien bleiben davon aber ausgenommen und müssen weiterhin explizit per git add hinzugefügt werden."},
+    {cat:"Befehle", q:"Unterschied git push vs. git fetch vs. git pull?", a:"push lädt lokale Commits zum Remote hoch. fetch holt neue Commits vom Remote herunter, ohne sie in den aktuellen Branch zu integrieren. pull = fetch + merge in einem Schritt."},
+    {cat:"Befehle", q:"Was macht git switch (bzw. das ältere git checkout ohne Dateiargument)?", a:"Den Branch wechseln — bewegt HEAD auf einen anderen Branch und aktualisiert das Working Directory entsprechend."},
+    {cat:"Befehle", q:"Unterschied git restore --staged vs. git restore?", a:"--staged nimmt eine Datei von der Stage (macht ein add rückgängig, die Datei bleibt aber geändert). Ohne --staged verwirft es die Änderungen im Working Directory komplett."},
+    {cat:"Befehle", q:"Drei Befehle, um den aktuellen Zustand zu inspizieren?", a:"git status (was hat sich geändert), git diff (Working Dir vs. Index), git log (die Commit-Historie mit Hash, Autor, Datum, Nachricht)."},
+    {cat:"Befehle", q:"Unterschied git diff vs. git diff --staged?", a:"diff zeigt Working Dir vs. Index (noch nicht gestagte Änderungen); diff --staged zeigt Index vs. letztem Commit (bereits gestagte Änderungen)."},
+    {cat:"Befehle", q:"Wozu dient git stash?", a:"Lokale Änderungen vorübergehend „parken\", ohne sie zu committen — stellt das Working Directory auf den letzten Commit zurück, nützlich um kurz den Branch zu wechseln. git stash pop holt die Änderungen zurück."},
+    {cat:"Befehle", q:"Was macht git reset, und was zusätzlich git reset --hard?", a:"Ein normaler reset bewegt nur den Branch-Zeiger zurück (Commits bleiben als Objekte erhalten). --hard setzt zusätzlich das Working Directory und die Stage auf diesen Stand zurück — nicht committete Änderungen gehen dabei verloren."},
+    {cat:"GitHub & Branching", q:"Was macht git clone?", a:"Kopiert ein komplettes Repository (alle Commits) von einem Server auf den lokalen Rechner, meist per https."},
+    {cat:"GitHub & Branching", q:"Wie heißt die lokale Referenz auf den zuletzt bekannten Stand des Remote-main-Branches, und ist sie immer aktuell?", a:"origin/main — ein remote-tracking branch, der sich nur bei fetch/pull aktualisiert, also nicht zwangsläufig den aktuellsten Stand auf dem Server zeigt."},
+    {cat:"GitHub & Branching", q:"Was passiert technisch bei git switch <branch>?", a:"HEAD zeigt jetzt auf den neuen Branch; der alte Branch bleibt unverändert, wo er war."},
+    {cat:"GitHub & Branching", q:"Wie führt git merge zwei Branches zusammen, und entsteht dabei immer ein Commit mit zwei Elternteilen?", a:"Vom Zielbranch aus mergt man den anderen Branch hinein; dabei entsteht — außer im Sonderfall eines reinen Fast-Forwards — ein Merge-Commit mit zwei Elternteilen, wodurch die Historie beider Branches sichtbar bleibt."},
+    {cat:"GitHub & Branching", q:"Was macht git rebase im Gegensatz zu git merge, und wie sollte man es nutzen?", a:"rebase spielt deine Commits auf einen neuen Stand ab, statt einen Merge-Commit zu erzeugen — dadurch wird die Historie linear, aber die Commits bekommen neue Hashes. Deshalb sollte man es selten und mit Vorsicht einsetzen, besonders nicht auf bereits geteilten Branches."},
+    {cat:"GitHub & Branching", q:"Wann entsteht ein Merge-Konflikt, und wie löst man ihn?", a:"Wenn dieselben Zeilen in zwei Branches unterschiedlich geändert wurden, kann Git sie nicht automatisch kombinieren. Die Konfliktmarker <<<<<<< ======= >>>>>>> manuell entfernen, den Code korrigieren, dann die Datei stagen (add) und committen."},
+    {cat:"GitHub & Branching", q:"Was ist ein Fork, und wie heißen die beiden beteiligten Repositories?", a:"Eine Kopie eines fremden GitHub-Projekts in den eigenen Account. origin ist dein eigener Fork, upstream das Original-Repository; Beiträge gelangen per Pull Request vom Fork zum Original, dessen Owner über die Annahme entscheidet."},
+    {cat:"GitHub Desktop & CLI", q:"GitHub Desktop „Publish branch\" entspricht welchem CLI-Befehl?", a:"git push -u origin <name> — lädt einen neuen lokalen Branch erstmals zum Remote hoch und richtet gleichzeitig das Remote-Tracking ein (-u), danach reicht ein einfaches git push."},
+    {cat:"GitHub Desktop & CLI", q:"GitHub Desktop „Current branch > New branch\" entspricht welchem CLI-Befehl?", a:"git switch -c <name> — -c erstellt den neuen Branch UND wechselt in einem Schritt dorthin, genau das, was der New-Branch-Dialog in der GUI macht."},
+    {cat:"GitHub Desktop & CLI", q:"Führen GitHub Desktop und die Kommandozeile im Hintergrund dieselben Git-Befehle aus?", a:"Ja — die GUI ist nur eine Oberfläche über denselben Git-Befehlen. Die Kommandozeile zeigt, was wirklich passiert, und funktioniert überall, auch auf Servern, in CI/CD oder Skripten ohne GUI."},
+    {cat:"GitHub Desktop & CLI", q:"Welche Shell ist seit macOS Catalina (2019) Standard?", a:"zsh (davor war bash Standard). Für den Alltag sind die Befehle praktisch identisch, zsh hat nur bessere Tab-Completion und Globbing. Unter Windows nutzt man Git Bash oder WSL."},
+    {cat:"GitHub Desktop & CLI", q:"Wozu dient eine .gitignore-Datei?", a:"Sie listet Muster für Dateien, die Git ignorieren soll — z. B. Build-Output (.class-Dateien) oder lokale IDE-Konfiguration, die meist nicht ins Repository gehören. GitHub kann beim Anlegen eines Repos automatisch eine passende Vorlage erzeugen."},
+    {cat:"Cursor & KI", q:"Wie entsprechen sich Cursor-Source-Control-Ansicht und Git-Befehle?", a:"Changes/Staged Changes = status/diff; + = add (stagen), − = unstage; Commit-Button + Message = commit -m; Sync = pull + push."},
+    {cat:"Cursor & KI", q:"Wie sollte man KI-Agenten-Änderungen in Cursor behandeln, bevor man committet?", a:"Jede Änderung einzeln als rot/grün markierten Inline-Diff reviewen (Keep/Undo), danach im Source-Control-Tab den Diff final prüfen, stagen und committen — wie bei jeder anderen Änderung auch."},
+    {cat:"Cursor & KI", q:"Sind Cursor-„Checkpoints\" ein Ersatz für Git?", a:"Nein — sie rollen nur eine lokale Agenten-Sitzung zurück und sind keine echte Versionskontrolle (keine geteilte Historie, kein Remote, keine Branches)."},
+    {cat:"Cursor & KI", q:"Wie löst man Merge-Konflikte in Cursor?", a:"Über Accept Current/Incoming/Both Changes, den 3-Way-Merge-Editor, oder indem ein Agent per „Resolve in Chat\" einen Lösungsvorschlag macht — diesen aber wie jede andere KI-Änderung prüfen, bevor man stagt und committet."}
+  ].map(function(c, i){ c.id = i; return c; });
+
+  var BASE_CATS = ["Grundlagen","Geschichte","Objekte & Workflow","Befehle","GitHub & Branching","GitHub Desktop & CLI","Cursor & KI"];
+  var STORE_KEY = "prog1-git";
+  var knownIds = new Set(loadJSON(STORE_KEY + "-known", []));
+  var removedIds = new Set(loadJSON(STORE_KEY + "-removed", []));
+  var customCards = loadJSON(STORE_KEY + "-custom", []);
+  var overrides = loadJSON(STORE_KEY + "-overrides", {});
+  var ALL = [];
+  function refreshAll(){
+    customCards.forEach(function(c, i){ c.id = CARDS.length + i; });
+    ALL = CARDS.concat(customCards).map(function(c){
+      var o = overrides[c.id];
+      if(!o) return c;
+      return {id:c.id, cat:o.cat, q:o.q, a:o.a, expl:(o.expl !== undefined ? o.expl : c.expl)};
+    });
+  }
+  refreshAll();
+
+  function activeTotal(){ return ALL.length - removedIds.size; }
+  var activeCat = "Alle";
+  var onlyUnsure = false;
+  var order = [];
+  var pos = 0;
+  var flipped = false;
+
+  var catFiltersEl = document.getElementById("catFilters");
+  function currentCats(){
+    var extra = [];
+    ALL.forEach(function(c){ if(BASE_CATS.indexOf(c.cat) === -1 && extra.indexOf(c.cat) === -1) extra.push(c.cat); });
+    return ["Alle"].concat(BASE_CATS, extra);
+  }
+  function renderCatFilters(){
+    catFiltersEl.innerHTML = "";
+    currentCats().forEach(function(cat){
+      var b = document.createElement("button");
+      b.className = "chip" + (cat === activeCat ? " active" : "");
+      b.type = "button"; b.textContent = cat; b.dataset.cat = cat;
+      b.addEventListener("click", function(){
+        activeCat = cat;
+        Array.prototype.forEach.call(catFiltersEl.children, function(c){ c.classList.toggle("active", c.dataset.cat === cat); });
+        rebuildOrder();
+      });
+      catFiltersEl.appendChild(b);
+    });
+  }
+  renderCatFilters();
+  document.getElementById("onlyUnsure").addEventListener("change", function(e){
+    onlyUnsure = e.target.checked; rebuildOrder();
+  });
+
+  function shuffle(arr){
+    for(var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function rebuildOrder(){
+    var pool = ALL.filter(function(c){
+      if(removedIds.has(c.id)) return false;
+      if(activeCat !== "Alle" && c.cat !== activeCat) return false;
+      if(onlyUnsure && knownIds.has(c.id)) return false;
+      return true;
+    });
+    order = pool.map(function(c){ return c.id; });
+    pos = 0; flipped = false;
+    renderCard();
+  }
+
+  var flashcardEl = document.getElementById("flashcard");
+  var flashCat = document.getElementById("flashCat");
+  var flashFront = document.getElementById("flashFront");
+  var flashBack = document.getElementById("flashBack");
+  var flashHint = document.getElementById("flashHint");
+  var flashMeta = document.getElementById("flashMeta");
+  var flashExplainRow = document.getElementById("flashExplainRow");
+  var flashExplain = document.getElementById("flashExplain");
+  var btnExplain = document.getElementById("btnExplain");
+
+  function cardAt(id){
+    for(var i = 0; i < ALL.length; i++){ if(ALL[i].id === id) return ALL[i]; }
+    return null;
+  }
+
+  function resetExplain(){
+    flashExplain.hidden = true;
+    btnExplain.textContent = "🔎 Mehr erklären";
+  }
+
+  function renderCard(){
+    resetExplain();
+    if(order.length === 0){
+      flashCat.textContent = "";
+      flashFront.textContent = onlyUnsure ? "Alles in dieser Kategorie sitzt schon. 🎉" : "Keine Karten in dieser Auswahl.";
+      flashBack.hidden = true; flashFront.hidden = false;
+      flashExplainRow.hidden = true;
+      flashHint.textContent = "";
+      flashMeta.textContent = "Gewusst: " + knownIds.size + " / " + activeTotal();
+      return;
+    }
+    var card = cardAt(order[pos]);
+    flashCat.textContent = card.cat;
+    flashFront.textContent = card.q;
+    flashBack.textContent = card.a;
+    flashFront.hidden = flipped;
+    flashBack.hidden = !flipped;
+    flashExplainRow.hidden = !(flipped && card.expl);
+    flashHint.textContent = flipped ? "Antippen für die Frage" : "Antippen zum Umdrehen";
+    flashMeta.textContent = "Karte " + (pos+1) + " / " + order.length + " · Gewusst gesamt: " + knownIds.size + " / " + activeTotal();
+  }
+
+  btnExplain.addEventListener("click", function(){
+    var card = order.length ? cardAt(order[pos]) : null;
+    if(!card) return;
+    flashExplain.textContent = card.expl || "";
+    flashExplain.hidden = !flashExplain.hidden;
+    btnExplain.textContent = flashExplain.hidden ? "🔎 Mehr erklären" : "🔽 Erklärung ausblenden";
+  });
+
+  flashcardEl.addEventListener("click", function(){
+    if(order.length === 0) return;
+    flipped = !flipped; renderCard();
+  });
+  flashcardEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flashcardEl.click(); }
+  });
+
+  function advance(delta){
+    if(order.length === 0) return;
+    pos = (pos + delta + order.length) % order.length;
+    flipped = false; renderCard();
+  }
+  document.getElementById("btnPrev").addEventListener("click", function(){ advance(-1); });
+  document.getElementById("btnNext").addEventListener("click", function(){ advance(1); });
+  document.getElementById("btnShuffle").addEventListener("click", function(){ shuffle(order); pos = 0; flipped = false; renderCard(); });
+  document.getElementById("btnKnown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.add(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    if(onlyUnsure){ rebuildOrder(); } else { advance(1); }
+    maybeShowCheck();
+  });
+  document.getElementById("btnUnknown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.delete(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    advance(1);
+    maybeShowCheck();
+  });
+
+  function updateRestoreBtn(){
+    var btn = document.getElementById("btnRestoreRemoved");
+    var countEl = document.getElementById("removedCount");
+    if(countEl) countEl.textContent = removedIds.size;
+    btn.hidden = removedIds.size === 0;
+  }
+  document.getElementById("btnDeleteCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    if(!confirm("Diese Karte wirklich dauerhaft aus dem Lernset entfernen?\n\n„" + card.q + "“")) return;
+    removedIds.add(card.id);
+    knownIds.delete(card.id);
+    saveJSON(STORE_KEY + "-removed", Array.from(removedIds));
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  document.getElementById("btnRestoreRemoved").addEventListener("click", function(){
+    if(removedIds.size === 0) return;
+    if(!confirm("Alle " + removedIds.size + " entfernten Karten wiederherstellen?")) return;
+    removedIds.clear();
+    saveJSON(STORE_KEY + "-removed", []);
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  updateRestoreBtn();
+
+  // ---------- Add / edit own card ----------
+  var addCardForm = document.getElementById("addCardForm");
+  var addCardCat = document.getElementById("addCardCat");
+  var addCardCatNew = document.getElementById("addCardCatNew");
+  var addCardFormTitle = document.getElementById("addCardFormTitle");
+  var addCardFormLead = document.getElementById("addCardFormLead");
+  var btnSaveCard = document.getElementById("btnSaveCard");
+  var btnResetCard = document.getElementById("btnResetCard");
+  var NEW_CAT_VALUE = "__new__";
+  var editingId = null;
+
+  function populateAddCardCats(){
+    addCardCat.innerHTML = "";
+    BASE_CATS.concat(currentCats().filter(function(c){ return c !== "Alle" && BASE_CATS.indexOf(c) === -1; })).forEach(function(cat){
+      var o = document.createElement("option"); o.value = cat; o.textContent = cat;
+      addCardCat.appendChild(o);
+    });
+    var o2 = document.createElement("option"); o2.value = NEW_CAT_VALUE; o2.textContent = "Neue Kategorie…";
+    addCardCat.appendChild(o2);
+  }
+  addCardCat.addEventListener("change", function(){
+    addCardCatNew.hidden = addCardCat.value !== NEW_CAT_VALUE;
+  });
+
+  function closeAddCardForm(){
+    addCardForm.reset(); addCardCatNew.hidden = true; addCardForm.hidden = true;
+    editingId = null;
+  }
+
+  document.getElementById("btnAddCard").addEventListener("click", function(){
+    if(!addCardForm.hidden && editingId === null){ closeAddCardForm(); return; }
+    editingId = null;
+    populateAddCardCats();
+    document.getElementById("addCardQ").value = "";
+    document.getElementById("addCardA").value = "";
+    addCardFormTitle.textContent = "Eigene Karteikarte hinzufügen";
+    addCardFormLead.textContent = "Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.";
+    btnSaveCard.textContent = "Karte speichern";
+    btnResetCard.hidden = true;
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnEditCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    editingId = card.id;
+    populateAddCardCats();
+    addCardCat.value = card.cat;
+    addCardCatNew.hidden = true;
+    document.getElementById("addCardQ").value = card.q;
+    document.getElementById("addCardA").value = card.a;
+    addCardFormTitle.textContent = "Karte bearbeiten";
+    addCardFormLead.textContent = "Änderungen werden dauerhaft in diesem Lernset gespeichert (im Browser).";
+    btnSaveCard.textContent = "Änderungen speichern";
+    btnResetCard.hidden = !overrides[card.id];
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnCancelCard").addEventListener("click", closeAddCardForm);
+
+  btnResetCard.addEventListener("click", function(){
+    if(editingId === null) return;
+    if(!confirm("Diese Karte wirklich auf die ursprüngliche Version zurücksetzen?")) return;
+    delete overrides[editingId];
+    saveJSON(STORE_KEY + "-overrides", overrides);
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  addCardForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var q = document.getElementById("addCardQ").value.trim();
+    var a = document.getElementById("addCardA").value.trim();
+    var cat = addCardCat.value === NEW_CAT_VALUE ? addCardCatNew.value.trim() : addCardCat.value;
+    if(!q || !a || !cat){ alert("Bitte Kategorie, Frage und Antwort ausfüllen."); return; }
+    if(editingId !== null){
+      overrides[editingId] = {cat:cat, q:q, a:a};
+      saveJSON(STORE_KEY + "-overrides", overrides);
+    } else {
+      customCards.push({cat:cat, q:q, a:a, expl:""});
+      saveJSON(STORE_KEY + "-custom", customCards);
+    }
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  rebuildOrder();
+
+  // ======================================================
+  // VERSTÄNDNIS-CHECK — alle 6-8 Karten ein kurzer, geprüfter
+  // Ja/Nein- oder Kurztext-Check zu einem Thema, das gerade geübt wurde.
+  // ======================================================
+  var ABFRAGE = [
+    {type:"bool", q:"Ja oder Nein: Entstehen die meisten Softwareprojekte isoliert, ohne Teamzugriff?", correct:false,
+     explain:"Nein — fast kein Projekt entsteht isoliert, mehrere Teammitglieder greifen gleichzeitig auf geteilten Code zu. Genau dafür braucht es Versionskontrolle."},
+    {type:"bool", q:"Ja oder Nein: Bei verteilter Versionskontrolle (Git) ist jeder Klon ein vollständiges Repository.", correct:true,
+     explain:"Richtig — jeder Klon enthält die komplette Historie und ist gleichwertig zum Server."},
+    {type:"text", q:"In welchem Jahr startete GitHub? (nur die Jahreszahl)", answer:"2008",
+     explain:"GitHub (2008) ergänzte Git um Hosting, Forks und Pull Requests."},
+    {type:"bool", q:"Ja oder Nein: Ein Branch in Git ist ein fester, unveränderlicher Zeiger.", correct:false,
+     explain:"Nein — Branches sind bewegliche Zeiger, die bei jedem neuen Commit automatisch mitrücken. Tags dagegen sind fest."},
+    {type:"text", q:"Welcher Befehl legt Änderungen auf die Stage? (nur der Befehl, z. B. \"git xyz\")", answer:"git add",
+     explain:"git add bereitet Änderungen für den nächsten Commit vor, ohne sie schon zu speichern."},
+    {type:"bool", q:"Ja oder Nein: git commit -a stagt automatisch auch brandneue, bisher ungetrackte Dateien.", correct:false,
+     explain:"Nein — commit -a stagt nur bereits getrackte, geänderte Dateien automatisch mit. Neue Dateien brauchen weiterhin git add."},
+    {type:"text", q:"Welcher Befehl zeigt die Commit-Historie an? (nur der Befehl)", answer:"git log",
+     explain:"git log listet Commits chronologisch mit Hash, Autor, Datum und Nachricht."},
+    {type:"bool", q:"Ja oder Nein: Ein Merge erzeugt immer einen Commit mit zwei Elternteilen.", correct:true, accept:[],
+     explain:"Im Regelfall ja — nur bei einem reinen Fast-Forward entsteht ausnahmsweise kein eigener Merge-Commit."},
+    {type:"text", q:"Wie heißt dein eigener Fork beim GitHub-Fork-Workflow? (ein Wort)", answer:"origin",
+     explain:"origin ist dein eigener Fork, upstream das Original-Repository."},
+    {type:"text", q:"Welcher CLI-Befehl entspricht GitHub Desktops „Current branch > New branch\"? (nur der Befehl, z. B. \"git xyz -c name\")", answer:"git switch -c",
+     explain:"-c erstellt den neuen Branch UND wechselt in einem Schritt dorthin."},
+    {type:"bool", q:"Ja oder Nein: GitHub Desktop und die Kommandozeile führen im Hintergrund dieselben Git-Befehle aus.", correct:true,
+     explain:"Richtig — die GUI ist nur eine Oberfläche über denselben Git-Befehlen."},
+    {type:"text", q:"Seit welchem macOS-Release ist zsh die Standard-Shell? (nur der Name)", answer:"catalina",
+     explain:"Seit macOS Catalina (2019) ist zsh Standard, davor war es bash."},
+    {type:"bool", q:"Ja oder Nein: Cursor-„Checkpoints\" sind ein vollwertiger Ersatz für Git.", correct:false,
+     explain:"Nein — Checkpoints rollen nur eine lokale Agenten-Sitzung zurück, ohne geteilte Historie, Remote oder Branches."},
+    {type:"text", q:"Wie heißt die Datei, die Build-Output und IDE-Konfiguration von der Versionskontrolle ausschließt? (nur der Dateiname)", answer:".gitignore",
+     explain:".gitignore listet Muster für Dateien, die Git ignorieren soll."}
+  ];
+
+  var checkCardEl = document.getElementById("checkCard");
+  var checkQEl = document.getElementById("checkQ");
+  var checkBoolEl = document.getElementById("checkBool");
+  var checkTextWrapEl = document.getElementById("checkTextWrap");
+  var checkInputEl = document.getElementById("checkInput");
+  var checkFeedbackEl = document.getElementById("checkFeedback");
+  var checkControlsEl = document.getElementById("checkControls");
+  var checkYesEl = document.getElementById("checkYes");
+  var checkNoEl = document.getElementById("checkNo");
+  var checkSubmitEl = document.getElementById("checkSubmit");
+  var flashControlsMain = document.getElementById("flashControlsMain");
+  var flashControlsShuffle = document.getElementById("flashControlsShuffle");
+  var flashControlsManage = document.getElementById("flashControlsManage");
+  var abfrageBag = [];
+  var currentCheckItem = null;
+
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  var cardsUntilCheck = randInt(6, 8);
+
+  function drawAbfrage(){
+    if(ABFRAGE.length === 0) return null;
+    if(abfrageBag.length === 0){ abfrageBag = shuffle(ABFRAGE.map(function(_, i){ return i; })); }
+    return ABFRAGE[abfrageBag.pop()];
+  }
+  function normalize(s){ return (s || "").toString().trim().toLowerCase().replace(/\s+/g, " "); }
+
+  function maybeShowCheck(){
+    cardsUntilCheck--;
+    if(cardsUntilCheck > 0) return;
+    cardsUntilCheck = randInt(6, 8);
+    var item = drawAbfrage();
+    if(!item) return;
+    currentCheckItem = item;
+    checkQEl.textContent = item.q;
+    checkBoolEl.hidden = item.type !== "bool";
+    checkTextWrapEl.hidden = item.type !== "text";
+    checkInputEl.value = "";
+    checkYesEl.disabled = checkNoEl.disabled = false;
+    checkSubmitEl.disabled = false;
+    checkFeedbackEl.hidden = true;
+    checkFeedbackEl.className = "check-feedback";
+    checkControlsEl.hidden = true;
+
+    flashcardEl.hidden = true;
+    flashControlsMain.hidden = true;
+    flashControlsShuffle.hidden = true;
+    flashControlsManage.hidden = true;
+    flashExplainRow.hidden = true;
+    flashExplain.hidden = true;
+    checkCardEl.hidden = false;
+  }
+
+  function finishCheck(isCorrect){
+    checkFeedbackEl.textContent = (isCorrect ? "✓ Richtig. " : "✗ Nicht ganz. ") + (currentCheckItem.explain || "");
+    checkFeedbackEl.className = "check-feedback " + (isCorrect ? "correct" : "wrong");
+    checkFeedbackEl.hidden = false;
+    checkYesEl.disabled = checkNoEl.disabled = true;
+    checkSubmitEl.disabled = true;
+    checkControlsEl.hidden = false;
+  }
+  checkYesEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === true); });
+  checkNoEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === false); });
+  checkSubmitEl.addEventListener("click", function(){
+    var val = normalize(checkInputEl.value);
+    var candidates = [currentCheckItem.answer].concat(currentCheckItem.accept || []).map(normalize);
+    finishCheck(candidates.indexOf(val) !== -1);
+  });
+  checkInputEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); checkSubmitEl.click(); }
+  });
+  document.getElementById("btnCheckDone").addEventListener("click", function(){
+    checkCardEl.hidden = true;
+    flashcardEl.hidden = false;
+    flashControlsMain.hidden = false;
+    flashControlsShuffle.hidden = false;
+    flashControlsManage.hidden = false;
+    renderCard();
+  });
+
+  // ======================================================
+  // QUIZ
+  // ======================================================
+  var QUIZ = [
+    {q:"Was unterscheidet verteilte von zentraler Versionskontrolle am stärksten?",
+     opts:["Verteilte Systeme brauchen keinen Server","Jeder Klon ist ein vollständiges Repository, gleichwertig zum Server","Zentrale Systeme sind grundsätzlich schneller","Verteilte Systeme erlauben kein Branching"],
+     correct:1, explain:"Bei Git/Mercurial ist jede lokale Kopie ein komplettes Repo; Server und lokale Kopie sind gleichwertig — das ist der Kernunterschied zu CVS/SVN."},
+    {q:"Warum hat Linus Torvalds 2005 Git geschrieben?",
+     opts:["Um GitHub zu ersetzen","Weil die kostenlose BitKeeper-Lizenz entzogen wurde","Weil CVS zu schnell war","Auf Wunsch von Microsoft"],
+     correct:1, explain:"Die bis dahin für den Linux-Kernel genutzte proprietäre DVCS BitKeeper verlor ihre freie Lizenz, also schrieb Torvalds sein eigenes Tool."},
+    {q:"Welches Git-Objekt verweist auf einen Snapshot (Tree) und seinen Elterncommit?",
+     opts:["Blob","Tree","Commit","Branch"],
+     correct:2, explain:"Ein Commit verweist auf einen Tree (den Snapshot) sowie auf seinen/seine Elterncommit(s)."},
+    {q:"Was ist KEIN Git-Objekttyp?",
+     opts:["Blob","Tree","Commit","Remote"],
+     correct:3, explain:"Blob, Tree und Commit (plus Tag) sind Objekttypen. Ein Remote ist ein Repository-Konzept, kein Objekttyp."},
+    {q:"Welche Reihenfolge der vier Bereiche ist korrekt, wenn du eine Änderung committest und pushst?",
+     opts:["Remote → Local Repo → Staging → Working Dir","Working Dir → Staging Area → Local Repo → Remote","Staging → Working Dir → Remote → Local Repo","Local Repo → Working Dir → Staging → Remote"],
+     correct:1, explain:"Eine Änderung wandert von deinen Dateien über die Stage in dein lokales Repo und von dort zum Remote."},
+    {q:"git fetch und git pull – was ist der Unterschied?",
+     opts:["Beide sind identisch","fetch lädt nur herunter, pull = fetch + merge","pull lädt nur herunter, fetch merged zusätzlich","fetch funktioniert nur offline"],
+     correct:1, explain:"fetch holt neue Commits vom Remote, ohne sie zu integrieren; pull holt sie UND merged sie in den lokalen Branch."},
+    {q:"Wofür stehen die Konfliktmarker <<<<<<< HEAD … ======= … >>>>>>> branch?",
+     opts:["Ein Syntaxfehler im Code","Die beiden Versionen, die beim Merge kollidieren","Ein Kommentar für die CI","Eine veraltete Datei, die gelöscht werden muss"],
+     correct:1, explain:"Git markiert beide konkurrierenden Versionen der betroffenen Zeilen im Text — sie müssen manuell aufgelöst werden."},
+    {q:"Warum sollte man git rebase nur selten und mit Vorsicht einsetzen?",
+     opts:["Es löscht immer den main-Branch","Es schreibt die Commit-Historie um (neue Commit-IDs)","Es funktioniert nur mit SVN","Es braucht immer GitHub"],
+     correct:1, explain:"rebase ersetzt alte Commits durch neue mit anderen IDs, um die Historie zu linearisieren — riskant bei bereits geteilten Branches."},
+    {q:"Beim Fork-Workflow: wie heißt das Original-Repository auf GitHub (aus Sicht deines Forks)?",
+     opts:["origin","upstream","main","local clone"],
+     correct:1, explain:"upstream ist das Original (z. B. das Kurs-Repo); origin ist dein eigener Fork."},
+    {q:"Wozu dient eine .gitignore-Datei?",
+     opts:["Um Commits zu verschlüsseln","Um Dateien/Muster von der Versionskontrolle auszuschließen (z. B. Build-Output)","Um Branches umzubenennen","Um Merge-Konflikte automatisch zu lösen"],
+     correct:1, explain:".gitignore listet Regex-Muster für Dateien, die nicht im Repository landen sollen, z. B. Compiler-Output oder IDE-Konfiguration."},
+    {q:"Seit wann nutzen neue GitHub-Repositories standardmäßig main statt master?",
+     opts:["Seit Git 1.0 (2005)","Seit 1. Oktober 2020","Seit der Microsoft-Übernahme 2018","main gab es schon immer"],
+     correct:1, explain:"Git 2.28 machte den Standard-Branchnamen konfigurierbar; GitHub stellte neue Repos am 1. Oktober 2020 auf main um."},
+    {q:"Was bedeutet git commit -a?",
+     opts:["Committet nur neue (ungetrackte) Dateien","Stagt automatisch alle bereits getrackten, geänderten Dateien und committet","Erstellt automatisch einen neuen Branch","Pusht den Commit direkt zum Remote"],
+     correct:1, explain:"-a stagt alle bereits getrackten Dateien mit Änderungen und committet sie in einem Schritt — neue, ungetrackte Dateien bleiben außen vor."},
+    {q:"Was gilt für Cursor-Checkpoints beim Review von KI-Agent-Änderungen?",
+     opts:["Sie ersetzen Git vollständig","Sie sind lokal und kein Ersatz für echte Versionskontrolle","Sie werden automatisch auf GitHub gepusht","Sie funktionieren nur ohne Git"],
+     correct:1, explain:"Checkpoints rollen eine Agenten-Sitzung lokal zurück, sind aber nur eine Zusatzfunktion von Cursor — keine Versionskontrolle."}
+  ];
+
+  var quizListEl = document.getElementById("quizList");
+  var quizScoreEl = document.getElementById("quizScore");
+  var score = 0;
+
+  function renderQuiz(){
+    quizListEl.innerHTML = "";
+    score = 0; quizScoreEl.textContent = "0";
+    QUIZ.forEach(function(item, qi){
+      var wrap = document.createElement("div");
+      wrap.className = "q-item card";
+      var qText = document.createElement("p");
+      qText.className = "q-text";
+      qText.textContent = (qi+1) + ". " + item.q;
+      wrap.appendChild(qText);
+
+      var optsWrap = document.createElement("div");
+      optsWrap.className = "q-opts";
+      var explainEl = document.createElement("div");
+      explainEl.className = "q-explain";
+      explainEl.textContent = item.explain;
+
+      item.opts.forEach(function(optText, oi){
+        var b = document.createElement("button");
+        b.className = "opt"; b.type = "button"; b.textContent = optText;
+        b.addEventListener("click", function(){
+          if(wrap.dataset.answered) return;
+          wrap.dataset.answered = "1";
+          Array.prototype.forEach.call(optsWrap.children, function(o, idx){
+            o.disabled = true;
+            if(idx === item.correct) o.classList.add("correct");
+            else if(idx === oi) o.classList.add("incorrect");
+          });
+          explainEl.classList.add("shown");
+          if(oi === item.correct){ score++; quizScoreEl.textContent = String(score); }
+        });
+        optsWrap.appendChild(b);
+      });
+
+      wrap.appendChild(optsWrap);
+      wrap.appendChild(explainEl);
+      quizListEl.appendChild(wrap);
+    });
+  }
+  document.getElementById("btnQuizReset").addEventListener("click", renderQuiz);
+  renderQuiz();
+
+  // ======================================================
+  // TASKS
+  // ======================================================
+  var TASKS = [
+    {t:"Repository klonen & Status prüfen", d:"Klone ein beliebiges GitHub-Repo (z. B. ein eigenes, leeres Repo mit README) und finde heraus, auf welchem Branch du bist und ob es offene Änderungen gibt.",
+     tip:"Erst klonen, dann in das Verzeichnis wechseln, dann den Status-Befehl.",
+     sol:"git clone &lt;url&gt;\ncd &lt;repo&gt;\ngit status"},
+    {t:"Änderung stagen, committen, pushen", d:"Ändere eine Datei (z. B. README.md), stage genau diese Datei, committe mit einer sinnvollen englischen Nachricht und push den Commit.",
+     tip:"add nimmt den Dateinamen; commit -m braucht eine Beschreibung in Anführungszeichen.",
+     sol:"git add README.md\ngit commit -m \"Update README\"\ngit push"},
+    {t:"Feature-Branch anlegen und wechseln", d:"Erstelle einen neuen Branch feature/my-change und wechsle in einem Schritt dorthin. Veröffentliche ihn auf dem Remote.",
+     tip:"git switch -c kombiniert Erstellen und Wechseln; -u setzt das Remote-Tracking beim ersten Push.",
+     sol:"git switch -c feature/my-change\ngit push -u origin feature/my-change"},
+    {t:"Branch zurück nach main mergen", d:"Wechsle zurück auf main und merge deinen Feature-Branch hinein.",
+     tip:"Merge wird immer vom Zielbranch aus ausgeführt: du stehst auf main und holst feature herein, nicht umgekehrt.",
+     sol:"git switch main\ngit merge feature/my-change"},
+    {t:".gitignore einrichten", d:"Lege eine .gitignore-Datei an, die Build-Ordner (z. B. target/) und IDE-Konfiguration ausschließt, und committe sie.",
+     tip:"GitHub kann beim Anlegen des Repos automatisch eine passende .gitignore-Vorlage erzeugen.",
+     sol:"# .gitignore\ntarget/\n.idea/\n*.class\n\ngit add .gitignore\ngit commit -m \"Add .gitignore\""},
+    {t:"Merge-Konflikt bewusst erzeugen und lösen", d:"Ändere dieselbe Zeile einer Datei auf zwei verschiedenen Branches unterschiedlich, merge sie zusammen und löse den entstehenden Konflikt von Hand.",
+     tip:"Nach dem Merge-Versuch zeigt git status die Konfliktdatei; öffne sie und suche nach den <<<<<<<-Markern.",
+     sol:"git merge feature/my-change\n# Konfliktmarker &lt;&lt;&lt;&lt;&lt;&lt;&lt; ======= &gt;&gt;&gt;&gt;&gt;&gt;&gt; manuell entfernen\n# richtige Version im Editor herstellen\ngit add &lt;datei&gt;\ngit commit -m \"Resolve merge conflict\""},
+    {t:"Die Original-Vorlesungsaufgabe: Team-Workflow", d:"Erstelle ein Projekt auf GitHub, verbinde alle Teammitglieder als Collaborators, push/pull von jedem Mitglied, merge die Änderungen zusammen — und versucht bewusst, einen Merge-Konflikt zu erzeugen und zu lösen.",
+     tip:"Collaborators fügst du über die Projekt-Einstellungen auf GitHub hinzu (Settings → Collaborators).",
+     sol:"# 1) Projekt auf GitHub anlegen (mit .gitignore, README, Lizenz)\n# 2) Settings -&gt; Collaborators -&gt; Team-Mitglieder einladen\n# 3) Jedes Mitglied: git clone &lt;url&gt;\n# 4) Jeder arbeitet in einem eigenen Branch, pusht, erstellt ggf. einen Pull Request\n# 5) Zusammenführen: git merge &lt;branch&gt;\n# 6) Konflikt bewusst erzeugen (gleiche Zeile ändern) und wie oben lösen"}
+  ];
+  var taskListEl = document.getElementById("taskList");
+  TASKS.forEach(function(task, i){
+    var det = document.createElement("details");
+    det.className = "task";
+    var summary = document.createElement("summary");
+    summary.innerHTML = '<span class="tnum">' + (i+1) + '</span> ' + task.t;
+    det.appendChild(summary);
+    var body = document.createElement("div");
+    body.className = "body";
+    body.innerHTML = "<p>" + task.d + "</p>" +
+      '<div class="tip">💡 Tipp: ' + task.tip + "</div>" +
+      '<details class="sol"><summary>✅ Lösung zum Gegenchecken</summary><pre class="code">' + task.sol + "</pre></details>";
+    det.appendChild(body);
+    taskListEl.appendChild(det);
+  });
+
+})();
+</script>

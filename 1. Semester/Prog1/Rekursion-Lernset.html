@@ -1,0 +1,1005 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Rekursion-Lernset</title>
+<style>
+/* Layout: sticky header with a stacked-call-frame motif, tab bar below it, one panel "on top" at a time —
+   the same visual idea (frames piling up, one resolves into the next) that the lecture itself teaches. */
+:root{
+  --bg:#f2f5f3;
+  --surface:#ffffff;
+  --surface-2:#e8ede9;
+  --fg:#162220;
+  --fg-muted:#52635d;
+  --border:#d7e0da;
+  --accent:#0f8f7c;      /* teal = Basisfall / richtig / primär */
+  --accent-ink:#ffffff;
+  --accent-tint:#e3f3ef;
+  --accent-2:#b85c12;    /* amber/terracotta = Rekursionsschritt / sekundär */
+  --accent-2-ink:#ffffff;
+  --accent-2-tint:#f8ead9;
+  --incorrect:#b23b3b;
+  --incorrect-tint:#fbe6e6;
+  --shadow:0 1px 2px rgba(15,30,25,.06), 0 6px 18px rgba(15,30,25,.07);
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1615;
+    --surface:#161f1e;
+    --surface-2:#1d2928;
+    --fg:#e7efec;
+    --fg-muted:#9db0aa;
+    --border:#2a3836;
+    --accent:#2bbfa3;
+    --accent-ink:#06211c;
+    --accent-tint:#133430;
+    --accent-2:#e2984c;
+    --accent-2-ink:#2a1703;
+    --accent-2-tint:#3a2a16;
+    --incorrect:#e2766e;
+    --incorrect-tint:#3a1f1d;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1615;
+  --surface:#161f1e;
+  --surface-2:#1d2928;
+  --fg:#e7efec;
+  --fg-muted:#9db0aa;
+  --border:#2a3836;
+  --accent:#2bbfa3;
+  --accent-ink:#06211c;
+  --accent-tint:#133430;
+  --accent-2:#e2984c;
+  --accent-2-ink:#2a1703;
+  --accent-2-tint:#3a2a16;
+  --incorrect:#e2766e;
+  --incorrect-tint:#3a1f1d;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;text-wrap:balance;margin:0}
+code,pre,.mono{font-family:var(--font-mono)}
+a{color:var(--accent)}
+
+.wrap{max-width:860px;margin:0 auto}
+
+/* ---------- Header ---------- */
+.page-head{
+  display:flex;align-items:center;gap:20px;
+  padding-block:28px 18px;
+  flex-wrap:wrap;
+}
+.frame-stack{
+  position:relative;width:64px;height:64px;flex:0 0 auto;
+}
+.frame-stack i{
+  position:absolute;left:50%;display:block;border-radius:6px;
+  border:1.5px solid var(--accent-2);background:var(--accent-2-tint);
+  height:11px;transform:translateX(-50%);
+}
+.frame-stack i:nth-child(1){width:64px;bottom:0;opacity:.55}
+.frame-stack i:nth-child(2){width:50px;bottom:14px;opacity:.72}
+.frame-stack i:nth-child(3){width:36px;bottom:28px;opacity:.88}
+.frame-stack i:nth-child(4){width:22px;bottom:42px;border-color:var(--accent);background:var(--accent-tint)}
+.head-text{flex:1 1 260px;min-width:0}
+.eyebrow{
+  margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--fg-muted);font-weight:600;
+}
+h1{font-size:clamp(28px,6vw,38px);letter-spacing:-.01em}
+.subtitle{margin:6px 0 0;color:var(--fg-muted);max-width:52ch}
+
+/* ---------- Tabs ---------- */
+.tabs{
+  display:flex;gap:6px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  padding-bottom:0;margin-bottom:22px;
+  position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;
+  padding-top:4px;
+}
+.tab-btn{
+  font-family:var(--font-body);font-weight:600;font-size:13.5px;
+  background:none;border:none;color:var(--fg-muted);cursor:pointer;
+  padding:10px 14px;border-bottom:2.5px solid transparent;border-radius:6px 6px 0 0;
+}
+.tab-btn:hover{color:var(--fg);background:var(--surface-2)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{padding-bottom:48px}
+.panel > section{margin-bottom:34px}
+.panel h2{font-size:21px;margin-bottom:4px}
+.panel h2 .n{color:var(--accent);font-family:var(--font-mono);font-size:15px;margin-right:8px}
+.lead{color:var(--fg-muted);margin:2px 0 14px;max-width:62ch}
+
+/* ---------- Reusable components ---------- */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);
+}
+pre.code{
+  background:var(--surface-2);border:1px solid var(--border);border-radius:9px;
+  padding:11px 13px;overflow-x:auto;font-size:12.5px;line-height:1.55;margin:8px 0;white-space:pre-wrap;
+}
+
+/* ---------- Flashcards ---------- */
+.cat-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{
+  font-family:var(--font-body);font-size:12.5px;font-weight:600;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg-muted);
+  padding:6px 12px;cursor:pointer;
+}
+.chip.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.card-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg-muted);margin-bottom:14px}
+
+.flash-wrap{max-width:480px;margin:0 auto}
+.flashcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--border);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;display:flex;flex-direction:column;justify-content:center;
+  cursor:pointer;position:relative;
+}
+.flashcard[hidden]{display:none}
+.flash-cat{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--fg-muted);
+}
+.flash-side{font-size:16px;text-align:center}
+.flash-q{font-weight:600}
+.flash-a{color:var(--accent);font-weight:600}
+.flash-hint{
+  position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:var(--fg-muted);
+}
+.flash-explain-row{display:flex;justify-content:center;margin-top:12px}
+.flash-explain-row[hidden]{display:none}
+.flash-explain{
+  margin-top:10px;font-size:13px;color:var(--fg);border-left:3px solid var(--accent-2);
+  padding:10px 13px;background:var(--accent-2-tint);border-radius:0 8px 8px 0;text-align:left;
+}
+.flash-explain[hidden]{display:none}
+.flash-controls{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.flash-controls[hidden]{display:none}
+.btn{
+  font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg);padding:9px 14px;
+}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.warn{background:var(--incorrect-tint);border-color:var(--incorrect);color:var(--incorrect)}
+.flash-meta{text-align:center;color:var(--fg-muted);font-size:12.5px;margin-top:12px}
+
+.addcard-form{
+  margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);text-align:left;
+}
+.addcard-form[hidden]{display:none}
+.addcard-form h3{font-size:15px;margin-bottom:2px}
+.addcard-form label{display:block;font-size:12.5px;font-weight:600;color:var(--fg-muted);margin:12px 0 4px}
+.addcard-form select,.addcard-form input[type="text"],.addcard-form textarea{
+  width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:13.5px;resize:vertical;
+}
+.addcard-form .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.addcard-form .hint{font-size:11.5px;color:var(--fg-muted);margin-top:2px}
+
+/* ---------- Verständnis-Check (periodic interrupt card) ---------- */
+.checkcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--accent-2);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;position:relative;text-align:center;
+}
+.checkcard[hidden]{display:none}
+.check-label{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--accent-2);
+}
+.check-q{font-size:16px;font-weight:600;margin:18px 0 18px}
+.check-bool{display:flex;justify-content:center;gap:10px}
+.check-bool[hidden]{display:none}
+.check-text{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.check-text[hidden]{display:none}
+.check-text input{
+  flex:1 1 220px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;
+}
+.check-feedback{margin-top:14px;font-size:13.5px;text-align:left;border-radius:0 8px 8px 0;padding:9px 13px;border-left:3px solid var(--border)}
+.check-feedback[hidden]{display:none}
+.check-feedback.correct{color:var(--accent);border-left-color:var(--accent);background:var(--accent-tint)}
+.check-feedback.wrong{color:var(--incorrect);border-left-color:var(--incorrect);background:var(--incorrect-tint)}
+.check-controls{display:flex;justify-content:center;margin-top:14px}
+.check-controls[hidden]{display:none}
+
+/* ---------- Quiz ---------- */
+.quiz-score{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;
+}
+.quiz-score strong{color:var(--accent);font-family:var(--font-mono)}
+.q-item{margin-bottom:18px}
+.q-item p.q-text{font-weight:600;margin:0 0 9px;white-space:pre-line}
+.q-opts{display:grid;gap:7px}
+.opt{
+  text-align:left;border:1px solid var(--border);background:var(--surface);border-radius:9px;
+  padding:9px 12px;font-family:var(--font-body);font-size:13.5px;cursor:pointer;color:var(--fg);
+}
+.opt:hover{background:var(--surface-2)}
+.opt.correct{background:var(--accent-tint);border-color:var(--accent)}
+.opt.incorrect{background:var(--incorrect-tint);border-color:var(--incorrect)}
+.opt[disabled]{cursor:default}
+.q-explain{
+  margin-top:7px;font-size:12.5px;color:var(--fg-muted);border-left:3px solid var(--accent);
+  padding:5px 10px;background:var(--surface-2);border-radius:0 8px 8px 0;display:none;
+}
+.q-explain.shown{display:block}
+
+/* ---------- Tasks ---------- */
+details.task{
+  background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:13px 16px;margin-bottom:10px;box-shadow:var(--shadow);
+}
+details.task summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.task summary::-webkit-details-marker{display:none}
+details.task summary .tnum{
+  font-family:var(--font-mono);color:var(--accent-ink);background:var(--accent);
+  border-radius:6px;padding:1px 7px;font-size:12px;flex:0 0 auto;
+}
+details.task .body{margin-top:10px;font-size:13.5px}
+details.task .tip{
+  margin-top:9px;font-size:12.5px;border-left:3px solid var(--accent-2);padding:6px 10px;
+  background:var(--accent-2-tint);border-radius:0 8px 8px 0;
+}
+details.task .sol summary{font-size:12.5px;font-weight:600;color:var(--fg-muted);margin-top:8px}
+.task-footnote{color:var(--fg-muted);font-size:12.5px;margin-top:14px}
+
+footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10px 0 30px}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <div class="frame-stack" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="head-text">
+      <p class="eyebrow">Programmiertechnik I · Vorlesung 10 von 30 · HTWG Konstanz</p>
+      <h1>Rekursion</h1>
+      <p class="subtitle">Dein Lernset zu Basisfall &amp; Rekursionsschritt, Stack &amp; Heap und Endrekursion — zum Verstehen, Behalten und Anwenden.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Lernbereiche">
+    <button class="tab-btn active" data-tab="cards" role="tab" aria-selected="true" id="tabbtn-cards">Karteikarten</button>
+    <button class="tab-btn" data-tab="quiz" role="tab" aria-selected="false" id="tabbtn-quiz">Verständnisfragen</button>
+    <button class="tab-btn" data-tab="tasks" role="tab" aria-selected="false" id="tabbtn-tasks">Übungsaufgaben</button>
+  </nav>
+
+  <main>
+    <!-- ============ FLASHCARDS ============ -->
+    <div class="panel" id="panel-cards" role="tabpanel" aria-labelledby="tabbtn-cards">
+      <section>
+        <h2><span class="n">◆</span>Karteikarten</h2>
+        <p class="lead">Karte anklicken, um die Antwort zu sehen — ehrlich einschätzen, das bringt mehr als nur lesen. Nach dem Umdrehen gibt „🔎 Mehr erklären" bei Bedarf noch mehr Hintergrund. Alle 6–8 Karten kommt ein kurzer Verständnis-Check zwischendurch (Ja/Nein oder kurze Texteingabe). Über „➕ Eigene Karte" kannst du jederzeit eigene Karten ergänzen.</p>
+
+        <div class="cat-filters" id="catFilters"></div>
+        <label class="card-toggle"><input type="checkbox" id="onlyUnsure"> Nur Karten üben, die ich noch nicht sicher weiß</label>
+
+        <div class="flash-wrap">
+          <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Karte umdrehen">
+            <span class="flash-cat" id="flashCat"></span>
+            <div class="flash-side" id="flashFront"></div>
+            <div class="flash-side flash-a" id="flashBack" hidden></div>
+            <span class="flash-hint" id="flashHint">Antippen zum Umdrehen</span>
+          </div>
+
+          <div class="checkcard" id="checkCard" hidden>
+            <span class="check-label">Verständnis-Check</span>
+            <p class="check-q" id="checkQ"></p>
+            <div class="check-bool" id="checkBool">
+              <button class="btn" id="checkYes" type="button">Ja</button>
+              <button class="btn" id="checkNo" type="button">Nein</button>
+            </div>
+            <div class="check-text" id="checkTextWrap">
+              <input type="text" id="checkInput" placeholder="Deine Antwort …" autocomplete="off">
+              <button class="btn primary" id="checkSubmit" type="button">Prüfen</button>
+            </div>
+            <div class="check-feedback" id="checkFeedback" hidden></div>
+            <div class="check-controls" id="checkControls" hidden>
+              <button class="btn primary" id="btnCheckDone" type="button">Weiter mit Karteikarten ▶</button>
+            </div>
+          </div>
+
+          <div class="flash-explain-row" id="flashExplainRow" hidden>
+            <button class="btn" id="btnExplain" type="button">🔎 Mehr erklären</button>
+          </div>
+          <div class="flash-explain" id="flashExplain" hidden></div>
+
+          <div class="flash-controls" id="flashControlsMain">
+            <button class="btn" id="btnPrev" type="button">◀ Zurück</button>
+            <button class="btn warn" id="btnUnknown" type="button">↻ Nochmal üben</button>
+            <button class="btn primary" id="btnKnown" type="button">✓ Weiß ich</button>
+            <button class="btn" id="btnNext" type="button">Weiter ▶</button>
+          </div>
+          <div class="flash-controls" id="flashControlsShuffle">
+            <button class="btn" id="btnShuffle" type="button">⤨ Mischen</button>
+            <button class="btn" id="btnAddCard" type="button">➕ Eigene Karte</button>
+          </div>
+          <div class="flash-controls" id="flashControlsManage">
+            <button class="btn" id="btnEditCard" type="button">✏️ Karte bearbeiten</button>
+            <button class="btn" id="btnDeleteCard" type="button" style="border-color:var(--incorrect);color:var(--incorrect)">🗑 Karte entfernen</button>
+            <button class="btn" id="btnRestoreRemoved" type="button" hidden>↺ Entfernte Karten wiederherstellen (<span id="removedCount">0</span>)</button>
+          </div>
+          <p class="flash-meta" id="flashMeta"></p>
+
+          <form class="addcard-form" id="addCardForm" hidden>
+            <h3 id="addCardFormTitle">Eigene Karteikarte hinzufügen</h3>
+            <p class="lead" id="addCardFormLead" style="margin-bottom:0">Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.</p>
+
+            <label for="addCardCat">Kategorie</label>
+            <select id="addCardCat"></select>
+            <input type="text" id="addCardCatNew" placeholder="Neue Kategorie…" hidden>
+
+            <label for="addCardQ">Frage (Vorderseite)</label>
+            <textarea id="addCardQ" rows="2" placeholder="Was soll abgefragt werden?"></textarea>
+
+            <label for="addCardA">Antwort (Rückseite)</label>
+            <textarea id="addCardA" rows="3" placeholder="Die vollständige, gute Antwort"></textarea>
+
+            <p class="hint">Frage und Antwort sind Pflicht.</p>
+
+            <div class="row">
+              <button class="btn primary" id="btnSaveCard" type="submit">Karte speichern</button>
+              <button class="btn" id="btnCancelCard" type="button">Abbrechen</button>
+              <button class="btn" id="btnResetCard" type="button" hidden style="border-color:var(--incorrect);color:var(--incorrect)">↺ Original wiederherstellen</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ QUIZ ============ -->
+    <div class="panel" id="panel-quiz" role="tabpanel" aria-labelledby="tabbtn-quiz" hidden>
+      <section>
+        <h2><span class="n">?</span>Verständnisfragen</h2>
+        <p class="lead">12 Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.</p>
+        <div class="quiz-score">
+          <span>Ergebnis: <strong id="quizScore">0</strong> / 12 richtig</span>
+          <button class="btn" id="btnQuizReset" type="button">Zurücksetzen</button>
+        </div>
+        <div id="quizList"></div>
+      </section>
+    </div>
+
+    <!-- ============ TASKS ============ -->
+    <div class="panel" id="panel-tasks" role="tabpanel" aria-labelledby="tabbtn-tasks" hidden>
+      <section>
+        <h2><span class="n">▸</span>Übungsaufgaben</h2>
+        <p class="lead">Die Original-Aufgaben aus der Vorlesung plus ergänzende Übungen im selben Stil — zum echten Programmieren, nicht zum schnellen Abrufen. Erst selbst in Scala probieren, dann Tipp bzw. Lösungsidee zum Gegenchecken aufklappen.</p>
+        <div id="taskList"></div>
+        <p class="task-footnote">LeetCode zum Üben: Pow(x, n) (50) · Climbing Stairs (70, folgt dem Fibonacci-Muster) · Binary Search (704) · Permutations (46, Baumrekursion wie Hanoi).</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="credit">Lernset zu Prof. Dr. Boger / Prof. Dr. Laube, Programmiertechnik I — Vorlesung 10: Recursion</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Tabs ----------
+  var tabBtns = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  var panels = {
+    cards: document.getElementById("panel-cards"),
+    quiz: document.getElementById("panel-quiz"),
+    tasks: document.getElementById("panel-tasks")
+  };
+  tabBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabBtns.forEach(function(b){ b.classList.remove("active"); b.setAttribute("aria-selected","false"); });
+      btn.classList.add("active"); btn.setAttribute("aria-selected","true");
+      Object.keys(panels).forEach(function(k){ panels[k].hidden = (k !== btn.dataset.tab); });
+    });
+  });
+
+  // ---------- Storage helpers ----------
+  function loadJSON(key, fallback){
+    try{ var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function saveJSON(key, val){
+    try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+  }
+
+  // ======================================================
+  // FLASHCARDS — Frage vorne, vollständige gute Antwort hinten.
+  // ======================================================
+  var CARDS = [
+    {cat:"Grundlagen", q:"Was sind die zwei Pflichtteile jeder korrekten Rekursion?", a:"Basisfall (einfacher Input, direkt lösbar) und Rekursionsschritt (Problem auf kleinere Instanz reduzieren + Ergebnis kombinieren)."},
+    {cat:"Grundlagen", q:"Wann terminiert eine Rekursion garantiert?", a:"Wenn der Input bei jedem Schritt kleiner wird und dabei immer den Basisfall erreicht."},
+    {cat:"Grundlagen", q:"Das 3-Schritte-Rezept für eine Rekursion?", a:"1) Rekursionsgleichung aufschreiben, 2) nach Scala übersetzen, 3) prüfen, dass der Input kleiner wird."},
+    {cat:"Grundlagen", q:"Unterschied direkte vs. indirekte Rekursion?", a:"Direkt: Funktion ruft sich selbst. Indirekt: A ruft B, B ruft wieder A."},
+    {cat:"Mathematik", q:"Rekursionsgleichung für n! ?", a:"n! = 1 für n = 0; n! = n · (n−1)! für n > 0."},
+    {cat:"Mathematik", q:"Warum liefert factorial in Scala BigInt statt Long?", a:"Fakultäten wachsen sehr schnell — 21! passt nicht mehr in einen Long."},
+    {cat:"Mathematik", q:"Wie viele Basisfälle / rekursive Aufrufe hat Fibonacci?", a:"Zwei Basisfälle (n=0, n=1), zwei rekursive Aufrufe (fib(n−1)+fib(n−2)) pro Schritt."},
+    {cat:"Mathematik", q:"Warum ist naives fib(n) so langsam?", a:"Dieselben Teilprobleme werden immer wieder neu berechnet — exponentielle Laufzeit (≈1,6^n Aufrufe)."},
+    {cat:"Mathematik", q:"Rekursionsgleichung für ggT nach Euklid?", a:"gcd(a,b) = a falls b=0; gcd(b, a mod b) falls b>0."},
+    {cat:"Mathematik", q:"Was wird bei ggT(a,b) garantiert kleiner?", a:"Der zweite Parameter b, denn a mod b < b."},
+    {cat:"Informatik", q:"Wie viele Züge braucht Hanoi für n Scheiben?", a:"2^n − 1 (moves(n) = 2·moves(n−1) + 1)."},
+    {cat:"Informatik", q:"Die drei Teile des Hanoi-Rekursionsschritts?", a:"n−1 Scheiben from→via; größte Scheibe from→to; n−1 Scheiben via→to."},
+    {cat:"Informatik", q:"Warum ist Hanoi mit Rekursion viel einfacher zu lösen als mit einfachen Schleifen?", a:"Mit Rekursion genügen drei Zeilen, weil sich das Problem direkt in zwei kleinere Hanoi-Probleme plus einen Zug aufteilt. Mit Schleifen müsste man den Zustand aller Scheiben manuell verwalten — deutlich aufwendiger."},
+    {cat:"Informatik", q:"Vergleiche bei binärer Suche, 1 Mio. Elemente?", a:"Etwa 20 (log₂ 1.000.000 ≈ 20) — Bereich wird jedes Mal halbiert."},
+    {cat:"Informatik", q:"Voraussetzung für binäre Suche?", a:"Das Array muss sortiert sein."},
+    {cat:"Informatik", q:"Rekursive Definition einer Liste?", a:"List[A] = Nil | A :: List[A] — leer, oder Kopf gefolgt von einem Rest, der wieder eine Liste ist."},
+    {cat:"Informatik", q:"Was ist strukturelle Rekursion?", a:"Die Funktion folgt dem Aufbau der Daten: ein Fall für Nil (Basisfall), ein Fall für head::tail (Aufruf auf tail)."},
+    {cat:"Informatik", q:"Warum terminiert strukturelle Rekursion auf Listen immer?", a:"Der tail ist immer kürzer als die Ursprungsliste — der Input wird garantiert kleiner."},
+    {cat:"Informatik", q:"Was macht merge() beim Mergesort?", a:"Zwei bereits sortierte Listen strukturell-rekursiv verschmelzen: jeweils den kleineren Kopf voranstellen."},
+    {cat:"Informatik", q:"Grundprinzip von mergeSort?", a:"Liste halbieren, beide Hälften rekursiv sortieren, dann mit merge() zusammenführen (Divide & Conquer)."},
+    {cat:"Informatik", q:"Zusammenhang LeetCode 21 und Mergesort?", a:"LeetCode 21 (zwei sortierte Listen mergen) ist genau die merge()-Funktion aus dem Herzen von Mergesort."},
+    {cat:"Informatik", q:"Worauf muss man beim Umwandeln römischer Zahlen per Pattern Matching besonders achten?", a:"Sonderfälle wie IV oder IX müssen VOR den einzelnen Grundziffern geprüft werden, sonst würde z. B. IV fälschlich als I gefolgt von V gelesen."},
+    {cat:"Speicher", q:"Was bekommt jeder Funktionsaufruf auf dem Call-Stack?", a:"Einen eigenen Stack-Frame mit eigenen lokalen Variablen/Parametern."},
+    {cat:"Speicher", q:"Wo liegen Objekte wie Listenzellen — Stack oder Heap?", a:"Auf dem Heap; der Stack-Frame hält nur eine Referenz darauf."},
+    {cat:"Speicher", q:"Wann tritt ein StackOverflowError auf?", a:"Wenn der Stack voller Frames läuft — fehlender Basisfall, ein Schritt wird nicht kleiner, oder sehr tiefe (aber korrekte) Rekursion."},
+    {cat:"Speicher", q:"Kann auch korrekte Rekursion überlaufen?", a:"Ja, z. B. factorial(100000) — der Stack hat nur begrenzt Platz (einige Tausend bis Zehntausende Frames)."},
+    {cat:"Speicher", q:"Stack vs. Heap — Größe und Lebensdauer?", a:"Stack: klein, schnell, automatisch freigegeben. Heap: groß, Objekte leben solange referenziert, Garbage Collector räumt auf."},
+    {cat:"Endrekursion", q:"Was ist ein Tail Call?", a:"Ein Aufruf, der die allerletzte Aktion der Funktion ist — danach passiert nichts mehr."},
+    {cat:"Endrekursion", q:"Ist h + sum(t) ein Tail Call?", a:"Nein — die Addition passiert NACH dem rekursiven Aufruf, also ist noch etwas zu tun."},
+    {cat:"Endrekursion", q:"Wofür sorgt @tailrec?", a:"Der Compiler prüft, ob die Funktion wirklich endrekursiv ist — sonst Kompilierfehler."},
+    {cat:"Endrekursion", q:"Was macht der Compiler aus einem echten Tail Call?", a:"Er wandelt ihn in eine Schleife (while) um — ein Stack-Frame wird wiederverwendet statt neue zu stapeln."},
+    {cat:"Endrekursion", q:"Wozu dient der Akkumulator?", a:"Er trägt das Zwischenergebnis als zusätzlichen Parameter mit, sodass nach dem Aufruf nichts mehr berechnet werden muss."},
+    {cat:"Endrekursion", q:"Kann Fibonacci endrekursiv werden, trotz zwei Aufrufen?", a:"Ja, mit zwei Akkumulatoren (a, b) — dann nur noch 1 Aufruf pro Schritt, linear statt exponentiell."},
+    {cat:"Endrekursion", q:"Faustregel: welche Rekursion lässt sich leicht endrekursiv machen?", a:"Lineare Rekursion (ein Aufruf, z. B. factorial, sum). Baumrekursion (mehrere Aufrufe, z. B. Hanoi) meist nicht sinnvoll."},
+    {cat:"Endrekursion", q:"Was ist foldLeft im Kern?", a:"Dasselbe Akkumulator-Muster wie Endrekursion auf Listen, fertig verpackt als Bibliotheksmethode: xs.foldLeft(z)(f)."},
+    {cat:"Endrekursion", q:"Was bedeuten z und f in xs.foldLeft(z)(f)?", a:"z = Startwert/Basisfall; f(acc, elem) = wie Akkumulator und nächstes Element kombiniert werden (Rekursionsschritt)."}
+  ].map(function(c, i){ c.id = i; return c; });
+
+  var BASE_CATS = ["Grundlagen","Mathematik","Informatik","Speicher","Endrekursion"];
+  var STORE_KEY = "recursion";
+  var knownIds = new Set(loadJSON(STORE_KEY + "-known", []));
+  var removedIds = new Set(loadJSON(STORE_KEY + "-removed", []));
+  var customCards = loadJSON(STORE_KEY + "-custom", []);
+  var overrides = loadJSON(STORE_KEY + "-overrides", {});
+  var ALL = [];
+  function refreshAll(){
+    customCards.forEach(function(c, i){ c.id = CARDS.length + i; });
+    ALL = CARDS.concat(customCards).map(function(c){
+      var o = overrides[c.id];
+      if(!o) return c;
+      return {id:c.id, cat:o.cat, q:o.q, a:o.a, expl:(o.expl !== undefined ? o.expl : c.expl)};
+    });
+  }
+  refreshAll();
+
+  function activeTotal(){ return ALL.length - removedIds.size; }
+  var activeCat = "Alle";
+  var onlyUnsure = false;
+  var order = [];
+  var pos = 0;
+  var flipped = false;
+
+  var catFiltersEl = document.getElementById("catFilters");
+  function currentCats(){
+    var extra = [];
+    ALL.forEach(function(c){ if(BASE_CATS.indexOf(c.cat) === -1 && extra.indexOf(c.cat) === -1) extra.push(c.cat); });
+    return ["Alle"].concat(BASE_CATS, extra);
+  }
+  function renderCatFilters(){
+    catFiltersEl.innerHTML = "";
+    currentCats().forEach(function(cat){
+      var b = document.createElement("button");
+      b.className = "chip" + (cat === activeCat ? " active" : "");
+      b.type = "button"; b.textContent = cat; b.dataset.cat = cat;
+      b.addEventListener("click", function(){
+        activeCat = cat;
+        Array.prototype.forEach.call(catFiltersEl.children, function(c){ c.classList.toggle("active", c.dataset.cat === cat); });
+        rebuildOrder();
+      });
+      catFiltersEl.appendChild(b);
+    });
+  }
+  renderCatFilters();
+  document.getElementById("onlyUnsure").addEventListener("change", function(e){
+    onlyUnsure = e.target.checked; rebuildOrder();
+  });
+
+  function shuffle(arr){
+    for(var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function rebuildOrder(){
+    var pool = ALL.filter(function(c){
+      if(removedIds.has(c.id)) return false;
+      if(activeCat !== "Alle" && c.cat !== activeCat) return false;
+      if(onlyUnsure && knownIds.has(c.id)) return false;
+      return true;
+    });
+    order = pool.map(function(c){ return c.id; });
+    pos = 0; flipped = false;
+    renderCard();
+  }
+
+  var flashcardEl = document.getElementById("flashcard");
+  var flashCat = document.getElementById("flashCat");
+  var flashFront = document.getElementById("flashFront");
+  var flashBack = document.getElementById("flashBack");
+  var flashHint = document.getElementById("flashHint");
+  var flashMeta = document.getElementById("flashMeta");
+  var flashExplainRow = document.getElementById("flashExplainRow");
+  var flashExplain = document.getElementById("flashExplain");
+  var btnExplain = document.getElementById("btnExplain");
+
+  function cardAt(id){
+    for(var i = 0; i < ALL.length; i++){ if(ALL[i].id === id) return ALL[i]; }
+    return null;
+  }
+
+  function resetExplain(){
+    flashExplain.hidden = true;
+    btnExplain.textContent = "🔎 Mehr erklären";
+  }
+
+  function renderCard(){
+    resetExplain();
+    if(order.length === 0){
+      flashCat.textContent = "";
+      flashFront.textContent = onlyUnsure ? "Alles in dieser Kategorie sitzt schon. 🎉" : "Keine Karten in dieser Auswahl.";
+      flashBack.hidden = true; flashFront.hidden = false;
+      flashExplainRow.hidden = true;
+      flashHint.textContent = "";
+      flashMeta.textContent = "Gewusst: " + knownIds.size + " / " + activeTotal();
+      return;
+    }
+    var card = cardAt(order[pos]);
+    flashCat.textContent = card.cat;
+    flashFront.textContent = card.q;
+    flashBack.textContent = card.a;
+    flashFront.hidden = flipped;
+    flashBack.hidden = !flipped;
+    flashExplainRow.hidden = !(flipped && card.expl);
+    flashHint.textContent = flipped ? "Antippen für die Frage" : "Antippen zum Umdrehen";
+    flashMeta.textContent = "Karte " + (pos+1) + " / " + order.length + " · Gewusst gesamt: " + knownIds.size + " / " + activeTotal();
+  }
+
+  btnExplain.addEventListener("click", function(){
+    var card = order.length ? cardAt(order[pos]) : null;
+    if(!card) return;
+    flashExplain.textContent = card.expl || "";
+    flashExplain.hidden = !flashExplain.hidden;
+    btnExplain.textContent = flashExplain.hidden ? "🔎 Mehr erklären" : "🔽 Erklärung ausblenden";
+  });
+
+  flashcardEl.addEventListener("click", function(){
+    if(order.length === 0) return;
+    flipped = !flipped; renderCard();
+  });
+  flashcardEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flashcardEl.click(); }
+  });
+
+  function advance(delta){
+    if(order.length === 0) return;
+    pos = (pos + delta + order.length) % order.length;
+    flipped = false; renderCard();
+  }
+  document.getElementById("btnPrev").addEventListener("click", function(){ advance(-1); });
+  document.getElementById("btnNext").addEventListener("click", function(){ advance(1); });
+  document.getElementById("btnShuffle").addEventListener("click", function(){ shuffle(order); pos = 0; flipped = false; renderCard(); });
+  document.getElementById("btnKnown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.add(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    if(onlyUnsure){ rebuildOrder(); } else { advance(1); }
+    maybeShowCheck();
+  });
+  document.getElementById("btnUnknown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.delete(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    advance(1);
+    maybeShowCheck();
+  });
+
+  function updateRestoreBtn(){
+    var btn = document.getElementById("btnRestoreRemoved");
+    var countEl = document.getElementById("removedCount");
+    if(countEl) countEl.textContent = removedIds.size;
+    btn.hidden = removedIds.size === 0;
+  }
+  document.getElementById("btnDeleteCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    if(!confirm("Diese Karte wirklich dauerhaft aus dem Lernset entfernen?\n\n„" + card.q + "“")) return;
+    removedIds.add(card.id);
+    knownIds.delete(card.id);
+    saveJSON(STORE_KEY + "-removed", Array.from(removedIds));
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  document.getElementById("btnRestoreRemoved").addEventListener("click", function(){
+    if(removedIds.size === 0) return;
+    if(!confirm("Alle " + removedIds.size + " entfernten Karten wiederherstellen?")) return;
+    removedIds.clear();
+    saveJSON(STORE_KEY + "-removed", []);
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  updateRestoreBtn();
+
+  // ---------- Add / edit own card ----------
+  var addCardForm = document.getElementById("addCardForm");
+  var addCardCat = document.getElementById("addCardCat");
+  var addCardCatNew = document.getElementById("addCardCatNew");
+  var addCardFormTitle = document.getElementById("addCardFormTitle");
+  var addCardFormLead = document.getElementById("addCardFormLead");
+  var btnSaveCard = document.getElementById("btnSaveCard");
+  var btnResetCard = document.getElementById("btnResetCard");
+  var NEW_CAT_VALUE = "__new__";
+  var editingId = null;
+
+  function populateAddCardCats(){
+    addCardCat.innerHTML = "";
+    BASE_CATS.concat(currentCats().filter(function(c){ return c !== "Alle" && BASE_CATS.indexOf(c) === -1; })).forEach(function(cat){
+      var o = document.createElement("option"); o.value = cat; o.textContent = cat;
+      addCardCat.appendChild(o);
+    });
+    var o2 = document.createElement("option"); o2.value = NEW_CAT_VALUE; o2.textContent = "Neue Kategorie…";
+    addCardCat.appendChild(o2);
+  }
+  addCardCat.addEventListener("change", function(){
+    addCardCatNew.hidden = addCardCat.value !== NEW_CAT_VALUE;
+  });
+
+  function closeAddCardForm(){
+    addCardForm.reset(); addCardCatNew.hidden = true; addCardForm.hidden = true;
+    editingId = null;
+  }
+
+  document.getElementById("btnAddCard").addEventListener("click", function(){
+    if(!addCardForm.hidden && editingId === null){ closeAddCardForm(); return; }
+    editingId = null;
+    populateAddCardCats();
+    document.getElementById("addCardQ").value = "";
+    document.getElementById("addCardA").value = "";
+    addCardFormTitle.textContent = "Eigene Karteikarte hinzufügen";
+    addCardFormLead.textContent = "Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.";
+    btnSaveCard.textContent = "Karte speichern";
+    btnResetCard.hidden = true;
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnEditCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    editingId = card.id;
+    populateAddCardCats();
+    addCardCat.value = card.cat;
+    addCardCatNew.hidden = true;
+    document.getElementById("addCardQ").value = card.q;
+    document.getElementById("addCardA").value = card.a;
+    addCardFormTitle.textContent = "Karte bearbeiten";
+    addCardFormLead.textContent = "Änderungen werden dauerhaft in diesem Lernset gespeichert (im Browser).";
+    btnSaveCard.textContent = "Änderungen speichern";
+    btnResetCard.hidden = !overrides[card.id];
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnCancelCard").addEventListener("click", closeAddCardForm);
+
+  btnResetCard.addEventListener("click", function(){
+    if(editingId === null) return;
+    if(!confirm("Diese Karte wirklich auf die ursprüngliche Version zurücksetzen?")) return;
+    delete overrides[editingId];
+    saveJSON(STORE_KEY + "-overrides", overrides);
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  addCardForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var q = document.getElementById("addCardQ").value.trim();
+    var a = document.getElementById("addCardA").value.trim();
+    var cat = addCardCat.value === NEW_CAT_VALUE ? addCardCatNew.value.trim() : addCardCat.value;
+    if(!q || !a || !cat){ alert("Bitte Kategorie, Frage und Antwort ausfüllen."); return; }
+    if(editingId !== null){
+      overrides[editingId] = {cat:cat, q:q, a:a};
+      saveJSON(STORE_KEY + "-overrides", overrides);
+    } else {
+      customCards.push({cat:cat, q:q, a:a, expl:""});
+      saveJSON(STORE_KEY + "-custom", customCards);
+    }
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  rebuildOrder();
+
+  // ======================================================
+  // VERSTÄNDNIS-CHECK — alle 6-8 Karten ein kurzer, geprüfter
+  // Ja/Nein- oder Kurztext-Check zu einem Thema, das gerade geübt wurde.
+  // ======================================================
+  var ABFRAGE = [
+    {type:"bool", q:"Ja oder Nein: Der Rekursionsschritt muss das Problem immer auf eine kleinere Instanz reduzieren.", correct:true,
+     explain:"Richtig — nur wenn der Input bei jedem Schritt kleiner wird, kann die Rekursion den Basisfall jemals erreichen und terminieren."},
+    {type:"text", q:"Wie viele Basisfälle hat die rekursive Fibonacci-Definition? (nur die Zahl)", answer:"2",
+     explain:"fib(0)=0 und fib(1)=1 sind beide Basisfälle; erst ab n≥2 greift der Rekursionsschritt."},
+    {type:"text", q:"Wie viele rekursive Aufrufe macht naives fib(n) pro Schritt? (nur die Zahl)", answer:"2",
+     explain:"fib(n) ruft sowohl fib(n−1) als auch fib(n−2) auf — Baumrekursion statt linearer Rekursion."},
+    {type:"text", q:"Wie viele Züge braucht Hanoi für n=3 Scheiben? (nur die Zahl)", answer:"7",
+     explain:"2³−1=7 — die Formel 2ⁿ−1 ergibt für n=3 genau 7 Züge."},
+    {type:"bool", q:"Ja oder Nein: Bei struktureller Rekursion auf Listen muss man extra beweisen, dass der Input kleiner wird.", correct:false,
+     explain:"Nein — der tail ist per Konstruktion immer um genau ein Element kürzer, die Terminierung ist durch die Datenstruktur selbst garantiert."},
+    {type:"bool", q:"Ja oder Nein: LeetCode 21 (Merge Two Sorted Lists) ist im Kern dieselbe Funktion wie merge() aus Mergesort.", correct:true,
+     explain:"Richtig — beide verschmelzen zwei sortierte Listen nach demselben Muster: strukturelle Rekursion auf zwei Listen gleichzeitig."},
+    {type:"bool", q:"Ja oder Nein: h + sum(t) ist ein Tail Call.", correct:false,
+     explain:"Nein — nach dem Aufruf sum(t) muss noch h addiert werden, das ist noch Arbeit nach dem rekursiven Aufruf."},
+    {type:"text", q:"Wie viele Stack-Frames braucht eine korrekt endrekursiv optimierte Funktion, unabhängig von n? (nur die Zahl)", answer:"1",
+     explain:"Der Compiler wandelt den Tail Call in eine Schleife um — derselbe Frame wird wiederverwendet statt bei jedem Aufruf einen neuen zu stapeln."},
+    {type:"bool", q:"Ja oder Nein: Fibonacci lässt sich trotz zwei rekursiver Aufrufe endrekursiv machen.", correct:true,
+     explain:"Richtig — mit zwei Akkumulatoren (den letzten zwei Fibonacci-Werten) reicht pro Schritt ein einziger Aufruf."},
+    {type:"bool", q:"Ja oder Nein: foldLeft ist im Kern dasselbe Muster wie eine endrekursive Schleife mit Akkumulator.", correct:true,
+     explain:"Richtig — foldLeft verpackt genau dieses Muster (Startwert + Kombinationsfunktion) als fertige Bibliotheksmethode."},
+    {type:"text", q:"Wie viele Vergleiche braucht binäre Suche höchstens bei 1 Million Elementen? (nur die ungefähre Zahl)", answer:"20",
+     explain:"log₂(1.000.000) ≈ 20 — bei jedem Schritt halbiert sich der verbleibende Suchbereich."},
+    {type:"bool", q:"Ja oder Nein: Auch korrekt geschriebene Rekursion kann einen StackOverflowError auslösen.", correct:true,
+     explain:"Richtig — z. B. ist factorial(100000) logisch korrekt, aber bei sehr tiefer (nicht endrekursiver) Rekursion läuft der Stack trotzdem über."},
+    {type:"bool", q:"Ja oder Nein: Türme von Hanoi lässt sich mit einfachen Schleifen genauso leicht lösen wie mit Rekursion.", correct:false,
+     explain:"Nein — mit Schleifen müsste man den Zustand aller Scheiben manuell verwalten; mit Rekursion reichen drei Zeilen."},
+    {type:"bool", q:"Ja oder Nein: Objekte wie Listenzellen liegen auf dem Stack.", correct:false,
+     explain:"Nein — sie liegen auf dem Heap. Der Stack-Frame hält nur eine Referenz darauf."}
+  ];
+
+  var checkCardEl = document.getElementById("checkCard");
+  var checkQEl = document.getElementById("checkQ");
+  var checkBoolEl = document.getElementById("checkBool");
+  var checkTextWrapEl = document.getElementById("checkTextWrap");
+  var checkInputEl = document.getElementById("checkInput");
+  var checkFeedbackEl = document.getElementById("checkFeedback");
+  var checkControlsEl = document.getElementById("checkControls");
+  var checkYesEl = document.getElementById("checkYes");
+  var checkNoEl = document.getElementById("checkNo");
+  var checkSubmitEl = document.getElementById("checkSubmit");
+  var flashControlsMain = document.getElementById("flashControlsMain");
+  var flashControlsShuffle = document.getElementById("flashControlsShuffle");
+  var flashControlsManage = document.getElementById("flashControlsManage");
+  var abfrageBag = [];
+  var currentCheckItem = null;
+
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  var cardsUntilCheck = randInt(6, 8);
+
+  function drawAbfrage(){
+    if(ABFRAGE.length === 0) return null;
+    if(abfrageBag.length === 0){ abfrageBag = shuffle(ABFRAGE.map(function(_, i){ return i; })); }
+    return ABFRAGE[abfrageBag.pop()];
+  }
+  function normalize(s){ return (s || "").toString().trim().toLowerCase().replace(/\s+/g, " "); }
+
+  function maybeShowCheck(){
+    cardsUntilCheck--;
+    if(cardsUntilCheck > 0) return;
+    cardsUntilCheck = randInt(6, 8);
+    var item = drawAbfrage();
+    if(!item) return;
+    currentCheckItem = item;
+    checkQEl.textContent = item.q;
+    checkBoolEl.hidden = item.type !== "bool";
+    checkTextWrapEl.hidden = item.type !== "text";
+    checkInputEl.value = "";
+    checkYesEl.disabled = checkNoEl.disabled = false;
+    checkSubmitEl.disabled = false;
+    checkFeedbackEl.hidden = true;
+    checkFeedbackEl.className = "check-feedback";
+    checkControlsEl.hidden = true;
+
+    flashcardEl.hidden = true;
+    flashControlsMain.hidden = true;
+    flashControlsShuffle.hidden = true;
+    flashControlsManage.hidden = true;
+    flashExplainRow.hidden = true;
+    flashExplain.hidden = true;
+    checkCardEl.hidden = false;
+  }
+
+  function finishCheck(isCorrect){
+    checkFeedbackEl.textContent = (isCorrect ? "✓ Richtig. " : "✗ Nicht ganz. ") + (currentCheckItem.explain || "");
+    checkFeedbackEl.className = "check-feedback " + (isCorrect ? "correct" : "wrong");
+    checkFeedbackEl.hidden = false;
+    checkYesEl.disabled = checkNoEl.disabled = true;
+    checkSubmitEl.disabled = true;
+    checkControlsEl.hidden = false;
+  }
+  checkYesEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === true); });
+  checkNoEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === false); });
+  checkSubmitEl.addEventListener("click", function(){
+    var val = normalize(checkInputEl.value);
+    var candidates = [currentCheckItem.answer].concat(currentCheckItem.accept || []).map(normalize);
+    finishCheck(candidates.indexOf(val) !== -1);
+  });
+  checkInputEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); checkSubmitEl.click(); }
+  });
+  document.getElementById("btnCheckDone").addEventListener("click", function(){
+    checkCardEl.hidden = true;
+    flashcardEl.hidden = false;
+    flashControlsMain.hidden = false;
+    flashControlsShuffle.hidden = false;
+    flashControlsManage.hidden = false;
+    renderCard();
+  });
+
+  // ======================================================
+  // QUIZ
+  // ======================================================
+  var QUIZ = [
+    {q:"Welche Aussage über Basisfall und Rekursionsschritt ist korrekt?",
+     opts:["Der Rekursionsschritt muss das Problem immer verdoppeln","Der Basisfall wird ohne weiteren rekursiven Aufruf direkt gelöst","Jede Funktion braucht mindestens zwei Basisfälle","Der Rekursionsschritt darf das Ergebnis nicht verändern"],
+     correct:1, explain:"Der Basisfall ist per Definition der Fall, der direkt beantwortet wird — ohne weitere Rekursion."},
+    {q:"Ist dieser Code tail-rekursiv?\nxs match { case Nil => 0; case h::t => h + sum(t) }",
+     opts:["Ja, sum(t) ist der letzte Ausdruck","Nein, nach sum(t) passiert noch die Addition h + …","Ja, weil es ein match ist","Nein, weil Nil kein gültiger Basisfall ist"],
+     correct:1, explain:"Ein Tail Call ist die allerletzte Aktion. Hier wird nach dem Aufruf noch addiert — also kein Tail Call."},
+    {q:"Was passiert, wenn @tailrec auf eine NICHT endrekursive Funktion angewendet wird?",
+     opts:["Läuft trotzdem, nur langsamer","Der Compiler baut automatisch eine Schleife","Kompilierfehler","StackOverflowError zur Laufzeit"],
+     correct:2, explain:"@tailrec lässt den Compiler prüfen, ob es wirklich ein Tail Call ist — sonst gibt es einen Kompilierfehler."},
+    {q:"Wie viele Stack-Frames braucht eine korrekt endrekursive Funktion nach der Optimierung?",
+     opts:["Einen konstanten, wiederverwendeten Frame","Genauso viele wie der Eingabewert n","n² Frames","Keine, es wird keine Funktion aufgerufen"],
+     correct:0, explain:"Der Compiler wandelt den Tail Call in eine Schleife um — ein Frame wird wiederverwendet statt neue zu stapeln."},
+    {q:"Welche Funktion ist Baumrekursion (mehrere rekursive Aufrufe pro Schritt)?",
+     opts:["gcd (Euklid)","binäre Suche","naives fib(n) = fib(n−1) + fib(n−2)","factorial"],
+     correct:2, explain:"fib ruft sich zweimal pro Schritt auf — das verzweigt wie ein Baum. Die anderen drei haben je einen Aufruf."},
+    {q:"Wie viele Vergleiche braucht binäre Suche höchstens bei 1.000.000 Elementen?",
+     opts:["1.000.000","1.000","20","2"],
+     correct:2, explain:"log₂(1.000.000) ≈ 20 — der Bereich wird bei jedem Schritt halbiert."},
+    {q:"Was liegt auf dem Heap, während sum(List(1,2,3)) läuft?",
+     opts:["Nur die aktuell addierte Zahl","Die Listenzellen (1::, 2::, 3::, Nil) als Objekte","Die Stack-Frames selbst","Nichts, Listen leben nur auf dem Stack"],
+     correct:1, explain:"Objekte wie Listenzellen leben auf dem Heap; die Stack-Frames halten nur Referenzen darauf."},
+    {q:"Warum terminiert strukturelle Rekursion auf Listen immer?",
+     opts:["Weil Nil immer am Anfang steht","Weil der tail bei jedem Aufruf garantiert kürzer ist als die Ursprungsliste","Weil Scala Listen auf 1000 Elemente begrenzt","Weil head::tail immer sortiert ist"],
+     correct:1, explain:"List[A] = Nil | A :: List[A] — der tail wird mit jedem Schritt kürzer, bis Nil erreicht ist."},
+    {q:"Was ist z in xs.foldLeft(z)(f)?",
+     opts:["Die Funktion, die zwei Elemente kombiniert","Der Startwert / die Basisfall-Antwort","Das letzte Element der Liste","Die Anzahl der Rekursionsschritte"],
+     correct:1, explain:"z ist der Startwert des Akkumulators — entspricht dem Basisfall der Rekursion."},
+    {q:"Warum kann factorial(100000) trotz korrekter Rekursion scheitern?",
+     opts:["BigInt kann so große Zahlen nicht speichern","Der Stack hat nur begrenzt Frames (StackOverflowError), da nicht endrekursiv","Int-Overflow bei n","Scala erlaubt keine Rekursionstiefe über 100"],
+     correct:1, explain:"Die normale (nicht endrekursive) Version braucht einen Frame pro Aufruf — bei 100.000 Aufrufen läuft der Stack über."},
+    {q:"Welche Aussage zu merge() (LeetCode 21 / Mergesort) ist richtig?",
+     opts:["merge() sortiert eine unsortierte Liste von Grund auf","merge() verschmilzt zwei bereits sortierte Listen, jeweils den kleineren Kopf zuerst","merge() funktioniert nur mit genau drei Elementen","merge() braucht keinen Basisfall"],
+     correct:1, explain:"merge() setzt voraus, dass beide Listen schon sortiert sind, und baut daraus eine sortierte Liste."},
+    {q:"Was ist beim Hanoi-Problem der Rekursionsschritt für n Scheiben?",
+     opts:["Alle n Scheiben gleichzeitig verschieben","n−1 Scheiben nach via, größte Scheibe nach to, dann n−1 Scheiben von via nach to","Nur die größte Scheibe bewegen","n Scheiben einzeln in zufälliger Reihenfolge verschieben"],
+     correct:1, explain:"Das ist exakt der dreiteilige Rekursionsschritt: hanoi(n-1, from, via, to); move; hanoi(n-1, via, to, from)."}
+  ];
+
+  var quizListEl = document.getElementById("quizList");
+  var quizScoreEl = document.getElementById("quizScore");
+  var score = 0;
+
+  function renderQuiz(){
+    quizListEl.innerHTML = "";
+    score = 0; quizScoreEl.textContent = "0";
+    QUIZ.forEach(function(item, qi){
+      var wrap = document.createElement("div");
+      wrap.className = "q-item card";
+      var qText = document.createElement("p");
+      qText.className = "q-text";
+      qText.textContent = (qi+1) + ". " + item.q;
+      wrap.appendChild(qText);
+
+      var optsWrap = document.createElement("div");
+      optsWrap.className = "q-opts";
+      var explainEl = document.createElement("div");
+      explainEl.className = "q-explain";
+      explainEl.textContent = item.explain;
+
+      item.opts.forEach(function(optText, oi){
+        var b = document.createElement("button");
+        b.className = "opt"; b.type = "button"; b.textContent = optText;
+        b.addEventListener("click", function(){
+          if(wrap.dataset.answered) return;
+          wrap.dataset.answered = "1";
+          Array.prototype.forEach.call(optsWrap.children, function(o, idx){
+            o.disabled = true;
+            if(idx === item.correct) o.classList.add("correct");
+            else if(idx === oi) o.classList.add("incorrect");
+          });
+          explainEl.classList.add("shown");
+          if(oi === item.correct){ score++; quizScoreEl.textContent = String(score); }
+        });
+        optsWrap.appendChild(b);
+      });
+
+      wrap.appendChild(optsWrap);
+      wrap.appendChild(explainEl);
+      quizListEl.appendChild(wrap);
+    });
+  }
+  document.getElementById("btnQuizReset").addEventListener("click", renderQuiz);
+  renderQuiz();
+
+  // ======================================================
+  // TASKS (Original-Aufgaben + die früher bei den Karteikarten
+  // eingestreuten Zwischenübungen — gehören inhaltlich hierher)
+  // ======================================================
+  var TASKS = [
+    {t:"digitSum(n: Int): Int", d:"digitSum(1234) == 10 — Quersumme einer Zahl.",
+     tip:"Rekursionsgleichung: digitSum(n) = n falls n &lt; 10; sonst n % 10 + digitSum(n / 10).",
+     sol:"def digitSum(n: Int): Int =\n  if n &lt; 10 then n\n  else n % 10 + digitSum(n / 10)"},
+    {t:"max(xs: List[Int]): Int", d:"Maximum einer Liste mit Pattern Matching bestimmen.",
+     tip:"Basisfall: Liste mit genau einem Element. Rekursionsschritt: Kopf mit dem Maximum des Rests vergleichen.",
+     sol:"def max(xs: List[Int]): Int = xs match\n  case x :: Nil => x\n  case x :: t   => x.max(max(t))\n// Achtung: leere Liste ist kein gültiger Input"},
+    {t:"power(x: Double, n: Int): Double  &amp;  sumTo(n: Int): Int", d:"Potenz sowie die Summe 1+2+…+n (kleiner Gauß).",
+     tip:"power: Basisfall n=0 → 1.0. sumTo: Basisfall n=0 → 0.",
+     sol:"def power(x: Double, n: Int): Double =\n  if n == 0 then 1.0 else x * power(x, n - 1)\n\ndef sumTo(n: Int): Int =\n  if n == 0 then 0 else n + sumTo(n - 1)"},
+    {t:"sumTo und length endrekursiv machen", d:"Beide mit @tailrec und einem Akkumulator umschreiben.",
+     tip:"Innere loop-Funktion mit (i, acc) bzw. (rest, acc); der Basisfall gibt acc direkt zurück.",
+     sol:"def sumTo(n: Int): Int =\n  @tailrec def loop(i: Int, acc: Int): Int =\n    if i == 0 then acc else loop(i - 1, acc + i)\n  loop(n, 0)"},
+    {t:"isPalindrome(s: String): Boolean  &amp;  flatten(xs: List[List[Int]]): List[Int]", d:"Ist ein String ein Palindrom? Liste von Listen zu einer Liste abflachen.",
+     tip:"isPalindrome: erstes und letztes Zeichen vergleichen, rekursiv auf dem Teilstring dazwischen. flatten: Basisfall Nil ⇒ Nil; sonst erste innere Liste + rekursiv geflattete Restliste verketten.",
+     sol:"def isPalindrome(s: String): Boolean =\n  if s.length &lt;= 1 then true\n  else s.head == s.last &amp;&amp; isPalindrome(s.substring(1, s.length - 1))\n\ndef flatten(xs: List[List[Int]]): List[Int] = xs match\n  case Nil    =&gt; Nil\n  case h :: t =&gt; h ++ flatten(t)"},
+    {t:"product(xs: List[Int]): Int — auf drei Arten", d:"Leseaufgabe aus der Vorlesung: dieselbe Funktion als Rekursion, @tailrec-Akkumulator und foldLeft schreiben, dann vergleichen, welche Variante am klarsten ist.",
+     tip:"Orientiere dich an sum() aus der Vorlesung — product ersetzt nur + durch * und den Startwert 0 durch 1.",
+     sol:"// 1) Rekursion mit match\ndef productRec(xs: List[Int]): Int = xs match\n  case Nil    =&gt; 1\n  case h :: t =&gt; h * productRec(t)\n\n// 2) @tailrec mit Akkumulator\ndef productTail(xs: List[Int]): Int =\n  @tailrec def loop(rest: List[Int], acc: Int): Int = rest match\n    case Nil    =&gt; acc\n    case h :: t =&gt; loop(t, acc * h)\n  loop(xs, 1)\n\n// 3) foldLeft\ndef productFold(xs: List[Int]): Int =\n  xs.foldLeft(1)(_ * _)"},
+    {t:"contains(xs: List[Int], x: Int): Boolean", d:"Prüfe mit struktureller Rekursion, ob x in der Liste xs vorkommt.",
+     tip:"Basisfall: Nil → false. Rekursionsschritt: Kopf vergleichen, sonst im Rest (tail) weitersuchen.",
+     sol:"def contains(xs: List[Int], x: Int): Boolean = xs match\n  case Nil => false\n  case h :: t => h == x || contains(t, x)"},
+    {t:"reverse[A](xs: List[A]): List[A] — rein rekursiv", d:"Kehre eine Liste rekursiv um, ohne foldLeft oder eingebaute Methoden. reverse(List(1,2,3)) == List(3,2,1).",
+     tip:"Rekursionsschritt: Liste ohne erstes Element umkehren, dann das erste Element ans Ende anhängen (++ List(h)).",
+     sol:"def reverse[A](xs: List[A]): List[A] = xs match\n  case Nil => Nil\n  case h :: t => reverse(t) ++ List(h)\n\n// Mit Akkumulator (wie foldLeft es tut) ist es endrekursiv und schneller:\ndef reverseFast[A](xs: List[A]): List[A] =\n  xs.foldLeft(List.empty[A])((acc, x) => x :: acc)"},
+    {t:"fibTail(n: Int): Long — mit zwei Akkumulatoren", d:"Schreibe eine endrekursive Fibonacci-Funktion mit zwei Akkumulatoren (a, b), sodass fibTail(50) sofort statt in Minuten läuft.",
+     tip:"loop(i, a, b): bei i=0 gib a zurück, sonst loop(i-1, b, a+b) — a und b tragen die letzten zwei Fibonacci-Werte mit.",
+     sol:"import scala.annotation.tailrec\ndef fibTail(n: Int): Long =\n  @tailrec\n  def loop(i: Int, a: Long, b: Long): Long =\n    if i == 0 then a else loop(i - 1, b, a + b)\n  loop(n, 0, 1)"},
+    {t:"search(a, x, lo, hi): Int — binäre Suche", d:"Implementiere rekursive binäre Suche auf einem sortierten Array: search(a, x, lo, hi) liefert den Index von x oder -1.",
+     tip:"Basisfall: lo &gt; hi → -1. Sonst mid berechnen, Treffer prüfen, sonst nur in der passenden Hälfte weitersuchen.",
+     sol:"def search(a: Array[Int], x: Int, lo: Int, hi: Int): Int =\n  if lo &gt; hi then -1\n  else\n    val mid = (lo + hi) / 2\n    if a(mid) == x then mid\n    else if a(mid) &gt; x then search(a, x, lo, mid - 1)\n    else search(a, x, mid + 1, hi)"},
+    {t:"LeetCode 70 — Climbing Stairs", d:"Mit Schritten von 1 oder 2 Stufen: wie viele verschiedene Wege gibt es, n Stufen zu erklimmen?",
+     tip:"Erkennst du das Muster? climbStairs(n) folgt exakt der Fibonacci-Rekursionsgleichung — nur mit anderen Basisfällen.",
+     sol:"def climbStairs(n: Int): Int =\n  if n &lt;= 2 then n\n  else climbStairs(n - 1) + climbStairs(n - 2)\n// Für große n: wie bei fibTail mit zwei Akkumulatoren endrekursiv machen."},
+    {t:"LeetCode 50 — Pow(x, n)", d:"Berechne x^n rekursiv, aber schneller als n-faches Multiplizieren — durch Halbieren des Exponenten.",
+     tip:"myPow(x, n/2) nur einmal berechnen und quadrieren; bei ungeradem n noch ein x dranmultiplizieren. So reichen ~log₂n statt n Multiplikationen.",
+     sol:"def myPow(x: Double, n: Int): Double =\n  if n == 0 then 1.0\n  else\n    val half = myPow(x, n / 2)\n    if n % 2 == 0 then half * half\n    else half * half * x\n// gilt hier nur für n &gt;= 0"},
+    {t:"countDown(n: Int): Unit — fehlenden Basisfall ergänzen", d:"Die Vorlesung zeigt countDown(n) ohne Basisfall — das führt zu StackOverflowError. Ergänze den fehlenden Basisfall.",
+     tip:"Welcher Wert von n sollte die Rekursion beenden, ohne weiter zu rekurrieren?",
+     sol:"def countDown(n: Int): Unit =\n  if n &gt;= 0 then\n    println(n)\n    countDown(n - 1)\n  // Basisfall: n &lt; 0 -> nichts tun, Rekursion endet"},
+    {t:"LeetCode 21 — Merge Two Sorted Lists", d:"Verschmelze zwei bereits sortierte Listen rekursiv zu einer sortierten Liste.",
+     tip:"Zwei Basisfälle (je eine Liste leer → andere zurückgeben), sonst den kleineren Kopf voranstellen und mit dem Rest rekursiv weitermachen.",
+     sol:"def merge(a: List[Int], b: List[Int]): List[Int] = (a, b) match\n  case (Nil, _) => b\n  case (_, Nil) => a\n  case (x :: xs, y :: ys) =>\n    if x &lt;= y then x :: merge(xs, b)\n    else y :: merge(a, ys)"}
+  ];
+  function taskBodyHtml(task){
+    return "<p>" + task.d + "</p>" +
+      '<div class="tip">💡 Tipp: ' + task.tip + "</div>" +
+      '<details class="sol"><summary>✅ Lösungsidee zum Gegenchecken</summary><pre class="code">' + task.sol + "</pre></details>";
+  }
+  var taskListEl = document.getElementById("taskList");
+  TASKS.forEach(function(task, i){
+    var det = document.createElement("details");
+    det.className = "task";
+    var summary = document.createElement("summary");
+    summary.innerHTML = '<span class="tnum">' + (i+1) + '</span> ' + task.t;
+    det.appendChild(summary);
+    var body = document.createElement("div");
+    body.className = "body";
+    body.innerHTML = taskBodyHtml(task);
+    det.appendChild(body);
+    taskListEl.appendChild(det);
+  });
+
+})();
+</script>
