@@ -335,6 +335,7 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
             <button class="btn" id="btnEditCard" type="button">✏️ Karte bearbeiten</button>
             <button class="btn" id="btnDeleteCard" type="button" style="border-color:var(--incorrect);color:var(--incorrect)">🗑 Karte entfernen</button>
             <button class="btn" id="btnRestoreRemoved" type="button" hidden>↺ Entfernte Karten wiederherstellen (<span id="removedCount">0</span>)</button>
+            <button class="btn" id="btnResetProgress" type="button" hidden>🔁 Fortschritt zurücksetzen (<span id="knownCount">0</span>)</button>
           </div>
           <p class="flash-meta" id="flashMeta"></p>
 
@@ -608,6 +609,7 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
     if(order.length === 0) return;
     knownIds.add(cardAt(order[pos]).id);
     saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateResetBtn();
     if(onlyUnsure){ rebuildOrder(); } else { advance(1); }
     maybeShowCheck();
   });
@@ -615,6 +617,7 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
     if(order.length === 0) return;
     knownIds.delete(cardAt(order[pos]).id);
     saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateResetBtn();
     advance(1);
     maybeShowCheck();
   });
@@ -633,6 +636,7 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
     knownIds.delete(card.id);
     saveJSON(STORE_KEY + "-removed", Array.from(removedIds));
     saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateResetBtn();
     updateRestoreBtn();
     rebuildOrder();
   });
@@ -645,6 +649,22 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
     rebuildOrder();
   });
   updateRestoreBtn();
+
+  function updateResetBtn(){
+    var btn = document.getElementById("btnResetProgress");
+    var countEl = document.getElementById("knownCount");
+    if(countEl) countEl.textContent = knownIds.size;
+    if(btn) btn.hidden = knownIds.size === 0;
+  }
+  document.getElementById("btnResetProgress").addEventListener("click", function(){
+    if(knownIds.size === 0) return;
+    if(!confirm("Fortschritt für dieses Lernset wirklich zurücksetzen? Alle " + knownIds.size + " als „gewusst“ markierten Karten gelten danach wieder als neu.")) return;
+    knownIds.clear();
+    saveJSON(STORE_KEY + "-known", []);
+    updateResetBtn();
+    rebuildOrder();
+  });
+  updateResetBtn();
 
   // ---------- Add / edit own card ----------
   var addCardForm = document.getElementById("addCardForm");
