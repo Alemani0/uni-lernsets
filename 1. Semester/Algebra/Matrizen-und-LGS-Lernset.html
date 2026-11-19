@@ -455,87 +455,233 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
   // ======================================================
   var CARDS = [
     // ===== Matrizen rechnen =====
-    {cat:"Matrizen rechnen", q:"Wie sind Summe und skalare Multiplikation von Matrizen definiert?", a:"Für A, B ∈ IK^{M×N}:\n• Summe: A + B = (A_ij + B_ij)_ij — komponentenweise.\n• Skalare Multiplikation mit α ∈ IR: α A = (α A_ij)_ij — jeder Eintrag wird mit α multipliziert.", expl:"Beides geht nur, wenn die Matrizen dasselbe Format haben. Anders als beim Produkt gibt es hier keine Dimensionsbedingung zwischen zwei verschiedenen Formaten."},
-    {cat:"Matrizen rechnen", q:"Wie ist das Matrixprodukt C · D definiert?", a:"Für C ∈ IK^{N×M} und D ∈ IK^{M×L} ist C · D ∈ IK^{N×L} definiert durch\n   (C · D)_nl = Σ (m = 1 bis M) C_nm · D_ml ,   1 ≤ n ≤ N, 1 ≤ l ≤ L.\nDer Eintrag in Zeile n, Spalte l ist also das Skalarprodukt aus der n-ten Zeile von C und der l-ten Spalte von D."},
-    {cat:"Bild: Formel ergänzen", q:"Bild: Rechenregeln für Matrizen (Folie 3-4) — ergänze die drei Definitionen (①–③).", a:"① A + B = (A_ij + B_ij)_ij\n② α A = (α A_ij)_ij\n③ C · D = ( Σ_{m=1}^{M} C_nm D_ml )_{1≤n≤N, 1≤l≤L} ,  C ∈ IK^{N×M}, D ∈ IK^{M×L}", img:"a04", set:"RR1"},
-    {cat:"Matrizen rechnen", q:"Wann lassen sich zwei Matrizen multiplizieren, und welches Format hat das Ergebnis?", a:"A · B ist genau dann definiert, wenn die Spaltenzahl von A gleich der Zeilenzahl von B ist. Merkregel:\n   (N × M) · (M × L) = (N × L)\nDie beiden inneren Zahlen müssen übereinstimmen und fallen weg; die äußeren bilden das Format des Ergebnisses.", expl:"Deshalb ist A·B oft definiert, B·A aber nicht — das Matrixprodukt ist nicht kommutativ."},
-    {cat:"Bild: Rechenweg", q:"Bild: Beispiele 1 und 2 (Folie 3-5) — welche Ergebnisse kommen heraus (①–②)?", a:"① (3, 7, −2)ᵀ — denn 2·2 + 1·(−1) = 3, 3·2 + (−1)·(−1) = 7, 0·2 + 2·(−1) = −2\n② ( 38, 33 ) — denn 3·2 + 4·8 = 38 und 3·(−1) + 4·9 = 33", img:"a05", set:"BP1"},
-    {cat:"Bild: Rechenweg", q:"Bild: Beispiele 1 und 2 (Folie 3-5) — welche Formate haben die Faktoren und die Ergebnisse (①–⑥)?", a:"① 3×2\n② 2×1\n③ 3×1\n④ 1×2\n⑤ 2×2\n⑥ 1×2\n(Merkregel: (N×M)·(M×L) = (N×L) — die inneren Zahlen müssen gleich sein und fallen weg.)", img:"a05", set:"BP2"},
-    {cat:"Bild: Rechenweg", q:"Bild: Beispiele 3 und 4 (Folie 3-6) — welche Ergebnisse kommen heraus (①–②)?", a:"① 14 — denn (2, 4) · (1, 3)ᵀ = 2·1 + 4·3 = 14, Format 1×1 (ein Skalar)\n② ( 2 6 ; 4 12 ) — denn (2, 4)ᵀ · (1, 3) ist ein 2×1 mal 1×2 und ergibt eine 2×2-Matrix", expl:"Beispiel 3 ist das Skalarprodukt (Zeile mal Spalte), Beispiel 4 das dyadische Produkt (Spalte mal Zeile) — dieselben Zahlen, völlig verschiedene Ergebnisse.", img:"a06", set:"BP3"},
-    {cat:"Matrizen rechnen", q:"Was ist der Unterschied zwischen (2,4)·(1,3)ᵀ und (2,4)ᵀ·(1,3)?", a:"• (2,4)·(1,3)ᵀ ist 1×2 mal 2×1 = 1×1, also ein Skalar: 2·1 + 4·3 = 14 (Skalarprodukt).\n• (2,4)ᵀ·(1,3) ist 2×1 mal 1×2 = 2×2, also eine Matrix: ( 2 6 ; 4 12 ) (dyadisches Produkt).\nDie Reihenfolge entscheidet über Format und Bedeutung."},
+    {cat:"Matrizen rechnen", q:"Wie sind Summe und skalare Multiplikation von Matrizen definiert?", a:"Beides geht komponentenweise und nur für Matrizen gleichen Formats. Sind A und B beide M×N-Matrizen und ist α eine reelle Zahl, so gilt:", ac:`A + B   hat an der Stelle (i, j)   den Eintrag   Aᵢⱼ + Bᵢⱼ
+
+α · A   hat an der Stelle (i, j)   den Eintrag   α · Aᵢⱼ`, expl:"Anders als beim Produkt müssen hier beide Matrizen dasselbe Format haben — dafür gibt es keine Bedingung an Zeilen- und Spaltenzahl zueinander."},
+    {cat:"Matrizen rechnen", q:"Wie ist das Matrixprodukt C · D definiert?", a:"C muss so viele Spalten haben wie D Zeilen: ist C eine N×M-Matrix und D eine M×L-Matrix, so ist C · D eine N×L-Matrix.\nDer Eintrag in Zeile n, Spalte l ist das Skalarprodukt aus der n-ten Zeile von C und der l-ten Spalte von D:", ac:`(C · D)ₙₗ = Cₙ₁·D₁ₗ + Cₙ₂·D₂ₗ + … + Cₙₘ·Dₘₗ
+
+kurz:  (C · D)ₙₗ = ∑ Cₙₘ · Dₘₗ   (Summe über m = 1 … M)
+
+für alle n = 1 … N und l = 1 … L`},
+    {cat:"Bild: Formel ergänzen", q:"Bild: Rechenregeln für Matrizen (Folie 3-4) — ergänze die drei Definitionen (①–③).", a:"① Summe:  A + B hat an der Stelle (i, j) den Eintrag Aᵢⱼ + Bᵢⱼ\n② Skalare Multiplikation:  α · A hat an der Stelle (i, j) den Eintrag α · Aᵢⱼ\n③ Produkt:  (C · D)ₙₗ = ∑ Cₙₘ · Dₘₗ, Summe über m = 1 … M — dabei ist C eine N×M-Matrix, D eine M×L-Matrix und C · D eine N×L-Matrix", img:"a04", set:"RR1"},
+    {cat:"Matrizen rechnen", q:"Wann lassen sich zwei Matrizen multiplizieren, und welches Format hat das Ergebnis?", a:"A · B ist genau dann definiert, wenn die Spaltenzahl von A gleich der Zeilenzahl von B ist. Merkregel:", ac:`(N × M) · (M × L)  =  (N × L)
+      ↑       ↑
+   müssen gleich sein, fallen weg
+
+die beiden äußeren Zahlen bilden das Format des Ergebnisses`, expl:"Deshalb ist A·B oft definiert, B·A aber nicht — das Matrixprodukt ist nicht kommutativ."},
+    {cat:"Bild: Rechenweg", q:"Bild: Beispiele 1 und 2 (Folie 3-5) — welche Ergebnisse kommen heraus (①–②)?", a:"① Der Spaltenvektor ( 3 ; 7 ; −2 ):\n   2·2 + 1·(−1) = 3,  3·2 + (−1)·(−1) = 7,  0·2 + 2·(−1) = −2\n② Der Zeilenvektor ( 38 , 33 ):\n   3·2 + 4·8 = 38,  3·(−1) + 4·9 = 33", img:"a05", set:"BP1"},
+    {cat:"Bild: Rechenweg", q:"Bild: Beispiele 1 und 2 (Folie 3-5) — welche Formate haben die Faktoren und die Ergebnisse (①–⑥)?", a:"① 3×2\n② 2×1\n③ 3×1\n④ 1×2\n⑤ 2×2\n⑥ 1×2\nMerkregel: (N×M) · (M×L) = (N×L) — die inneren Zahlen müssen gleich sein und fallen weg.", img:"a05", set:"BP2"},
+    {cat:"Bild: Rechenweg", q:"Bild: Beispiele 3 und 4 (Folie 3-6) — welche Ergebnisse kommen heraus (①–②)?", a:"① 14 — denn ( 2 , 4 ) · ( 1 ; 3 ) = 2·1 + 4·3 = 14, Format 1×1, also ein Skalar\n② die 2×2-Matrix ( 2 6 ; 4 12 ) — denn ( 2 ; 4 ) · ( 1 , 3 ) ist 2×1 mal 1×2", expl:"Beispiel 3 ist das Skalarprodukt (Zeile mal Spalte), Beispiel 4 das dyadische Produkt (Spalte mal Zeile) — dieselben Zahlen, völlig verschiedene Ergebnisse.", img:"a06", set:"BP3"},
+    {cat:"Matrizen rechnen", q:"Was ist der Unterschied zwischen ( 2 , 4 ) · ( 1 ; 3 ) und ( 2 ; 4 ) · ( 1 , 3 )?", a:"Die Reihenfolge entscheidet über Format und Bedeutung — Zeile mal Spalte ergibt eine Zahl, Spalte mal Zeile eine ganze Matrix:", ac:`Zeile · Spalte   (1×2) · (2×1) = 1×1    Skalarprodukt
+
+   ( 2 , 4 ) · ( 1 ; 3 )  =  2·1 + 4·3  =  14
+
+
+Spalte · Zeile   (2×1) · (1×2) = 2×2    dyadisches Produkt
+
+   ( 2 ; 4 ) · ( 1 , 3 )  =  (  2   6  )
+                             (  4  12  )`},
     {cat:"Bild: Rechenweg", q:"Bild: Saalaufgabe (Folie 3-7) — welche Formate haben die Matrizen A, B, C, D und F (①–⑤)?", a:"① A: 2×1\n② B: 3×2\n③ C: 2×4\n④ D: 1×4\n⑤ F: 4×3", img:"a07", set:"SA1"},
-    {cat:"Bild: Rechenweg", q:"Bild: Saalaufgabe (Folie 3-7) — welche der neun Multiplikationen sind erlaubt (①–⑨)?", a:"① A·B: 2×1 · 3×2 → nein\n② B·A: 3×2 · 2×1 → ja, ergibt 3×1\n③ A·C: 2×1 · 2×4 → nein\n④ D·C: 1×4 · 2×4 → nein\n⑤ C·Dᵀ: 2×4 · 4×1 → ja, ergibt 2×1\n⑥ C·D: 2×4 · 1×4 → nein\n⑦ C·F: 2×4 · 4×3 → ja, ergibt 2×3\n⑧ F·B: 4×3 · 3×2 → ja, ergibt 4×2\n⑨ B·F: 3×2 · 4×3 → nein", img:"a07", set:"SA2", expl:"Immer nur die inneren Zahlen vergleichen: (N×M)·(M×L) geht, alles andere nicht."},
-    {cat:"Matrizen rechnen", q:"Welche drei Schreibweisen für A·x zeigt die Vorlesung im „Hirnjogging“?", a:"1) Zeilenweise: A x = ( Σ_{j=1}^{n} a_ij x_j )_i — jede Komponente ist das Skalarprodukt einer Zeile von A mit x.\n2) Von links: xᵀ A = ( Σ_i a_i1 x_i , … , Σ_i a_in x_i ) — jede Komponente ist Skalarprodukt mit einer Spalte.\n3) Spaltenweise: A x = (Spalte 1)·x₁ + … + (Spalte n)·x_n — A x ist eine Linearkombination der Spalten von A.", expl:"Die dritte Sichtweise ist die wichtigste: Ax = y ist genau dann lösbar, wenn y sich als Linearkombination der Spalten von A schreiben lässt."},
-    {cat:"Bild: Formel ergänzen", q:"Bild: Matrixmultiplikation anders hingeschrieben (Folie 3-11) — ergänze (①–③).", a:"① ( Σ_{j=1}^{n} a_1j x_j , … , Σ_{j=1}^{n} a_nj x_j )ᵀ — die Komponenten als Summen\n② Σ_{i=1}^{n} a_i1 x_i , … , Σ_{i=1}^{n} a_in x_i — die Zeile xᵀA\n③ ( Σ_{k=1}^{n} a_ik x_k )_i — Ax als Linearkombination der Spalten", img:"a11", set:"HJ1"},
+    {cat:"Bild: Rechenweg", q:"Bild: Saalaufgabe (Folie 3-7) — welche der neun Multiplikationen sind erlaubt (①–⑨)?", a:"① A·B  (2×1)·(3×2)  →  nein\n② B·A  (3×2)·(2×1)  →  ja, ergibt 3×1\n③ A·C  (2×1)·(2×4)  →  nein\n④ D·C  (1×4)·(2×4)  →  nein\n⑤ C·Dᵀ (2×4)·(4×1)  →  ja, ergibt 2×1\n⑥ C·D  (2×4)·(1×4)  →  nein\n⑦ C·F  (2×4)·(4×3)  →  ja, ergibt 2×3\n⑧ F·B  (4×3)·(3×2)  →  ja, ergibt 4×2\n⑨ B·F  (3×2)·(4×3)  →  nein", img:"a07", set:"SA2", expl:"Immer nur die inneren Zahlen vergleichen: (N×M)·(M×L) geht, alles andere nicht."},
+    {cat:"Matrizen rechnen", q:"Welche drei Schreibweisen für A · x zeigt die Vorlesung im „Hirnjogging“?", a:"Dreimal dasselbe Produkt, nur anders gelesen:", ac:`1)  zeilenweise
+    Komponente i von A·x  =  aᵢ₁x₁ + aᵢ₂x₂ + … + aᵢₙxₙ
+    also das Skalarprodukt der i-ten Zeile von A mit x
+
+2)  von links
+    Komponente j von xᵀ·A  =  a₁ⱼx₁ + a₂ⱼx₂ + … + aₙⱼxₙ
+    also das Skalarprodukt von x mit der j-ten Spalte von A
+
+3)  spaltenweise
+    A·x  =  (1. Spalte)·x₁ + (2. Spalte)·x₂ + … + (n. Spalte)·xₙ
+    A·x ist eine Linearkombination der Spalten von A`, expl:"Die dritte Sichtweise ist die wichtigste: A x = y ist genau dann lösbar, wenn y sich als Linearkombination der Spalten von A schreiben lässt."},
+    {cat:"Bild: Formel ergänzen", q:"Bild: Matrixmultiplikation anders hingeschrieben (Folie 3-11) — ergänze (①–③).", a:"① Die Komponenten von A·x als Summen: Komponente i ist aᵢ₁x₁ + … + aᵢₙxₙ\n② Die Zeile xᵀ·A: Komponente j ist a₁ⱼx₁ + … + aₙⱼxₙ\n③ A·x als Linearkombination der Spalten: (1. Spalte)·x₁ + … + (n. Spalte)·xₙ", img:"a11", set:"HJ1"},
 
     // ===== Transponierte =====
-    {cat:"Transponierte", q:"Wie ist die Transponierte einer Matrix definiert?", a:"(Aᵀ)_ij = A_ji — Zeilen und Spalten werden vertauscht. Aus einer m×n-Matrix wird eine n×m-Matrix."},
-    {cat:"Transponierte", q:"Wann heißt eine Matrix symmetrisch, wann hermitesch?", a:"• A ∈ IR^{n×n} heißt symmetrisch, wenn A = Aᵀ.\n• A ∈ C^{n×n} heißt hermitesch, wenn A = Ā ᵀ =: A⋆ — also transponieren und zusätzlich komplex konjugieren.\nBeide Begriffe setzen eine quadratische Matrix voraus."},
-    {cat:"Bild: Formel ergänzen", q:"Bild: Definition der Transponierten (Folie 3-8) — ergänze (①–③).", a:"① (Aᵀ)_ij = A_ji\n② A = Aᵀ   (symmetrisch)\n③ A = Ā ᵀ =: A⋆   (hermitesch)", img:"a08", set:"TR1"},
-    {cat:"Bild: Rechenweg", q:"Bild: Beispiel zur Transponierten (Folie 3-8) — ergänze (①–②).", a:"① ( 1 4 ; 2 5 ; 3 6 ) — die Spalten werden zu Zeilen\n② ∈ IR^{2×3} — die Ausgangsmatrix ist 2×3, die Transponierte 3×2", img:"a08b", set:"TR2"},
-    {cat:"Bild: Rechenweg", q:"Bild: Beispiele zu symmetrisch und hermitesch (Folie 3-9) — ergänze (①–③).", a:"① ist symmetrisch — die Matrix ( 1 2 3 ; 2 4 5 ; 3 5 6 ) ist an der Hauptdiagonale gespiegelt\n② ( 1−i  i ; −2i  8 ) — erst konjugieren, dann transponieren\n③ ist hermitesch — bei ( 0 i ; −i 1 ) liefert A⋆ wieder dieselbe Matrix", img:"a09", set:"TR3"},
-    {cat:"Transponierte", q:"Wie lautet der Satz über die Transponierte eines Produkts, und wie beweist man ihn?", a:"Für Matrizen A, B mit passenden Dimensionen gilt (A B)ᵀ = Bᵀ Aᵀ — die Reihenfolge dreht sich um!\nBeweis über die Komponenten:\n   (A B)ᵀ_ki = Σ_j A_ij B_jk = Σ_j B_jk A_ij = Σ_j Bᵀ_kj Aᵀ_ji = (Bᵀ Aᵀ)_ki .", expl:"Man nutzt nur, dass die Faktoren einer Summe von Zahlen vertauscht werden dürfen — die Umkehrung der Reihenfolge kommt daher, dass beim Transponieren die Indizes getauscht werden."},
-    {cat:"Bild: Formel ergänzen", q:"Bild: Satz zur Transponierten eines Produkts (Folie 3-10) — ergänze Aussage und Beweisschritte (①–②).", a:"① (A B)ᵀ = Bᵀ Aᵀ\n② = Σ_{j=1}^{n} B_jk A_ij = Σ_{j=1}^{n} Bᵀ_kj Aᵀ_ji = (Bᵀ Aᵀ)_ki", img:"a10", set:"TS1"},
+    {cat:"Transponierte", q:"Wie ist die Transponierte einer Matrix definiert?", a:"Zeilen und Spalten werden vertauscht: der Eintrag an der Stelle (i, j) von Aᵀ ist der Eintrag an der Stelle (j, i) von A.", ac:`(Aᵀ)ᵢⱼ  =  Aⱼᵢ
+
+aus einer m×n-Matrix wird eine n×m-Matrix
+
+Beispiel:   (  1  2  3  )ᵀ       (  1  4  )
+            (  4  5  6  )   =    (  2  5  )
+                                 (  3  6  )
+              2×3-Matrix          3×2-Matrix`},
+    {cat:"Transponierte", q:"Wann heißt eine Matrix symmetrisch, wann hermitesch?", a:"Beide Begriffe setzen eine quadratische Matrix voraus:", ac:`symmetrisch    (reelle n×n-Matrix)
+
+    A = Aᵀ            an der Hauptdiagonale gespiegelt
+
+
+hermitesch     (komplexe n×n-Matrix)
+
+    A = A⋆            dabei ist A⋆ die konjugiert
+                      Transponierte: erst jeden Eintrag
+                      konjugieren, dann transponieren`},
+    {cat:"Bild: Formel ergänzen", q:"Bild: Definition der Transponierten (Folie 3-8) — ergänze (①–③).", a:"① (Aᵀ)ᵢⱼ = Aⱼᵢ — Zeilen und Spalten vertauschen\n② A = Aᵀ  (symmetrisch)\n③ A = A⋆, also die konjugiert Transponierte  (hermitesch)", img:"a08", set:"TR1"},
+    {cat:"Bild: Rechenweg", q:"Bild: Beispiel zur Transponierten (Folie 3-8) — ergänze (①–②).", a:"① die 3×2-Matrix ( 1 4 ; 2 5 ; 3 6 ) — die Spalten werden zu Zeilen\n② die Ausgangsmatrix ist eine 2×3-Matrix, die Transponierte eine 3×2-Matrix", img:"a08b", set:"TR2"},
+    {cat:"Bild: Rechenweg", q:"Bild: Beispiele zu symmetrisch und hermitesch (Folie 3-9) — ergänze (①–③).", a:"① ist symmetrisch — ( 1 2 3 ; 2 4 5 ; 3 5 6 ) ist an der Hauptdiagonale gespiegelt\n② die Matrix ( 1−i  i ; −2i  8 ) — erst jeden Eintrag konjugieren, dann transponieren\n③ ist hermitesch — bei ( 0 i ; −i 1 ) liefert A⋆ wieder dieselbe Matrix", img:"a09", set:"TR3"},
+    {cat:"Transponierte", q:"Wie lautet der Satz über die Transponierte eines Produkts, und wie beweist man ihn?", a:"Die Reihenfolge der Faktoren dreht sich um:", ac:`(A · B)ᵀ  =  Bᵀ · Aᵀ
+
+
+Beweis über die Komponenten:
+
+(A·B)ᵀ an der Stelle (k, i)
+     = (A·B) an der Stelle (i, k)
+     = ∑ Aᵢⱼ · Bⱼₖ        (Summe über j)
+     = ∑ Bⱼₖ · Aᵢⱼ        Zahlen darf man vertauschen
+     = ∑ (Bᵀ)ₖⱼ · (Aᵀ)ⱼᵢ
+     = (Bᵀ·Aᵀ) an der Stelle (k, i)`, expl:"Die Umkehrung der Reihenfolge kommt daher, dass beim Transponieren die beiden Indizes getauscht werden."},
+    {cat:"Bild: Formel ergänzen", q:"Bild: Satz zur Transponierten eines Produkts (Folie 3-10) — ergänze Aussage und Beweisschritte (①–②).", a:"① (A · B)ᵀ = Bᵀ · Aᵀ\n② = ∑ Bⱼₖ · Aᵢⱼ = ∑ (Bᵀ)ₖⱼ · (Aᵀ)ⱼᵢ = (Bᵀ·Aᵀ) an der Stelle (k, i)", img:"a10", set:"TS1"},
 
     // ===== LGS aufstellen =====
-    {cat:"LGS aufstellen", q:"Wie lautet die allgemeine Problemstellung eines LGS?", a:"Zu gegebenem y ∈ IR^m und A ∈ IR^{m×n} ist ein x ∈ IR^n gesucht mit\n   A x = y .\nm ist die Anzahl der Gleichungen, n die Anzahl der Unbekannten."},
+    {cat:"LGS aufstellen", q:"Wie lautet die allgemeine Problemstellung eines LGS?", a:"Gegeben sind eine m×n-Matrix A und ein Vektor y mit m Einträgen. Gesucht ist ein Vektor x mit n Einträgen, so dass gilt:", ac:`A · x  =  y
+
+m  =  Anzahl der Gleichungen   (Zeilen von A)
+n  =  Anzahl der Unbekannten   (Spalten von A)`},
     {cat:"LGS aufstellen", q:"Welche drei Fragen stellt die Vorlesung an ein LGS, und wie geht sie vor?", a:"Frage: Gibt es zu dieser Problemstellung eine Lösung, und wenn ja wie viele? Können wir sie berechnen, und wenn nein, warum nicht?\nVorgehensweise:\n• Lösungsmethode (Berechnung) — das Gauß-Verfahren\n• Interpretation der Lösungsmengen (Anzahl der Lösungen)\n• Matrixeigenschaften (geben Auskunft über die Lösbarkeit) — Rang, Regularität"},
-    {cat:"LGS aufstellen", q:"Wie wird aus dem Straßen-Geviert ein LGS?", a:"An jeder Kreuzung muss der Zufluss gleich dem Abfluss sein. Das ergibt vier Gleichungen:\n   A: x₁ + x₄ = 600\n   B: x₁ + x₂ = 500\n   C: x₂ + x₃ = 200\n   D: x₃ + x₄ = 300\nIn Matrix-Vektor-Form: A x = y mit A = (1 0 0 1 ; 1 1 0 0 ; 0 1 1 0 ; 0 0 1 1) und y = (600, 500, 200, 300)ᵀ.", expl:"Die Matrizenschreibweise ist nicht nur kürzer: Sie liefert allgemeingültige Methoden und Aussagen über Lösbarkeit und Eindeutigkeit."},
-    {cat:"Bild: Rechenweg", q:"Bild: Das LGS des Gevierts in Matrix-Vektor-Darstellung (Folie 3-12) — ergänze (①–③).", a:"① Koeffizientenmatrix ( 1 0 0 1 ; 1 1 0 0 ; 0 1 1 0 ; 0 0 1 1 )\n② rechte Seite ( 600 ; 500 ; 200 ; 300 )\n③ A x = y", img:"a12", set:"GV1"},
+    {cat:"LGS aufstellen", q:"Wie wird aus dem Straßen-Geviert ein LGS?", a:"An jeder Kreuzung muss der Zufluss gleich dem Abfluss sein. Das ergibt vier Gleichungen, die man als A · x = y schreibt:", ac:`A:  x₁      + x₄ = 600        (  1  0  0  1  )   ( x₁ )   ( 600 )
+B:  x₁ + x₂      = 500        (  1  1  0  0  ) · ( x₂ ) = ( 500 )
+C:       x₂ + x₃ = 200        (  0  1  1  0  )   ( x₃ )   ( 200 )
+D:            x₃ + x₄ = 300   (  0  0  1  1  )   ( x₄ )   ( 300 )`, expl:"Die Matrizenschreibweise ist nicht nur kürzer: Sie liefert allgemeingültige Methoden und Aussagen über Lösbarkeit und Eindeutigkeit."},
+    {cat:"Bild: Rechenweg", q:"Bild: Das LGS des Gevierts in Matrix-Vektor-Darstellung (Folie 3-12) — ergänze (①–③).", a:"① die Koeffizientenmatrix ( 1 0 0 1 ; 1 1 0 0 ; 0 1 1 0 ; 0 0 1 1 )\n② die rechte Seite ( 600 ; 500 ; 200 ; 300 )\n③ A · x = y", img:"a12", set:"GV1"},
 
     // ===== Gauß-Verfahren =====
-    {cat:"Gauß-Verfahren", q:"Welche zwei Zeilenumformungen sind erlaubt?", a:"1. Multiplikation einer Zeile mit einer Zahl aus IR \\ {0}.\n2. Addition einer Zeile zu einer anderen.\nBeides zusammen erlaubt auch das übliche „Zeile II minus 2 mal Zeile I“.", expl:"Die 0 ist ausgeschlossen, weil Multiplikation mit 0 Information vernichten und damit die Lösungsmenge verändern würde."},
-    {cat:"Gauß-Verfahren", q:"Was ist eine Stufenform, und was die erweiterte Matrix?", a:"Stufenform: eine obere Dreiecksmatrix, die aus A ∈ IR^{m×n} mittels Zeilenumformungen entstanden ist.\nErweiterte Matrix: (A, y) — die Koeffizientenmatrix A, um den Spaltenvektor y ergänzt und durch einen Strich abgetrennt."},
-    {cat:"Gauß-Verfahren", q:"Warum darf man das Gauß-Verfahren überhaupt anwenden?", a:"Weil Zeilenumformungen von (A, y) die Lösungsmenge des LGS A x = y nicht ändern. Man rechnet also mit einer einfacheren, aber äquivalenten Matrix weiter.", expl:"Jede Zeilenumformung ist umkehrbar — deshalb geht keine Lösung verloren und es kommt keine hinzu."},
-    {cat:"Bild: Lückentext", q:"Bild: Definition Stufenform und Zeilenumformungen (Folie 3-14) — ergänze (①–⑤).", a:"① Multiplikation einer Zeile mit einer Zahl aus IR \\ {0}.\n② Addition einer Zeile zu einer anderen.\n③ Stufenform (von A)\n④ (A, y) = ( a₁₁ … a₁ₙ | y₁ ; ⋮ ⋱ ⋮ | ⋮ ; a_m1 … a_mn | y_m )\n⑤ Zeilenumformungen von (A, y) ändern die Lösungsmenge des LGS A x = y nicht.", img:"a14", set:"ZU1"},
-    {cat:"Gauß-Verfahren", q:"Wie sieht das Gauß-Verfahren konkret aus? (Beispiel x₁−x₂+2x₃=6, 2x₁+3x₂+3x₃=5, 2x₁+8x₂+2x₃=2)", a:"Erweiterte Matrix aufstellen und Spalte für Spalte ausräumen:\n( 1 −1 2 | 6 ; 2 3 3 | 5 ; 2 8 2 | 2 )\n  — II − 2·I und (III − 2·I)/2 →\n( 1 −1 2 | 6 ; 0 5 −1 | −7 ; 0 5 −1 | −5 )\n  — III − II →\n( 1 −1 2 | 6 ; 0 5 −1 | −7 ; 0 0 0 | 2 )", expl:"Die letzte Zeile lautet 0·x₁ + 0·x₂ + 0·x₃ = 2 — ein Widerspruch. Dieses LGS hat keine Lösung."},
+    {cat:"Gauß-Verfahren", q:"Welche zwei Zeilenumformungen sind erlaubt?", a:"1. Multiplikation einer Zeile mit einer Zahl ungleich 0.\n2. Addition einer Zeile zu einer anderen.\nBeides zusammen erlaubt auch das übliche „Zeile II minus 2 mal Zeile I“.", expl:"Die 0 ist ausgeschlossen, weil Multiplikation mit 0 Information vernichten und damit die Lösungsmenge verändern würde."},
+    {cat:"Gauß-Verfahren", q:"Was ist eine Stufenform, und was die erweiterte Matrix?", a:"Stufenform: eine obere Dreiecksmatrix, die aus A mittels Zeilenumformungen entstanden ist.\nErweiterte Matrix: die Koeffizientenmatrix A, um den Spaltenvektor y ergänzt und durch einen Strich abgetrennt:", ac:`           (  a₁₁  …  a₁ₙ  |  y₁  )
+(A, y)  =  (   ⋮   ⋱   ⋮   |   ⋮  )
+           (  aₘ₁  …  aₘₙ  |  yₘ  )`},
+    {cat:"Gauß-Verfahren", q:"Warum darf man das Gauß-Verfahren überhaupt anwenden?", a:"Weil Zeilenumformungen von (A, y) die Lösungsmenge des LGS A · x = y nicht ändern. Man rechnet also mit einer einfacheren, aber gleichwertigen Matrix weiter.", expl:"Jede Zeilenumformung ist umkehrbar — deshalb geht keine Lösung verloren und es kommt keine hinzu."},
+    {cat:"Bild: Lückentext", q:"Bild: Definition Stufenform und Zeilenumformungen (Folie 3-14) — ergänze (①–⑤).", a:"① Multiplikation einer Zeile mit einer Zahl aus IR ohne die 0\n② Addition einer Zeile zu einer anderen\n③ Stufenform (von A)\n④ die erweiterte Matrix (A, y): A um die Spalte y ergänzt, durch einen Strich abgetrennt\n⑤ Zeilenumformungen von (A, y) ändern die Lösungsmenge des LGS A · x = y nicht.", img:"a14", set:"ZU1"},
+    {cat:"Gauß-Verfahren", q:"Wie sieht das Gauß-Verfahren konkret aus? (Beispiel x₁−x₂+2x₃=6, 2x₁+3x₂+3x₃=5, 2x₁+8x₂+2x₃=2)", a:"Erweiterte Matrix aufstellen und Spalte für Spalte ausräumen:", ac:`(  1  −1   2  |   6  )
+(  2   3   3  |   5  )      II − 2·I
+(  2   8   2  |   2  )      (III − 2·I)/2
+            ↓
+(  1  −1   2  |   6  )
+(  0   5  −1  |  −7  )      III − II
+(  0   5  −1  |  −5  )
+            ↓
+(  1  −1   2  |   6  )
+(  0   5  −1  |  −7  )
+(  0   0   0  |   2  )   ←  0 = 2 , Widerspruch`, expl:"Die letzte Zeile lautet 0·x₁ + 0·x₂ + 0·x₃ = 2 — ein Widerspruch. Dieses LGS hat keine Lösung."},
     {cat:"Bild: Rechenweg", q:"Bild: Gauß-Verfahren, erstes Beispiel (Folie 3-15) — welche Matrizen entstehen (①–②)?", a:"① ( 1 −1 2 | 6 ; 0 5 −1 | −7 ; 0 5 −1 | −5 )\n② ( 1 −1 2 | 6 ; 0 5 −1 | −7 ; 0 0 0 | 2 )", img:"a15", set:"GA1"},
     {cat:"Bild: Rechenweg", q:"Bild: Gauß-Verfahren, erstes Beispiel (Folie 3-15) — welche Zeilenumformungen führen dorthin (①–②)?", a:"① II − 2·I   und   (III − 2·I)/2\n② III − II", img:"a15", set:"GA2"},
-    {cat:"Bild: Lückentext", q:"Bild: LGS ohne Lösung (Folie 3-16) — ergänze (①–③).", a:"① 0 · x₁ + 0 · x₂ + 0 · x₃ = 2 .\n② IL = ∅\n③ Das LGS hat keine Lösung.", img:"a16", set:"KL1"},
+    {cat:"Bild: Lückentext", q:"Bild: LGS ohne Lösung (Folie 3-16) — ergänze (①–③).", a:"① 0·x₁ + 0·x₂ + 0·x₃ = 2\n② IL = ∅  (die Lösungsmenge ist leer)\n③ Das LGS hat keine Lösung.", img:"a16", set:"KL1"},
     {cat:"Bild: Rechenweg", q:"Bild: zweites Beispiel (Folie 3-17) — ergänze Stufenform und zugehöriges LGS (①–②).", a:"① ( 1 −1 2 | 6 ; 0 5 −1 | −7 ; 0 0 −1 | 2 )\n② x₁ − x₂ + 2x₃ = 6 ;  5x₂ − x₃ = −7 ;  −x₃ = 2", img:"a17", set:"EB1"},
-    {cat:"Gauß-Verfahren", q:"Wie löst man ein LGS in Stufenform auf? (rekursives Auflösen)", a:"Von unten nach oben einsetzen. Beispiel mit −x₃ = 2, 5x₂ − x₃ = −7, x₁ − x₂ + 2x₃ = 6:\n   x₃ = −2\n   x₂ = (1/5)(−7 + x₃) = −9/5\n   x₁ = 6 + x₂ − 2x₃ = 6 − 9/5 + 4 = 41/5\nAlso x = (41/5, −9/5, −2)ᵀ und IL = { (−1/5)·(−41, 9, 10)ᵀ } — das LGS ist eindeutig lösbar."},
-    {cat:"Bild: Rechenweg", q:"Bild: eindeutig lösbares LGS (Folie 3-18) — ergänze (①–④).", a:"① x₃ = −2 ;  x₂ = (1/5)(−7 + x₃) = −9/5 ;  x₁ = 6 + x₂ − 2x₃ = 6 − 9/5 + 4 = 41/5\n② x = ( 41/5 ; −9/5 ; −2 )\n③ IL = { (−1/5) · ( −41 ; 9 ; 10 ) }\n④ Das LGS ist eindeutig lösbar.", img:"a18", set:"EL1"},
+    {cat:"Gauß-Verfahren", q:"Wie löst man ein LGS in Stufenform auf? (rekursives Auflösen)", a:"Von unten nach oben einsetzen — die unterste Gleichung hat nur noch eine Unbekannte:", ac:`aus    x₁ − x₂ + 2x₃ =  6
+        5x₂ −  x₃ = −7
+              −x₃ =  2
+
+folgt  x₃ = −2
+       x₂ = (−7 + x₃) / 5     = −9/5
+       x₁ = 6 + x₂ − 2·x₃     = 6 − 9/5 + 4  = 41/5
+
+also   x = ( 41/5 ; −9/5 ; −2 )`, expl:"Die Lösungsmenge enthält genau einen Vektor — das LGS ist eindeutig lösbar."},
+    {cat:"Bild: Rechenweg", q:"Bild: eindeutig lösbares LGS (Folie 3-18) — ergänze (①–④).", a:"① x₃ = −2 ;  x₂ = (−7 + x₃)/5 = −9/5 ;  x₁ = 6 + x₂ − 2x₃ = 41/5\n② x = ( 41/5 ; −9/5 ; −2 )\n③ IL = { (−1/5) · ( −41 ; 9 ; 10 ) }\n④ Das LGS ist eindeutig lösbar.", img:"a18", set:"EL1"},
     {cat:"Bild: Rechenweg", q:"Bild: drittes Beispiel (Folie 3-19) — ergänze (①–②).", a:"① ( 1 −1 2 | 6 ; 0 5 −1 | −7 ; 0 0 0 | 0 )\n② 0 = 0 — die dritte Gleichung ist immer erfüllt und liefert keine Bedingung", img:"a19", set:"UL1"},
-    {cat:"Gauß-Verfahren", q:"Wie geht man vor, wenn in der Stufenform eine Nullzeile 0 = 0 steht?", a:"Die zugehörige Unbekannte ist frei wählbar: Man setzt x₃ = t mit t ∈ IR und rechnet damit rekursiv weiter.\n   x₃ = t,  x₂ = (1/5)(−7 + t),  x₁ = 6 + x₂ − 2x₃ = 23/5 − (9/5)t\nDie Lösungsmenge ist dann\n   IL = { x ∈ IR³ | x = (1/5)(23, −7, 0)ᵀ + (1/5)(−9, 1, 5)ᵀ · t , t ∈ IR }\nDa t beliebig ist, hat das LGS unendlich viele Lösungen.", expl:"Geometrisch: eine Gerade im IR³ — ein Aufpunkt plus ein Richtungsvektor mal Parameter."},
-    {cat:"Bild: Rechenweg", q:"Bild: LGS mit unendlich vielen Lösungen (Folie 3-20) — ergänze (①–④).", a:"① x₃ = t ;  x₂ = (1/5)(−7 + t) ;  x₁ = 6 + x₂ − 2x₃ = 6 + (1/5)(−7 + t) − 2t\n② x = ( 23/5 − (9/5)t ; −7/5 + (1/5)t ; t )\n③ IL = { x ∈ IR³ | x = (1/5)( 23 ; −7 ; 0 ) + (1/5)( −9 ; 1 ; 5 ) t , t ∈ IR }\n④ Das LGS hat unendlich viele Lösungen.", img:"a20", set:"UL2"},
+    {cat:"Gauß-Verfahren", q:"Wie geht man vor, wenn in der Stufenform eine Nullzeile 0 = 0 steht?", a:"Die zugehörige Unbekannte ist frei wählbar. Man setzt sie gleich einem Parameter t und rechnet damit rekursiv weiter:", ac:`x₃ = t                       t ist frei wählbar
+x₂ = (−7 + t) / 5
+x₁ = 6 + x₂ − 2t  =  23/5 − (9/5)·t
+
+Lösungsmenge:
+
+IL = { x :  x = (1/5)·( 23 ; −7 ; 0 ) + (1/5)·( −9 ; 1 ; 5 )·t ,  t ∈ IR }`, expl:"Geometrisch ist das eine Gerade im Raum: ein Aufpunkt plus ein Richtungsvektor mal Parameter. Da t beliebig ist, gibt es unendlich viele Lösungen."},
+    {cat:"Bild: Rechenweg", q:"Bild: LGS mit unendlich vielen Lösungen (Folie 3-20) — ergänze (①–④).", a:"① x₃ = t ;  x₂ = (−7 + t)/5 ;  x₁ = 6 + x₂ − 2t\n② x = ( 23/5 − (9/5)t ; −7/5 + (1/5)t ; t )\n③ IL = { x : x = (1/5)·( 23 ; −7 ; 0 ) + (1/5)·( −9 ; 1 ; 5 )·t , t ∈ IR }\n④ Das LGS hat unendlich viele Lösungen.", img:"a20", set:"UL2"},
 
     // ===== Lösungsmengen =====
-    {cat:"Lösungsmengen", q:"Wie erkennt man an der Stufenform, wie viele Lösungen ein LGS hat?", a:"• Eine Zeile der Form (0 … 0 | c) mit c ≠ 0 → Widerspruch → keine Lösung, IL = ∅.\n• Für jede Unbekannte ein Pivotelement (keine Nullzeile) → genau eine Lösung.\n• Eine Zeile (0 … 0 | 0), also eine freie Unbekannte → unendlich viele Lösungen (ein Parameter pro freier Unbekannten).", expl:"Dieselbe Ausgangsmatrix mit anderer rechter Seite kann jeden der drei Fälle liefern — das zeigt die Tabelle auf Folie 3-21."},
-    {cat:"Bild: Rechenweg", q:"Bild: Übersicht Anzahl Lösungen (Folie 3-21) — welche Lösungsmenge gehört zu jeder Zeile (①–③)?", a:"① IL = ∅\n② IL = { (−1/5) · ( −41 ; 9 ; 10 ) }\n③ IL = { x ∈ IR³ | x = (1/5)( 37 ; −7 ; 0 ) + (1/5)( −9 ; 1 ; 5 ) t , t ∈ IR }", img:"a21", set:"AL1"},
+    {cat:"Lösungsmengen", q:"Wie erkennt man an der Stufenform, wie viele Lösungen ein LGS hat?", a:"Man schaut sich die unterste Zeile bzw. die Nullzeilen an:", ac:`(  0  0  0  |  c  )   mit c ≠ 0
+        →  Widerspruch 0 = c   →  keine Lösung,  IL = ∅
+
+für jede Unbekannte ein Pivot, keine Nullzeile
+        →  genau eine Lösung
+
+(  0  0  0  |  0  )
+        →  eine Unbekannte wird frei (Parameter t)
+        →  unendlich viele Lösungen`, expl:"Dieselbe Ausgangsmatrix mit anderer rechter Seite kann jeden der drei Fälle liefern — das zeigt die Tabelle auf Folie 3-21."},
+    {cat:"Bild: Rechenweg", q:"Bild: Übersicht Anzahl Lösungen (Folie 3-21) — welche Lösungsmenge gehört zu jeder Zeile (①–③)?", a:"① IL = ∅\n② IL = { (−1/5) · ( −41 ; 9 ; 10 ) }\n③ IL = { x : x = (1/5)·( 37 ; −7 ; 0 ) + (1/5)·( −9 ; 1 ; 5 )·t , t ∈ IR }", img:"a21", set:"AL1"},
     {cat:"Bild: Lückentext", q:"Bild: Übersicht Anzahl Lösungen (Folie 3-21) — wie lautet das Fazit jeder Zeile (①–③)?", a:"① Das LGS hat keine Lösung\n② Das LGS hat genau eine Lösung\n③ Das LGS hat unendlich viele Lösungen", img:"a21", set:"AL2"},
     {cat:"Bild: Rechenweg", q:"Bild: Übersicht Anzahl Lösungen (Folie 3-21) — welche Stufenform ergibt sich jeweils (①–③)?", a:"① ( 1 −1 2 | 6 ; 0 5 −1 | −7 ; 0 0 0 | 2 ) — Widerspruchszeile\n② ( 1 −1 2 | 6 ; 0 5 −1 | −7 ; 0 0 −1 | 2 ) — drei Pivots\n③ ( 1 −1 2 | 6 ; 0 5 −1 | −7 ; 0 0 0 | 0 ) — Nullzeile", img:"a21", set:"AL3", expl:"Die drei Ausgangsmatrizen unterscheiden sich nur in einem einzigen Eintrag bzw. in der rechten Seite — und trotzdem liegt jedes Mal ein anderer Fall vor."},
-    {cat:"Lösungsmengen", q:"Was ist der Unterschied zwischen einem homogenen und einem inhomogenen LGS?", a:"• Inhomogen: A x = y mit beliebigem y. Möglich sind Fall 1 (unendlich viele), Fall 2 (genau eine) und Fall 3 (keine Lösung).\n• Homogen: A x = 0. Da x = 0 auf jeden Fall eine Lösung ist, gilt hier immer IL ≠ ∅ — nur Fall 1 und Fall 2 sind möglich.", expl:"x = 0 heißt triviale Lösung. Ein homogenes LGS ist also nie unlösbar, höchstens „nur trivial lösbar“."},
-    {cat:"Bild: Lückentext", q:"Bild: homogenes und inhomogenes LGS (Folie 3-22) — ergänze (①–⑤).", a:"① A x = y   (inhomogen)\n② A x = 0   (homogen)\n③ IL ≠ ∅ .\n④ Fall 1 unendlich viele Lösungen / Fall 2 genau eine Lösung / Fall 3 keine Lösung\n⑤ Fall 1 unendlich viele Lösungen / Fall 2 genau eine Lösung", img:"a22", set:"IH1"},
+    {cat:"Lösungsmengen", q:"Was ist der Unterschied zwischen einem homogenen und einem inhomogenen LGS?", a:"Beim homogenen LGS steht rechts der Nullvektor:", ac:`inhomogen     A · x = y      y beliebig
+
+   Fall 1  unendlich viele Lösungen
+   Fall 2  genau eine Lösung
+   Fall 3  keine Lösung
+
+
+homogen       A · x = 0
+
+   x = 0 ist immer eine Lösung  →  IL ist nie leer
+
+   Fall 1  unendlich viele Lösungen
+   Fall 2  genau eine Lösung`, expl:"x = 0 heißt triviale Lösung. Ein homogenes LGS ist also nie unlösbar, höchstens „nur trivial lösbar“."},
+    {cat:"Bild: Lückentext", q:"Bild: homogenes und inhomogenes LGS (Folie 3-22) — ergänze (①–⑤).", a:"① A · x = y   (inhomogen)\n② A · x = 0   (homogen)\n③ IL ist nicht leer\n④ Fall 1 unendlich viele Lösungen / Fall 2 genau eine Lösung / Fall 3 keine Lösung\n⑤ Fall 1 unendlich viele Lösungen / Fall 2 genau eine Lösung", img:"a22", set:"IH1"},
     {cat:"Lösungsmengen", q:"Warum ist „unendlich viele Lösungen“ in der Praxis oft kein Problem?", a:"Im praktischen Kontext lassen sich die unendlich vielen Lösungen häufig auf die relevanten, also auf endlich viele, einschränken. Beim Straßen-Geviert sind z. B. nur nichtnegative Verkehrsdichten sinnvoll (Einbahnstraßen), und daraus folgen konkrete Intervalle für jede Variable."},
     {cat:"Bild: Rechenweg", q:"Bild: Straßen-Geviert, Teil 3/3 (Folie 3-24) — ergänze Stufenform und Lösung (①–③).", a:"① ( 1 1 0 0 | 500 ; 0 1 0 −1 | −100 ; 0 0 1 1 | 300 ; 0 0 0 0 | 0 )\n② ( x₁ ; x₂ ; x₃ ; x₄ ) = ( 600 ; −100 ; 300 ; 0 ) + x₄ · ( −1 ; 1 ; −1 ; 1 )\n③ Das LGS für sich hat unendlich viele Lösungen.", img:"a24", set:"SG1"},
-    {cat:"Bild: Rechenweg", q:"Bild: Einbahnstraßen (Folie 3-25) — welche Intervalle folgen aus den Ungleichungen (①–⑥)?", a:"① x₄ ∈ (−∞, 600]\n② x₄ ∈ [100, ∞)\n③ x₄ ∈ (−∞, 300]\n④ x₄ ∈ [0, ∞)\n⑤ x₄ ∈ [100, 300]\n⑥ x₁ ∈ [300, 500], x₂ ∈ [0, 200], x₃ ∈ [0, 200]", img:"a25", set:"SG2", expl:"Jede Komponente muss ≥ 0 sein (Einbahnstraßen). Der Schnitt aller Bedingungen schränkt x₄ auf [100, 300] ein — und daraus folgen die Intervalle der übrigen Variablen."},
-    {cat:"Bild: Lückentext", q:"Bild: praktikable Aussagen zum Straßen-Geviert (Folie 3-26) — ergänze (①–③).", a:"① ist nicht möglich. (Eine Sperrung von AD hieße x₄ = 0, aber x₄ ∈ [100, 300].)\n② ist 300. (x₁ ∈ [300, 500])\n③ ist 200. (x₃ ∈ [0, 200])", img:"a26", set:"SG3"},
+    {cat:"Bild: Rechenweg", q:"Bild: Einbahnstraßen (Folie 3-25) — welche Intervalle folgen aus den Ungleichungen (①–⑥)?", a:"① x₄ ≤ 600\n② x₄ ≥ 100\n③ x₄ ≤ 300\n④ x₄ ≥ 0\n⑤ zusammen: x₄ liegt zwischen 100 und 300\n⑥ x₁ zwischen 300 und 500, x₂ zwischen 0 und 200, x₃ zwischen 0 und 200", img:"a25", set:"SG2", expl:"Jede Komponente muss ≥ 0 sein (Einbahnstraßen). Der Schnitt aller Bedingungen schränkt x₄ auf 100 bis 300 ein — und daraus folgen die Intervalle der übrigen Variablen."},
+    {cat:"Bild: Lückentext", q:"Bild: praktikable Aussagen zum Straßen-Geviert (Folie 3-26) — ergänze (①–③).", a:"① ist nicht möglich — eine Sperrung von AD hieße x₄ = 0, aber x₄ liegt zwischen 100 und 300\n② ist 300 — denn x₁ liegt zwischen 300 und 500\n③ ist 200 — denn x₃ liegt zwischen 0 und 200", img:"a26", set:"SG3"},
 
     // ===== Rang & Regularität =====
-    {cat:"Rang & Regularität", q:"Was ist ein Pivotelement, und was ist der Rang einer Matrix?", a:"• Pivotelement: das jeweils erste nicht-Nullelement einer Zeile in einer Stufenform von A ∈ IR^{m×n}.\n• Rang: die Anzahl der Pivotelemente in der Stufenform von A, geschrieben rang(A)."},
-    {cat:"Rang & Regularität", q:"Wann heißt eine Matrix regulär, wann singulär?", a:"Nur für quadratische n×n-Matrizen: Gilt rang(A) = n (die Matrix hat dann maximalen Rang), so heißt A regulär, andernfalls singulär.", expl:"Regulär ⇔ keine Nullzeile in der Stufenform ⇔ A x = y ist für jedes y eindeutig lösbar ⇔ A⁻¹ existiert."},
-    {cat:"Bild: Lückentext", q:"Bild: Definition Pivot, Rang, Regularität, Singularität (Folie 3-27) — ergänze (①–③).", a:"① Pivotelement.\n② Rang (der Matrix A, geschrieben rang(A))\n③ regulär, andernfalls singulär.", img:"a27", set:"PR1"},
-    {cat:"Bild: Rechenweg", q:"Bild: Beispiele zu Rang und Regularität (Folie 3-27) — ergänze (①–②).", a:"① rang(A) = 2, Spalten: n = 3 (singulär) — nur zwei Pivots bei drei Spalten\n② rang(A) = 3, Spalten: n = 3 (regulär) — maximaler Rang", img:"a27b", set:"PR2"},
-    {cat:"Rang & Regularität", q:"Wie hängen Rang, Regularität und die Lösbarkeit von A x = y zusammen?", a:"Für eine quadratische Matrix A ∈ IR^{n×n} sind äquivalent:\n• rang(A) = n (maximaler Rang)\n• A ist regulär\n• die Stufenform hat keine Nullzeile\n• A x = y ist für jedes y eindeutig lösbar\n• A⁻¹ existiert\nIst A dagegen singulär, so hat A x = y je nach y entweder keine oder unendlich viele Lösungen."},
+    {cat:"Rang & Regularität", q:"Was ist ein Pivotelement, und was ist der Rang einer Matrix?", a:"• Pivotelement: das jeweils erste Element einer Zeile in der Stufenform, das nicht 0 ist.\n• Rang: die Anzahl der Pivotelemente in der Stufenform, geschrieben rang(A).", ac:`(  2   3   0  )       Pivots:  2  und  1
+(  0   0   1  )       rang(A) = 2
+(  0   0   0  )       Nullzeile → kein Pivot
+
+
+(  2   3   0  )       Pivots:  2 , −2  und  1
+(  0  −2   2  )       rang(A) = 3
+(  0   0   1  )`},
+    {cat:"Rang & Regularität", q:"Wann heißt eine Matrix regulär, wann singulär?", a:"Nur für quadratische n×n-Matrizen: Gilt rang(A) = n, hat die Matrix also maximalen Rang, so heißt sie regulär — andernfalls singulär.", expl:"Regulär ⇔ keine Nullzeile in der Stufenform ⇔ A · x = y ist für jedes y eindeutig lösbar ⇔ die Inverse A⁻¹ existiert."},
+    {cat:"Bild: Lückentext", q:"Bild: Definition Pivot, Rang, Regularität, Singularität (Folie 3-27) — ergänze (①–③).", a:"① Pivotelement\n② Rang der Matrix A, geschrieben rang(A)\n③ regulär, andernfalls singulär", img:"a27", set:"PR1"},
+    {cat:"Bild: Rechenweg", q:"Bild: Beispiele zu Rang und Regularität (Folie 3-27) — ergänze (①–②).", a:"① rang(A) = 2, Spalten n = 3 → singulär (nur zwei Pivots bei drei Spalten)\n② rang(A) = 3, Spalten n = 3 → regulär (maximaler Rang)", img:"a27b", set:"PR2"},
+    {cat:"Rang & Regularität", q:"Wie hängen Rang, Regularität und die Lösbarkeit von A · x = y zusammen?", a:"Für eine quadratische n×n-Matrix A bedeuten die folgenden Aussagen alle dasselbe:\n• rang(A) = n, die Matrix hat maximalen Rang\n• A ist regulär\n• die Stufenform hat keine Nullzeile\n• A · x = y ist für jedes y eindeutig lösbar\n• die Inverse A⁻¹ existiert\nIst A dagegen singulär, so hat A · x = y je nach y entweder keine oder unendlich viele Lösungen."},
 
     // ===== Inverse Matrix =====
-    {cat:"Inverse Matrix", q:"Was ist das neutrale Element der Matrixmultiplikation, und wie ist A⁻¹ definiert?", a:"Neutrales Element ist die Einheitsmatrix E_n: A E_n = A.\nWenn es A⁻¹ gibt, gilt A⁻¹ A = E_n bzw. A A⁻¹ = E_n."},
-    {cat:"Inverse Matrix", q:"Welche zwei Schreibweisen sind bei der Inversen streng verboten?", a:"• A⁻¹ ≠ 1/A — es gibt keine Division durch eine Matrix.\n• Aus A x = y folgt nicht x = y/A, sondern x = A⁻¹ y (von links multiplizieren!).\nHerleitung: A x = y ⇔ A⁻¹A x = A⁻¹ y ⇔ E_n x = A⁻¹ y ⇔ x = A⁻¹ y.", expl:"Weil die Matrixmultiplikation nicht kommutativ ist, muss man immer sagen, ob von links oder von rechts multipliziert wird."},
-    {cat:"Bild: Formel ergänzen", q:"Bild: Inverse — neutrales Element und Rechenregeln (Folie 3-32) — ergänze (①–④).", a:"① A E_n = A\n② A⁻¹ A = E_n   bzw.   A A⁻¹ = E_n\n③ A⁻¹ ≠ 1/A   und   A x = y ⇎ x = y/A   (beide durchgestrichen!)\n④ ⇔ A⁻¹A x = A⁻¹ y ⇔ E_n x = A⁻¹ y ⇔ x = A⁻¹ y", img:"a32", set:"IN1"},
-    {cat:"Inverse Matrix", q:"Was ist der Trick, mit dem man die Inverse spaltenweise berechnet?", a:"Die Lösung x¹ von A x = e₁ ist die erste Spalte von A⁻¹, dabei ist e₁ = (1, 0, …, 0)ᵀ der erste Einheitsvektor. Entsprechend löst man A x² = e₂ usw.:\n   A x¹ = e₁ , … , A xⁿ = e_n\nJede Lösung xⁱ ist die i-te Spalte von A⁻¹."},
-    {cat:"Bild: Formel ergänzen", q:"Bild: sukzessives Fortführen (Folie 3-33) — ergänze (①–③).", a:"① A x¹ = e₁ , … , A xⁿ = e_n\n② i-te Spalte von A⁻¹ dar.\n③ (A, E_n) —Zeilenumformungen→ (E_n, A⁻¹)", img:"a33", set:"IN2"},
-    {cat:"Inverse Matrix", q:"Wie berechnet man A⁻¹ mit dem Gauß-Jordan-Verfahren?", a:"Man schreibt A und die Einheitsmatrix nebeneinander und formt mit Zeilenumformungen so lange um, bis links die Einheitsmatrix steht:\n   (A, E_n) —Zeilenumformungen→ (E_n, A⁻¹)\nRechts steht dann direkt die Inverse. Das ist dasselbe wie n LGS mit derselben Matrix und den Einheitsvektoren als rechten Seiten — auf einen Streich gerechnet."},
-    {cat:"Bild: Rechenweg", q:"Bild: Beispiel Inverse berechnen (Folie 3-34) — ergänze (①–②).", a:"① ( 1 0 | −2 1 ; 0 1 | 3/2 −1/2 ) = (E₂, A⁻¹)\n② A⁻¹ = (1/2) · ( −4 2 ; 3 −1 )", img:"a34", set:"IN3", expl:"Probe nicht vergessen: A · A⁻¹ = E₂ und A⁻¹ · A = E₂."},
-    {cat:"Inverse Matrix", q:"Wie lautet die Formel für die Inverse einer 2×2-Matrix?", a:"Für A = ( a b ; c d ) gilt\n   A⁻¹ = 1/(ad − bc) · ( d −b ; −c a ) .\nDie Hauptdiagonale wird vertauscht, die Nebendiagonale bekommt ein Minuszeichen, und alles wird durch die Determinante ad − bc geteilt.", expl:"Ist ad − bc = 0, so existiert A⁻¹ nicht — die Matrix ist dann singulär."},
-    {cat:"Bild: Formel ergänzen", q:"Bild: Zwischenstand und Inverse einer 2×2-Matrix (Folie 3-35) — ergänze (①–④).", a:"① x = A⁻¹ y\n② A = { A ∈ IR^{n×n} | rang(A) = n }\n③ eine Gruppe (nicht abelsch!)\n④ A⁻¹ = 1/(ad − bc) · ( d −b ; −c a )", img:"a35", set:"IN4"},
-    {cat:"Inverse Matrix", q:"Bilden Matrizen mit der Matrixmultiplikation eine Gruppe?", a:"Alle Matrizen: nein — es fehlen die Inversen (singuläre Matrizen haben keine).\nDie Menge A = { A ∈ IR^{n×n} | rang(A) = n }, also die quadratischen regulären Matrizen, bildet mit der üblichen Matrixmultiplikation dagegen sehr wohl eine Gruppe — allerdings keine abelsche, da A·B ≠ B·A.", expl:"Damit schließt sich der Kreis zu Kapitel 2.2: Assoziativität gilt, neutrales Element ist E_n, inverses Element ist A⁻¹, nur G4 (Kommutativität) fehlt."},
-    {cat:"Inverse Matrix", q:"Berechne mit der 2×2-Formel die Inverse von A = ( 5 6 ; 7 8 ) und von B = ( 1 2 ; 2 4 ).", a:"A: ad − bc = 5·8 − 6·7 = 40 − 42 = −2, also\n   A⁻¹ = (−1/2) · ( 8 −6 ; −7 5 ) .\nProbe: A⁻¹ A = (−1/2)·( 8 −6 ; −7 5 )·( 5 6 ; 7 8 ) = (−1/2)·( −2 0 ; 0 −2 ) = E₂ ✓\nB: ad − bc = 1·4 − 2·2 = 0, also existiert B⁻¹ nicht — B ist singulär."},
-    {cat:"Bild: Rechenweg", q:"Bild: Saalaufgabe zur Inversen (Folie 3-36) — ergänze (①–③).", a:"① A⁻¹ = (−1/2) · ( 8 −6 ; −7 5 )\n② (−1/2) · ( −2 0 ; 0 −2 ) = E₂  ✓\n③ B⁻¹ existiert nicht, da ad − bc = 0!", img:"a36", set:"SI1"},
-    {cat:"Inverse Matrix", q:"Warum lohnt es sich, mehrere LGS mit derselben Matrix „auf einen Streich“ zu rechnen?", a:"Für A x¹ = y¹ und A x² = y² sind die Zeilenumformungen zweimal identisch — nur die rechte Seite ändert sich. Statt (A, y¹) und (A, y²) getrennt umzuformen, schreibt man beide rechten Seiten nebeneinander:\n   (A, y¹, y²)\nund rechnet einmal. Genau dieses Prinzip steckt hinter der Berechnung der Inversen mit (A, E_n)."},
-    {cat:"Bild: Formel ergänzen", q:"Bild: 2 LGS auf einen Streich (Folie 3-30) — ergänze (①–②).", a:"① (A, y¹)   und   (A, y²)\n② (A, y¹, y²)", img:"a30", set:"ZS1"},
-    {cat:"Bild: Rechenweg", q:"Bild: 2 LGS auf einen Streich, Beispiel (Folie 3-31) — ergänze (①–③).", a:"① ( 1 1 ; −1 1 ) — die beiden Lösungsspalten\n② x¹ = ( 1 ; −1 )\n③ x² = ( 1 ; 1 )", img:"a31", set:"ZS2"},
-    {cat:"Bild: Rechenweg", q:"Bild: Stufenform bis zur Einheitsmatrix (Folie 3-29) — ergänze (①–③).", a:"① ( 1 0 | 1/5 ; 0 1 | 3/5 )\n② 1 · x₁ + 0 · x₂ = 1/5  und  0 · x₁ + 1 · x₂ = 3/5\n③ ( x₁ ; x₂ ) = ( 1 ; 3 ) · 1/5", img:"a29", set:"GJ1", expl:"Formt man über die Stufenform hinaus bis zur Einheitsmatrix um (Gauß-Jordan), kann man die Lösung direkt ablesen — ohne rekursives Auflösen."},
-    {cat:"Inverse Matrix", q:"Was sind die Lernziele dieses Kapitels?", a:"• Sie erkennen, ob sich zwei Matrizen multiplizieren lassen.\n• Falls erlaubt, sind Sie in der Lage, das Produkt zweier Matrizen zu berechnen.\n• Sie können Matrizenprodukte in abstrakter und unterschiedlichster Weise beschreiben.\n• Sie können ein lineares Gleichungssystem lösen — sofern es lösbar ist — und eine Aussage über die Anzahl der Lösungen treffen.\n• Sie sind in der Lage, falls möglich, die Inverse einer Matrix zu berechnen.\n• Sie verstehen die Zusammenhänge zwischen Regularität, maximalem Rang einer Matrix A und dem Vermögen, mit dieser Matrix eine eindeutige Lösung des LGS A x = y zu erhalten."}
+    {cat:"Inverse Matrix", q:"Was ist das neutrale Element der Matrixmultiplikation, und wie ist A⁻¹ definiert?", a:"Neutral ist die Einheitsmatrix Eₙ — Einsen auf der Hauptdiagonale, sonst Nullen:", ac:`A · Eₙ  =  A            Eₙ ist das neutrale Element
+
+A⁻¹ · A  =  Eₙ          so ist die Inverse definiert
+A · A⁻¹  =  Eₙ`},
+    {cat:"Inverse Matrix", q:"Welche zwei Schreibweisen sind bei der Inversen streng verboten?", a:"Es gibt keine Division durch eine Matrix — man multipliziert immer mit der Inversen, und zwar von links:", ac:`FALSCH              RICHTIG
+
+A⁻¹ = 1/A           A⁻¹ ist keine Bruchschreibweise
+
+aus A·x = y             A · x = y
+folgt x = y/A       ⇔  A⁻¹ · A · x = A⁻¹ · y     von links!
+                    ⇔  Eₙ · x = A⁻¹ · y
+                    ⇔  x = A⁻¹ · y`, expl:"Weil die Matrixmultiplikation nicht kommutativ ist, muss man immer sagen, ob von links oder von rechts multipliziert wird."},
+    {cat:"Bild: Formel ergänzen", q:"Bild: Inverse — neutrales Element und Rechenregeln (Folie 3-32) — ergänze (①–④).", a:"① A · Eₙ = A\n② A⁻¹ · A = Eₙ   bzw.   A · A⁻¹ = Eₙ\n③ A⁻¹ ist nicht 1/A, und aus A·x = y folgt nicht x = y/A (beides auf der Folie durchgestrichen)\n④ ⇔ A⁻¹·A·x = A⁻¹·y ⇔ Eₙ·x = A⁻¹·y ⇔ x = A⁻¹·y", img:"a32", set:"IN1"},
+    {cat:"Inverse Matrix", q:"Was ist der Trick, mit dem man die Inverse spaltenweise berechnet?", a:"Man löst n Gleichungssysteme mit derselben Matrix und den Einheitsvektoren als rechten Seiten:", ac:`A · x¹ = e₁        e₁ = ( 1 ; 0 ; … ; 0 )
+A · x² = e₂        e₂ = ( 0 ; 1 ; … ; 0 )
+   …
+A · xⁿ = eₙ        eₙ = ( 0 ; 0 ; … ; 1 )
+
+Jede Lösung xⁱ ist die i-te Spalte von A⁻¹.`},
+    {cat:"Bild: Formel ergänzen", q:"Bild: sukzessives Fortführen (Folie 3-33) — ergänze (①–③).", a:"① A·x¹ = e₁ , … , A·xⁿ = eₙ\n② xⁱ ist die i-te Spalte von A⁻¹\n③ (A, Eₙ) wird mit Zeilenumformungen zu (Eₙ, A⁻¹)", img:"a33", set:"IN2"},
+    {cat:"Inverse Matrix", q:"Wie berechnet man A⁻¹ mit dem Gauß-Jordan-Verfahren?", a:"Man schreibt A und die Einheitsmatrix nebeneinander und formt so lange um, bis links die Einheitsmatrix steht — rechts steht dann die Inverse:", ac:`                 Zeilenumformungen
+( A  |  Eₙ )   ───────────────────►   ( Eₙ  |  A⁻¹ )`, expl:"Das ist dasselbe wie n Gleichungssysteme mit derselben Matrix und den Einheitsvektoren als rechten Seiten — auf einen Streich gerechnet."},
+    {cat:"Bild: Rechenweg", q:"Bild: Beispiel Inverse berechnen (Folie 3-34) — ergänze (①–②).", a:"① ( 1 0 | −2 1 ; 0 1 | 3/2 −1/2 ), also (E₂ , A⁻¹)\n② A⁻¹ = (1/2) · ( −4 2 ; 3 −1 )", img:"a34", set:"IN3", expl:"Probe nicht vergessen: A · A⁻¹ = E₂ und A⁻¹ · A = E₂."},
+    {cat:"Inverse Matrix", q:"Wie lautet die Formel für die Inverse einer 2×2-Matrix?", a:"Hauptdiagonale vertauschen, Nebendiagonale mit Minuszeichen, alles durch die Determinante ad − bc:", ac:`      (  a   b  )                    1      (   d   −b  )
+A  =  (  c   d  )     ⇒    A⁻¹ =  ───────  · (  −c    a  )
+                                  ad − bc`, expl:"Ist ad − bc = 0, so existiert A⁻¹ nicht — die Matrix ist dann singulär."},
+    {cat:"Bild: Formel ergänzen", q:"Bild: Zwischenstand und Inverse einer 2×2-Matrix (Folie 3-35) — ergänze (①–④).", a:"① x = A⁻¹ · y\n② die Menge aller quadratischen Matrizen mit rang(A) = n, also aller regulären n×n-Matrizen\n③ eine Gruppe (nicht abelsch!)\n④ A⁻¹ = 1/(ad − bc) · ( d −b ; −c a )", img:"a35", set:"IN4"},
+    {cat:"Inverse Matrix", q:"Bilden Matrizen mit der Matrixmultiplikation eine Gruppe?", a:"Alle Matrizen: nein — singuläre Matrizen haben kein Inverses.\nDie Menge der quadratischen regulären Matrizen (also aller n×n-Matrizen mit rang(A) = n) bildet dagegen sehr wohl eine Gruppe — allerdings keine abelsche, da A·B im Allgemeinen ungleich B·A ist.", expl:"Damit schließt sich der Kreis zu Kapitel 2.2: Assoziativität gilt, neutrales Element ist Eₙ, inverses Element ist A⁻¹, nur G4 (Kommutativität) fehlt."},
+    {cat:"Inverse Matrix", q:"Berechne mit der 2×2-Formel die Inverse von A = ( 5 6 ; 7 8 ) und von B = ( 1 2 ; 2 4 ).", a:"Zuerst immer ad − bc ausrechnen — daran sieht man sofort, ob es überhaupt eine Inverse gibt:", ac:`A = (  5   6  )     ad − bc = 5·8 − 6·7 = 40 − 42 = −2
+    (  7   8  )
+
+            −1    (   8   −6  )
+    A⁻¹ =  ──── · (  −7    5  )
+             2
+
+Probe:  A⁻¹ · A  =  (−1/2) · ( −2  0 ; 0  −2 )  =  E₂   ✓
+
+
+B = (  1   2  )     ad − bc = 1·4 − 2·2 = 0
+    (  2   4  )     →  B⁻¹ existiert nicht, B ist singulär`},
+    {cat:"Bild: Rechenweg", q:"Bild: Saalaufgabe zur Inversen (Folie 3-36) — ergänze (①–③).", a:"① A⁻¹ = (−1/2) · ( 8 −6 ; −7 5 )\n② (−1/2) · ( −2 0 ; 0 −2 ) = E₂  ✓\n③ B⁻¹ existiert nicht, da ad − bc = 0", img:"a36", set:"SI1"},
+    {cat:"Inverse Matrix", q:"Warum lohnt es sich, mehrere LGS mit derselben Matrix „auf einen Streich“ zu rechnen?", a:"Die Zeilenumformungen hängen nur von A ab, nicht von der rechten Seite. Statt zweimal dasselbe zu rechnen, schreibt man beide rechten Seiten nebeneinander:", ac:`getrennt:     ( A | y¹ )     und     ( A | y² )
+              zweimal dieselben Rechenschritte
+
+zusammen:     ( A | y¹  y² )
+              einmal rechnen`, expl:"Genau dieses Prinzip steckt hinter der Berechnung der Inversen mit (A, Eₙ)."},
+    {cat:"Bild: Formel ergänzen", q:"Bild: 2 LGS auf einen Streich (Folie 3-30) — ergänze (①–②).", a:"① ( A | y¹ )   und   ( A | y² )   — zweimal dieselben Rechenschritte\n② ( A | y¹ y² )   — einmal rechnen", img:"a30", set:"ZS1"},
+    {cat:"Bild: Rechenweg", q:"Bild: 2 LGS auf einen Streich, Beispiel (Folie 3-31) — ergänze (①–③).", a:"① die beiden Lösungsspalten ( 1 1 ; −1 1 )\n② x¹ = ( 1 ; −1 )\n③ x² = ( 1 ; 1 )", img:"a31", set:"ZS2"},
+    {cat:"Bild: Rechenweg", q:"Bild: Stufenform bis zur Einheitsmatrix (Folie 3-29) — ergänze (①–③).", a:"① ( 1 0 | 1/5 ; 0 1 | 3/5 )\n② 1·x₁ + 0·x₂ = 1/5   und   0·x₁ + 1·x₂ = 3/5\n③ ( x₁ ; x₂ ) = (1/5) · ( 1 ; 3 )", img:"a29", set:"GJ1", expl:"Formt man über die Stufenform hinaus bis zur Einheitsmatrix um (Gauß-Jordan), kann man die Lösung direkt ablesen — ohne rekursives Auflösen."},
+    {cat:"Inverse Matrix", q:"Was sind die Lernziele dieses Kapitels?", a:"• Sie erkennen, ob sich zwei Matrizen multiplizieren lassen.\n• Falls erlaubt, sind Sie in der Lage, das Produkt zweier Matrizen zu berechnen.\n• Sie können Matrizenprodukte in abstrakter und unterschiedlichster Weise beschreiben.\n• Sie können ein lineares Gleichungssystem lösen — sofern es lösbar ist — und eine Aussage über die Anzahl der Lösungen treffen.\n• Sie sind in der Lage, falls möglich, die Inverse einer Matrix zu berechnen.\n• Sie verstehen die Zusammenhänge zwischen Regularität, maximalem Rang einer Matrix A und dem Vermögen, mit dieser Matrix eine eindeutige Lösung des LGS A · x = y zu erhalten."}
   ].map(function(c, i){ c.id = i; return c; });
 
   var BASE_CATS = ["Matrizen rechnen", "Transponierte", "LGS aufstellen", "Gauß-Verfahren", "Lösungsmengen", "Rang & Regularität", "Inverse Matrix", "Bild: Lückentext", "Bild: Formel ergänzen", "Bild: Rechenweg"];
@@ -867,7 +1013,7 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
   // ======================================================
   var ABFRAGE = [
     {type:"bool", q:"Ja oder Nein: Zwei Matrizen können nur addiert werden, wenn sie dasselbe Format haben.", correct:true,
-     explain:"Richtig — die Summe ist komponentenweise definiert: A + B = (A_ij + B_ij)_ij."},
+     explain:"Richtig — die Summe ist komponentenweise definiert: A + B = Aᵢⱼ + Bᵢⱼ an der Stelle (i, j)."},
     {type:"bool", q:"Ja oder Nein: A · B ist definiert, wenn die Zeilenzahl von A gleich der Spaltenzahl von B ist.", correct:false,
      explain:"Falsch — es muss die Spaltenzahl von A gleich der Zeilenzahl von B sein: (N×M)·(M×L) = (N×L)."},
     {type:"bool", q:"Ja oder Nein: Das Matrixprodukt ist kommutativ, es gilt also immer A·B = B·A.", correct:false,
@@ -876,14 +1022,14 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
      explain:"Richtig — die inneren Zahlen (2 und 2) stimmen überein und fallen weg, die äußeren bilden das Ergebnis."},
     {type:"bool", q:"Ja oder Nein: (2,4)·(1,3)ᵀ und (2,4)ᵀ·(1,3) liefern dasselbe Ergebnis.", correct:false,
      explain:"Falsch — das erste ist 1×2 mal 2×1 und ergibt den Skalar 14, das zweite ist 2×1 mal 1×2 und ergibt die 2×2-Matrix ( 2 6 ; 4 12 )."},
-    {type:"bool", q:"Ja oder Nein: Beim Transponieren gilt (Aᵀ)_ij = A_ji.", correct:true,
+    {type:"bool", q:"Ja oder Nein: Beim Transponieren gilt (Aᵀ)ᵢⱼ = Aⱼᵢ.", correct:true,
      explain:"Richtig — Zeilen und Spalten werden vertauscht, aus m×n wird n×m."},
     {type:"bool", q:"Ja oder Nein: Es gilt (A B)ᵀ = Aᵀ Bᵀ.", correct:false,
      explain:"Falsch — die Reihenfolge dreht sich um: (A B)ᵀ = Bᵀ Aᵀ."},
     {type:"bool", q:"Ja oder Nein: Eine symmetrische Matrix muss quadratisch sein.", correct:true,
      explain:"Richtig — A = Aᵀ geht nur, wenn A und Aᵀ dasselbe Format haben, also bei n×n."},
     {type:"bool", q:"Ja oder Nein: Bei einer hermiteschen Matrix wird nur transponiert, nicht konjugiert.", correct:false,
-     explain:"Falsch — hermitesch heißt A = Ā ᵀ = A⋆, also transponieren UND komplex konjugieren. Nur transponieren wäre symmetrisch."},
+     explain:"Falsch — hermitesch heißt A = A⋆, also die konjugiert Transponierte, also transponieren UND komplex konjugieren. Nur transponieren wäre symmetrisch."},
     {type:"bool", q:"Ja oder Nein: Zeilenumformungen verändern die Lösungsmenge eines LGS.", correct:false,
      explain:"Falsch — genau deshalb darf man das Gauß-Verfahren überhaupt anwenden: Zeilenumformungen von (A, y) ändern die Lösungsmenge nicht."},
     {type:"bool", q:"Ja oder Nein: Man darf eine Zeile mit 0 multiplizieren.", correct:false,
@@ -906,11 +1052,11 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
      explain:"Richtig — regulär ⇔ rang(A) = n ⇔ keine Nullzeile in der Stufenform ⇔ A⁻¹ existiert, und dann ist x = A⁻¹ y."},
     {type:"bool", q:"Ja oder Nein: Aus A x = y folgt x = y/A.", correct:false,
      explain:"Falsch — man darf nicht durch eine Matrix teilen. Richtig ist x = A⁻¹ y (von links mit A⁻¹ multiplizieren)."},
-    {type:"bool", q:"Ja oder Nein: Das neutrale Element der Matrixmultiplikation ist die Einheitsmatrix E_n.", correct:true,
-     explain:"Richtig — A E_n = A, und wenn A⁻¹ existiert, gilt A⁻¹ A = E_n."},
-    {type:"bool", q:"Ja oder Nein: Bei der Berechnung der Inversen formt man (A, E_n) so lange um, bis links E_n steht.", correct:true,
-     explain:"Richtig — dann steht rechts direkt A⁻¹: (A, E_n) → (E_n, A⁻¹)."},
-    {type:"bool", q:"Ja oder Nein: Die i-te Spalte von A⁻¹ ist die Lösung von A x = e_i.", correct:true,
+    {type:"bool", q:"Ja oder Nein: Das neutrale Element der Matrixmultiplikation ist die Einheitsmatrix Eₙ.", correct:true,
+     explain:"Richtig — A · Eₙ = A, und wenn A⁻¹ existiert, gilt A⁻¹ · A = Eₙ."},
+    {type:"bool", q:"Ja oder Nein: Bei der Berechnung der Inversen formt man ( A | Eₙ ) so lange um, bis links Eₙ steht.", correct:true,
+     explain:"Richtig — dann steht rechts direkt A⁻¹: ( A | Eₙ ) → ( Eₙ | A⁻¹ )."},
+    {type:"bool", q:"Ja oder Nein: Die i-te Spalte von A⁻¹ ist die Lösung von A · x = eᵢ.", correct:true,
      explain:"Richtig — genau das ist der Trick hinter dem Gauß-Jordan-Verfahren für die Inverse."},
     {type:"bool", q:"Ja oder Nein: Ist ad − bc = 0, so existiert die Inverse der 2×2-Matrix ( a b ; c d ) trotzdem.", correct:false,
      explain:"Falsch — die Formel hat dann den Nenner 0; die Matrix ist singulär und besitzt keine Inverse."},
@@ -923,7 +1069,7 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
     {type:"text", q:"Welches Format hat das Produkt einer 4×3-Matrix mit einer 3×2-Matrix? (Form: m x n)", answer:"4x2", accept:["4×2","4 x 2","4*2","4,2"],
      explain:"(4×3)·(3×2) = (4×2) — die inneren Zahlen stimmen überein und fallen weg."},
     {type:"text", q:"Wie heißt die Matrix, die bei der Matrixmultiplikation neutral ist? (ein Wort)", answer:"einheitsmatrix", accept:["e_n","en","identitaetsmatrix","identität","einheitsmatrix e_n"],
-     explain:"Die Einheitsmatrix E_n: A E_n = A."},
+     explain:"Die Einheitsmatrix Eₙ: A · Eₙ = A."},
     {type:"text", q:"Wie nennt man die Anzahl der Pivotelemente in der Stufenform einer Matrix? (ein Wort)", answer:"rang", accept:["der rang","rang(a)","rangzahl"],
      explain:"rang(A) — bei einer n×n-Matrix mit rang(A) = n heißt die Matrix regulär."},
     {type:"text", q:"Wie lautet die Lösungsmenge eines LGS, dessen Stufenform die Zeile (0 0 0 | 2) enthält? (Symbol)", answer:"∅", accept:["leere menge","{}","leer","l = ∅","ist leer"],
@@ -931,13 +1077,13 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
     {type:"text", q:"Wie heißt eine quadratische Matrix mit rang(A) < n? (ein Wort)", answer:"singulär", accept:["singulaer","singular","nicht regulär"],
      explain:"Singulär — sie hat keinen maximalen Rang und damit auch keine Inverse."},
     {type:"text", q:"Wie berechnet man x aus A x = y, wenn A regulär ist? (kurze Formel)", answer:"x = A^-1 y", accept:["x=a^-1y","a^-1 y","x = a hoch -1 mal y","x=a⁻¹y","x = a⁻¹ y"],
-     explain:"Von links mit A⁻¹ multiplizieren: A x = y ⇔ A⁻¹A x = A⁻¹ y ⇔ x = A⁻¹ y."},
+     explain:"Von links mit A⁻¹ multiplizieren: A x = y ⇔ A⁻¹ · A · x = A⁻¹ · y ⇔ x = A⁻¹ y."},
     {type:"text", q:"Wie lautet der Nenner in der Formel für die Inverse von ( a b ; c d )?", answer:"ad - bc", accept:["ad-bc","ad − bc","a*d-b*c","ad minus bc"],
      explain:"A⁻¹ = 1/(ad − bc) · ( d −b ; −c a ). Ist ad − bc = 0, existiert die Inverse nicht."},
     {type:"text", q:"Wie viele Lösungen hat ein homogenes LGS mindestens? (nur die Zahl)", answer:"1", accept:["eine","genau eine","mindestens eine"],
      explain:"Mindestens die triviale Lösung x = 0 — deshalb ist IL bei einem homogenen LGS nie leer."},
-    {type:"text", q:"Wie nennt man eine Matrix A ∈ IR^{n×n} mit A = Aᵀ? (ein Wort)", answer:"symmetrisch", accept:["symetrisch"],
-     explain:"Symmetrisch — das komplexe Gegenstück mit A = Ā ᵀ heißt hermitesch."}
+    {type:"text", q:"Wie nennt man eine quadratische n×n-Matrix mit A = Aᵀ? (ein Wort)", answer:"symmetrisch", accept:["symetrisch"],
+     explain:"Symmetrisch — das komplexe Gegenstück mit A = A⋆ heißt hermitesch."}
   ];
 
   var checkCardEl = document.getElementById("checkCard");
@@ -1036,8 +1182,8 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
      opts:["(A B)ᵀ = Aᵀ Bᵀ", "(A B)ᵀ = Bᵀ Aᵀ", "(A B)ᵀ = (B A)ᵀ", "(A B)ᵀ = A B"],
      correct:1, explain:"Die Reihenfolge dreht sich um — im Beweis sieht man das daran, dass beim Transponieren die Indizes getauscht werden."},
     {q:"Wann heißt eine komplexe Matrix hermitesch?",
-     opts:["Wenn A = Aᵀ", "Wenn A = −Aᵀ", "Wenn A = Ā ᵀ", "Wenn alle Einträge reell sind"],
-     correct:2, explain:"Hermitesch heißt A = Ā ᵀ =: A⋆ — transponieren und komplex konjugieren. A = Aᵀ wäre symmetrisch."},
+     opts:["Wenn A = Aᵀ", "Wenn A = −Aᵀ", "Wenn A = A⋆ (konjugiert Transponierte)", "Wenn alle Einträge reell sind"],
+     correct:2, explain:"Hermitesch heißt A = A⋆, also die konjugiert Transponierte — transponieren und komplex konjugieren. A = Aᵀ wäre symmetrisch."},
     {q:"Welche Zeilenumformungen sind beim Gauß-Verfahren erlaubt?",
      opts:["Nur das Vertauschen von Zeilen", "Multiplikation einer Zeile mit einer Zahl ungleich 0 und Addition einer Zeile zu einer anderen", "Multiplikation einer Spalte mit einer Zahl", "Alle Umformungen, die die Matrix vereinfachen"],
      correct:1, explain:"Genau diese zwei Operationen — und beide ändern die Lösungsmenge nicht."},
@@ -1064,9 +1210,9 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
      correct:1, explain:"Regulär ⇔ rang(A) = n ⇔ keine Nullzeile ⇔ A⁻¹ existiert, und dann ist x = A⁻¹ y."},
     {q:"Wie löst man A x = y mit Hilfe der Inversen korrekt auf?",
      opts:["x = y / A", "x = y A⁻¹", "x = A⁻¹ y", "x = A y⁻¹"],
-     correct:2, explain:"Von links mit A⁻¹ multiplizieren: A⁻¹A x = A⁻¹ y ⇔ E_n x = A⁻¹ y. Durch eine Matrix teilen darf man nie."},
+     correct:2, explain:"Von links mit A⁻¹ multiplizieren: A⁻¹ · A · x = A⁻¹ · y ⇔ Eₙ · x = A⁻¹ · y. Durch eine Matrix teilen darf man nie."},
     {q:"Wie berechnet man A⁻¹ mit Zeilenumformungen?",
-     opts:["(A, E_n) → (E_n, A⁻¹)", "(A, y) → (E_n, y)", "(Aᵀ, A) → (A, Aᵀ)", "Durch Transponieren von A"],
+     opts:["( A | Eₙ ) → ( Eₙ | A⁻¹ )", "( A | y ) → ( Eₙ | y )", "(Aᵀ, A) → (A, Aᵀ)", "Durch Transponieren von A"],
      correct:0, explain:"Man löst n LGS mit den Einheitsvektoren als rechten Seiten auf einen Streich — jede Lösungsspalte ist eine Spalte von A⁻¹."},
     {q:"Wie lautet die Inverse von A = ( a b ; c d )?",
      opts:["1/(ab − cd) · ( a −b ; −c d )", "1/(ad − bc) · ( d −b ; −c a )", "1/(ad + bc) · ( d b ; c a )", "( 1/a 1/b ; 1/c 1/d )"],
@@ -1078,8 +1224,8 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
      opts:["Alle n×n-Matrizen", "Alle m×n-Matrizen", "Die regulären n×n-Matrizen", "Die symmetrischen Matrizen"],
      correct:2, explain:"Nur dort existiert zu jedem Element ein Inverses. Die Gruppe ist allerdings nicht abelsch, da A·B ≠ B·A."},
     {q:"Was bedeutet A x als Linearkombination gelesen?",
-     opts:["A x ist eine Linearkombination der Spalten von A mit den Koeffizienten x₁, …, x_n", "A x ist das Skalarprodukt von A und x", "A x ist die Summe aller Einträge von A", "A x ist die Transponierte von x"],
-     correct:0, explain:"A x = (1. Spalte)·x₁ + … + (n. Spalte)·x_n. Deshalb ist A x = y genau dann lösbar, wenn y Linearkombination der Spalten von A ist."}
+     opts:["A · x ist eine Linearkombination der Spalten von A mit den Koeffizienten x₁, …, xₙ", "A · x ist das Skalarprodukt von A und x", "A · x ist die Summe aller Einträge von A", "A · x ist die Transponierte von x"],
+     correct:0, explain:"A x = (1. Spalte)·x₁ + … + (n. Spalte)·xₙ. Deshalb ist A · x = y genau dann lösbar, wenn y Linearkombination der Spalten von A ist."}
   ];
 
   var quizListEl = document.getElementById("quizList");
@@ -1143,10 +1289,10 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
      sol:"(a) (3×2)·(2×1) = 3×1\n    2·2 + 1·(−1) = 3\n    3·2 + (−1)·(−1) = 7\n    0·2 + 2·(−1) = −2        →  ( 3 ; 7 ; −2 )\n\n(b) (1×2)·(2×2) = 1×2\n    3·2 + 4·8 = 38 ,  3·(−1) + 4·9 = 33   →  ( 38 , 33 )\n\n(c) (1×2)·(2×1) = 1×1\n    2·1 + 4·3 = 14            →  der Skalar 14 (Skalarprodukt)\n\n(d) (2×1)·(1×2) = 2×2\n    ( 2·1  2·3 ; 4·1  4·3 ) = ( 2 6 ; 4 12 )   (dyadisches Produkt)\n\nBeachte (c) und (d): dieselben Zahlen, aber Reihenfolge und Format entscheiden über das Ergebnis."},
     {t:"Transponieren, symmetrisch, hermitesch", d:"(a) Transponiere ( 1 2 3 ; 4 5 6 ) und gib beide Formate an. (b) Ist ( 1 2 3 ; 2 4 5 ; 3 5 6 ) symmetrisch? (c) Berechne ( 0 i ; −i 1 )⋆ und entscheide, ob die Matrix hermitesch ist. (d) Zeige an einem selbst gewählten Beispiel, dass (A B)ᵀ = Bᵀ Aᵀ gilt und (A B)ᵀ = Aᵀ Bᵀ falsch ist.",
      tip:"Bei (c): erst jeden Eintrag komplex konjugieren, dann transponieren. Bei (d) reichen eine 2×3- und eine 3×2-Matrix.",
-     sol:"(a) ( 1 2 3 ; 4 5 6 ) ∈ IR^{2×3} ,  Transponierte ( 1 4 ; 2 5 ; 3 6 ) ∈ IR^{3×2}\n\n(b) Ja — die Matrix ist an der Hauptdiagonale gespiegelt, also A = Aᵀ.\n\n(c) Konjugieren: ( 0 −i ; i 1 ) ,  dann transponieren: ( 0 i ; −i 1 ) = A.\n    Also A = A⋆ — die Matrix ist hermitesch.\n\n(d) Mit A ∈ IR^{2×3} und B ∈ IR^{3×2} ist A B ∈ IR^{2×2}, also (A B)ᵀ ∈ IR^{2×2}.\n    Bᵀ Aᵀ = (2×3)·(3×2) = 2×2  ✓\n    Aᵀ Bᵀ = (3×2)·(2×3) = 3×3  ✗ — schon das Format passt nicht.\n    Der Beweis über Komponenten: (A B)ᵀ_ki = Σ_j A_ij B_jk = Σ_j Bᵀ_kj Aᵀ_ji = (Bᵀ Aᵀ)_ki ."},
+     sol:"(a) ( 1 2 3 ; 4 5 6 ) ist eine 2×3-Matrix,  die Transponierte ( 1 4 ; 2 5 ; 3 6 ) eine 3×2-Matrix\n\n(b) Ja — die Matrix ist an der Hauptdiagonale gespiegelt, also A = Aᵀ.\n\n(c) Konjugieren: ( 0 −i ; i 1 ) ,  dann transponieren: ( 0 i ; −i 1 ) = A.\n    Also A = A⋆ — die Matrix ist hermitesch.\n\n(d) Ist A eine 2×3-Matrix und B eine 3×2-Matrix, so ist A·B eine 2×2-Matrix, also ist auch (A·B)ᵀ eine 2×2-Matrix.\n    Bᵀ · Aᵀ = (2×3)·(3×2) = 2×2  ✓\n    Aᵀ · Bᵀ = (3×2)·(2×3) = 3×3  ✗ — schon das Format passt nicht.\n    Der Beweis über Komponenten: (A·B)ᵀ an der Stelle (k, i) = ∑ Aᵢⱼ·Bⱼₖ = ∑ (Bᵀ)ₖⱼ·(Aᵀ)ⱼᵢ = (Bᵀ·Aᵀ) an der Stelle (k, i) ."},
     {t:"Straßen-Geviert: vom Text zum LGS", d:"An den Kreuzungen A, B, C, D gilt jeweils Zufluss = Abfluss: x₁ + x₄ = 600, x₁ + x₂ = 500, x₂ + x₃ = 200, x₃ + x₄ = 300. Schreibe das LGS in Matrix-Vektor-Form A x = y und gib das Format von A, x und y an.",
      tip:"Jede Gleichung wird eine Zeile der Matrix: Koeffizient 1, wo die Variable vorkommt, sonst 0.",
-     sol:"A = ( 1 0 0 1 ; 1 1 0 0 ; 0 1 1 0 ; 0 0 1 1 )  ∈ IR^{4×4}\nx = ( x₁ ; x₂ ; x₃ ; x₄ )                     ∈ IR^4\ny = ( 600 ; 500 ; 200 ; 300 )                 ∈ IR^4\n\nA x = y .\n\nDie Matrizenschreibweise ist nicht nur kürzer — sie erlaubt allgemeingültige Aussagen über Lösbarkeit und Eindeutigkeit, unabhängig vom konkreten Zahlenbeispiel."},
+     sol:"A = ( 1 0 0 1 ; 1 1 0 0 ; 0 1 1 0 ; 0 0 1 1 )     4×4-Matrix\nx = ( x₁ ; x₂ ; x₃ ; x₄ )                        4 Eintraege\ny = ( 600 ; 500 ; 200 ; 300 )                    4 Eintraege\n\nA x = y .\n\nDie Matrizenschreibweise ist nicht nur kürzer — sie erlaubt allgemeingültige Aussagen über Lösbarkeit und Eindeutigkeit, unabhängig vom konkreten Zahlenbeispiel."},
     {t:"Gauß-Verfahren: alle drei Fälle an einem Beispiel", d:"Bringe die folgenden drei erweiterten Matrizen in Stufenform und gib jeweils die Lösungsmenge an:\n(a) ( 1 −1 2 | 6 ; 2 3 3 | 5 ; 2 8 2 | 2 )\n(b) ( 1 −1 2 | 6 ; 2 3 3 | 5 ; 2 8 0 | 2 )\n(c) ( 1 −1 2 | 6 ; 2 3 3 | 5 ; 2 8 2 | −2 )",
      tip:"Starte überall mit II − 2·I und (III − 2·I)/2, danach III − II. Die drei Matrizen unterscheiden sich nur an einer einzigen Stelle.",
      sol:"(a) → ( 1 −1 2 | 6 ; 0 5 −1 | −7 ; 0 0 0 | 2 )\n    Dritte Zeile: 0 = 2 — Widerspruch.\n    IL = ∅ ,  das LGS hat keine Lösung.\n\n(b) → ( 1 −1 2 | 6 ; 0 5 −1 | −7 ; 0 0 −1 | 2 )\n    Rekursiv auflösen:  x₃ = −2 ,  x₂ = (1/5)(−7 + x₃) = −9/5 ,  x₁ = 6 + x₂ − 2x₃ = 41/5\n    IL = { (−1/5)·( −41 ; 9 ; 10 ) } ,  das LGS ist eindeutig lösbar.\n\n(c) → ( 1 −1 2 | 6 ; 0 5 −1 | −7 ; 0 0 0 | 0 )\n    Dritte Zeile: 0 = 0 — keine Bedingung, also x₃ = t frei wählbar.\n    x₂ = (1/5)(−7 + t) ,  x₁ = 6 + x₂ − 2t = 23/5 − (9/5)t\n    IL = { x ∈ IR³ | x = (1/5)( 23 ; −7 ; 0 ) + (1/5)( −9 ; 1 ; 5 ) t , t ∈ IR }\n    Das LGS hat unendlich viele Lösungen (geometrisch: eine Gerade im IR³)."},
@@ -1170,16 +1316,16 @@ footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10p
      sol:"( 1 2 | −1  3 ; 3 4 | −1  7 )\n  — II − 3·I , danach I + II →   ( 1 0 | 1  1 ; 0 −2 | 2  −2 )\n  — II/(−2) →                    ( 1 0 | 1  1 ; 0 1 | −1  1 )\n\nAlso  x¹ = ( 1 ; −1 )  und  x² = ( 1 ; 1 ).\n\nProbe:\n  A x¹ = ( 1 2 ; 3 4 )·( 1 ; −1 ) = ( −1 ; −1 ) = y¹  ✓\n  A x² = ( 1 2 ; 3 4 )·( 1 ;  1 ) = (  3 ;  7 ) = y²  ✓\n\nDie Zeilenumformungen sind für beide rechten Seiten identisch — man spart also die halbe Arbeit."},
     {t:"Inverse mit dem Gauß-Jordan-Verfahren", d:"Berechne A⁻¹ für A = ( 1 2 ; 3 4 ) über (A, E₂) → (E₂, A⁻¹). Mache die Probe A·A⁻¹ = E₂ und A⁻¹·A = E₂. Warum ist die i-te Lösungsspalte gerade die i-te Spalte von A⁻¹?",
      tip:"Rechts startet die Einheitsmatrix; jede Zeilenumformung wendest du auf beide Hälften an.",
-     sol:"( 1 2 | 1 0 ; 3 4 | 0 1 )\n  — II − 3·I →   ( 1 2 | 1 0 ; 0 −2 | −3 1 )\n  — II/(−2) →    ( 1 2 | 1 0 ; 0 1 | 3/2 −1/2 )\n  — I − 2·II →   ( 1 0 | −2 1 ; 0 1 | 3/2 −1/2 )\n\nAlso  A⁻¹ = ( −2 1 ; 3/2 −1/2 ) = (1/2)·( −4 2 ; 3 −1 ).\n\nProbe:  A·A⁻¹ = ( 1 2 ; 3 4 )·( −2 1 ; 3/2 −1/2 ) = ( 1 0 ; 0 1 ) = E₂  ✓\n\nBegründung: Die i-te Spalte von E₂ ist der Einheitsvektor e_i. Man löst also gleichzeitig\nA x¹ = e₁ und A x² = e₂. Wegen A·A⁻¹ = E₂ ist die i-te Spalte von A⁻¹ genau das xⁱ mit\nA xⁱ = e_i — die Lösungsspalten sind damit die Spalten der Inversen."},
+     sol:"( 1 2 | 1 0 ; 3 4 | 0 1 )\n  — II − 3·I →   ( 1 2 | 1 0 ; 0 −2 | −3 1 )\n  — II/(−2) →    ( 1 2 | 1 0 ; 0 1 | 3/2 −1/2 )\n  — I − 2·II →   ( 1 0 | −2 1 ; 0 1 | 3/2 −1/2 )\n\nAlso  A⁻¹ = ( −2 1 ; 3/2 −1/2 ) = (1/2)·( −4 2 ; 3 −1 ).\n\nProbe:  A·A⁻¹ = ( 1 2 ; 3 4 )·( −2 1 ; 3/2 −1/2 ) = ( 1 0 ; 0 1 ) = E₂  ✓\n\nBegründung: Die i-te Spalte von E₂ ist der Einheitsvektor eᵢ. Man löst also gleichzeitig\nA·x¹ = e₁ und A·x² = e₂. Wegen A·A⁻¹ = E₂ ist die i-te Spalte von A⁻¹ genau das xⁱ mit\nA·xⁱ = eᵢ — die Lösungsspalten sind damit die Spalten der Inversen."},
     {t:"Saalaufgabe: Inverse mit der 2×2-Formel", d:"(a) Berechne mit der Formel A⁻¹ = 1/(ad − bc) · ( d −b ; −c a ) die Inversen von A = ( 5 6 ; 7 8 ) und B = ( 1 2 ; 2 4 ), falls sie existieren. (b) Überprüfe das Ergebnis, d. h. gilt A⁻¹ · A = E₂?",
      tip:"Rechne zuerst ad − bc aus — daran siehst du sofort, ob die Inverse überhaupt existiert.",
      sol:"(a) A = ( 5 6 ; 7 8 ):  ad − bc = 5·8 − 6·7 = 40 − 42 = −2\n    A⁻¹ = (1/(−2))·( 8 −6 ; −7 5 ) = (−1/2)·( 8 −6 ; −7 5 )\n\n    B = ( 1 2 ; 2 4 ):  ad − bc = 1·4 − 2·2 = 0\n    B⁻¹ existiert nicht — B ist singulär (die zweite Zeile ist das Doppelte der ersten).\n\n(b) A⁻¹ A = (−1/2)·( 8 −6 ; −7 5 )·( 5 6 ; 7 8 )\n           = (−1/2)·( 8·5−6·7   8·6−6·8 ; −7·5+5·7   −7·6+5·8 )\n           = (−1/2)·( −2 0 ; 0 −2 )\n           = ( 1 0 ; 0 1 ) = E₂  ✓"},
     {t:"Warum ist x = y/A falsch?", d:"(a) Erkläre, warum man A x = y nicht zu x = y/A umformen darf, und leite die richtige Umformung Schritt für Schritt her. (b) Warum muss man dabei sagen, ob man von links oder von rechts multipliziert?",
      tip:"Welche Eigenschaft der Matrixmultiplikation fehlt im Vergleich zum Rechnen mit Zahlen?",
-     sol:"(a) Eine Division durch eine Matrix ist nicht definiert — es gibt nur die Inverse, und auch\n    die nur für reguläre Matrizen. Richtige Herleitung:\n      A x = y\n      ⇔ A⁻¹ (A x) = A⁻¹ y        (von links mit A⁻¹ multiplizieren)\n      ⇔ (A⁻¹ A) x = A⁻¹ y        (Assoziativität)\n      ⇔ E_n x = A⁻¹ y            (Definition der Inversen)\n      ⇔ x = A⁻¹ y                (E_n ist neutral)\n\n(b) Weil die Matrixmultiplikation nicht kommutativ ist: A⁻¹ (A x) und (A x) A⁻¹ sind\n    verschiedene Ausdrücke — letzterer ist oft nicht einmal definiert. Bei Zahlen gibt es\n    dieses Problem nicht, bei Matrizen schon.\n\nMerke die beiden durchgestrichenen Schreibweisen der Folie: A⁻¹ ≠ 1/A und A x = y ⇎ x = y/A."},
-    {t:"Gruppeneigenschaften der regulären Matrizen", d:"Prüfe für die Menge A = { A ∈ IR^{n×n} | rang(A) = n } mit der Matrixmultiplikation die Gruppenaxiome G1–G4 aus Kapitel 2.2 und begründe, warum alle n×n-Matrizen keine Gruppe bilden.",
+     sol:"(a) Eine Division durch eine Matrix ist nicht definiert — es gibt nur die Inverse, und auch\n    die nur für reguläre Matrizen. Richtige Herleitung:\n      A x = y\n      ⇔ A⁻¹ (A x) = A⁻¹ y        (von links mit A⁻¹ multiplizieren)\n      ⇔ (A⁻¹ A) x = A⁻¹ y        (Assoziativität)\n      ⇔ Eₙ · x = A⁻¹ · y            (Definition der Inversen)\n      ⇔ x = A⁻¹ · y            (Eₙ ist neutral)\n\n(b) Weil die Matrixmultiplikation nicht kommutativ ist: A⁻¹ (A x) und (A x) A⁻¹ sind\n    verschiedene Ausdrücke — letzterer ist oft nicht einmal definiert. Bei Zahlen gibt es\n    dieses Problem nicht, bei Matrizen schon.\n\nMerke die beiden durchgestrichenen Schreibweisen der Folie: A⁻¹ ≠ 1/A und A x = y ⇎ x = y/A."},
+    {t:"Gruppeneigenschaften der regulären Matrizen", d:"Prüfe für die Menge A = Menge aller quadratischen n×n-Matrizen mit rang(A) = n mit der Matrixmultiplikation die Gruppenaxiome G1–G4 aus Kapitel 2.2 und begründe, warum alle n×n-Matrizen keine Gruppe bilden.",
      tip:"G1 Assoziativität, G2 neutrales Element, G3 inverses Element, G4 Kommutativität (abelsch).",
-     sol:"Abgeschlossenheit: Sind A und B regulär, so ist auch A·B regulär (das Produkt zweier\n   invertierbarer Abbildungen ist invertierbar; (A B)⁻¹ = B⁻¹ A⁻¹).  ✓\nG1 Assoziativität: (A B) C = A (B C) gilt für Matrizen immer.  ✓\nG2 neutrales Element: E_n mit A E_n = E_n A = A, und E_n ist regulär.  ✓\nG3 inverses Element: Zu jedem regulären A existiert A⁻¹, und A⁻¹ ist wieder regulär.  ✓\nG4 Kommutativität: A B ≠ B A im Allgemeinen.  ✗\n\n⇒ A ist eine Gruppe, aber keine abelsche Gruppe.\n\nAlle n×n-Matrizen bilden dagegen nur ein Monoid: G1 und G2 gelten, aber G3 scheitert —\nsinguläre Matrizen (rang(A) &lt; n) besitzen kein Inverses."}
+     sol:"Abgeschlossenheit: Sind A und B regulär, so ist auch A·B regulär (das Produkt zweier\n   invertierbarer Abbildungen ist invertierbar; (A·B)⁻¹ = B⁻¹·A⁻¹).  ✓\nG1 Assoziativität: (A·B)·C = A·(B·C) gilt für Matrizen immer.  ✓\nG2 neutrales Element: Eₙ mit A·Eₙ = Eₙ·A = A, und Eₙ ist regulär.  ✓\nG3 inverses Element: Zu jedem regulären A existiert A⁻¹, und A⁻¹ ist wieder regulär.  ✓\nG4 Kommutativität: A B ≠ B A im Allgemeinen.  ✗\n\n⇒ A ist eine Gruppe, aber keine abelsche Gruppe.\n\nAlle n×n-Matrizen bilden dagegen nur ein Monoid: G1 und G2 gelten, aber G3 scheitert —\nsinguläre Matrizen (rang(A) &lt; n) besitzen kein Inverses."}
   ];
   function taskBodyHtml(task){
     return "<p>" + task.d + "</p>" +
