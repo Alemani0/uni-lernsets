@@ -1,0 +1,1099 @@
+<meta charset="utf-8">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Lazy-Lists-Lernset</title>
+<style>
+:root{
+  --bg:#f2f5f6;
+  --surface:#ffffff;
+  --surface-2:#e7edef;
+  --fg:#16222a;
+  --fg-muted:#55676f;
+  --border:#d7e1e4;
+  --accent:#136e8b;
+  --accent-ink:#ffffff;
+  --accent-tint:#dfeef3;
+  --accent-2:#b5620b;
+  --accent-2-ink:#ffffff;
+  --accent-2-tint:#f8e8d4;
+  --incorrect:#b23b3b;
+  --incorrect-tint:#fbe6e6;
+  --shadow:0 1px 2px rgba(15,30,25,.06), 0 6px 18px rgba(15,30,25,.07);
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'IBM Plex Sans',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1518;
+    --surface:#141e22;
+    --surface-2:#1b282d;
+    --fg:#e8eef0;
+    --fg-muted:#9bb0b7;
+    --border:#28373d;
+    --accent:#49b8d9;
+    --accent-ink:#06242d;
+    --accent-tint:#123540;
+    --accent-2:#e2984c;
+    --accent-2-ink:#2a1703;
+    --accent-2-tint:#3a2a16;
+    --incorrect:#e2766e;
+    --incorrect-tint:#3a1f1d;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1518;
+  --surface:#141e22;
+  --surface-2:#1b282d;
+  --fg:#e8eef0;
+  --fg-muted:#9bb0b7;
+  --border:#28373d;
+  --accent:#49b8d9;
+  --accent-ink:#06242d;
+  --accent-tint:#123540;
+  --accent-2:#e2984c;
+  --accent-2-ink:#2a1703;
+  --accent-2-tint:#3a2a16;
+  --incorrect:#e2766e;
+  --incorrect-tint:#3a1f1d;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;text-wrap:balance;margin:0}
+code,pre,.mono{font-family:var(--font-mono)}
+a{color:var(--accent)}
+
+.wrap{max-width:860px;margin:0 auto}
+
+/* ---------- Header ---------- */
+.page-head{
+  display:flex;align-items:center;gap:20px;
+  padding-block:28px 18px;
+  flex-wrap:wrap;
+}
+.deco{position:relative;width:72px;height:64px;flex:0 0 auto;font-family:var(--font-mono);font-weight:700;font-size:11px}
+.deco i{position:absolute;display:flex;align-items:center;justify-content:center;font-style:normal;box-sizing:border-box}
+.deco i:nth-child(1){left:2px;top:26px;width:16px;height:16px;border-radius:50%;background:var(--accent);color:var(--accent-ink)}
+.deco i:nth-child(2){left:28px;top:26px;width:16px;height:16px;border-radius:50%;background:var(--accent);color:var(--accent-ink)}
+.deco i:nth-child(3){left:54px;top:22px;width:18px;height:18px;border-radius:50%;border:2px dashed var(--accent-2);background:var(--accent-2-tint);color:var(--accent-2);font-size:12px}
+.deco i:nth-child(4){left:18px;top:33px;width:11px;height:2px;background:var(--fg-muted)}
+.deco i:nth-child(5){left:44px;top:31px;width:11px;height:2px;background:var(--fg-muted);transform:rotate(-10deg)}
+.head-text{flex:1 1 260px;min-width:0}
+.eyebrow{
+  margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--fg-muted);font-weight:600;
+}
+h1{font-size:clamp(28px,6vw,38px);letter-spacing:-.01em}
+.subtitle{margin:6px 0 0;color:var(--fg-muted);max-width:58ch}
+
+/* ---------- Tabs ---------- */
+.tabs{
+  display:flex;gap:6px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  padding-bottom:0;margin-bottom:22px;
+  position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;
+  padding-top:4px;
+}
+.tab-btn{
+  font-family:var(--font-body);font-weight:600;font-size:13.5px;
+  background:none;border:none;color:var(--fg-muted);cursor:pointer;
+  padding:10px 14px;border-bottom:2.5px solid transparent;border-radius:6px 6px 0 0;
+}
+.tab-btn:hover{color:var(--fg);background:var(--surface-2)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{padding-bottom:48px}
+.panel > section{margin-bottom:34px}
+.panel h2{font-size:21px;margin-bottom:4px}
+.panel h2 .n{color:var(--accent);font-family:var(--font-mono);font-size:15px;margin-right:8px}
+.lead{color:var(--fg-muted);margin:2px 0 14px;max-width:62ch}
+
+/* ---------- Reusable components ---------- */
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);
+}
+pre.code{
+  background:var(--surface-2);border:1px solid var(--border);border-radius:9px;
+  padding:11px 13px;overflow-x:auto;font-size:12.5px;line-height:1.55;margin:8px 0;
+}
+
+/* ---------- Flashcards ---------- */
+.cat-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{
+  font-family:var(--font-body);font-size:12.5px;font-weight:600;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg-muted);
+  padding:6px 12px;cursor:pointer;
+}
+.chip.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.card-toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg-muted);margin-bottom:14px}
+
+.flash-wrap{max-width:480px;margin:0 auto}
+.flash-wrap.wide{max-width:860px}
+.flashcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--border);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;display:flex;flex-direction:column;justify-content:center;
+  cursor:pointer;position:relative;
+}
+.flashcard[hidden]{display:none}
+.flash-cat{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--fg-muted);
+}
+.flash-side{font-size:16px;text-align:center}
+.flash-side[hidden]{display:none}
+.flash-q{font-weight:600}
+.flash-a{color:var(--accent)}
+.flash-side pre.code{text-align:left;white-space:pre;overflow-x:auto;display:block;font-size:12.5px;margin:12px 0 4px;max-width:100%}
+.flash-side pre.code.ac{margin-top:10px}
+.flash-hint{
+  position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:11px;color:var(--fg-muted);
+}
+.flash-explain-row{display:flex;justify-content:center;margin-top:12px}
+.flash-explain-row[hidden]{display:none}
+.flash-explain{
+  margin-top:10px;font-size:13px;color:var(--fg);border-left:3px solid var(--accent-2);
+  padding:10px 13px;background:var(--accent-2-tint);border-radius:0 8px 8px 0;text-align:left;
+}
+.flash-explain[hidden]{display:none}
+.flash-controls{display:flex;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+.flash-controls[hidden]{display:none}
+.btn{
+  font-family:var(--font-body);font-weight:600;font-size:13px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--border);background:var(--surface);color:var(--fg);padding:9px 14px;
+}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.warn{background:var(--incorrect-tint);border-color:var(--incorrect);color:var(--incorrect)}
+.flash-meta{text-align:center;color:var(--fg-muted);font-size:12.5px;margin-top:12px}
+
+.addcard-form{
+  margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--shadow);text-align:left;
+}
+.addcard-form[hidden]{display:none}
+.addcard-form h3{font-size:15px;margin-bottom:2px}
+.addcard-form label{display:block;font-size:12.5px;font-weight:600;color:var(--fg-muted);margin:12px 0 4px}
+.addcard-form select,.addcard-form input[type="text"],.addcard-form textarea{
+  width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:13.5px;resize:vertical;
+}
+.addcard-form .row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.addcard-form .hint{font-size:11.5px;color:var(--fg-muted);margin-top:2px}
+
+/* ---------- Verständnis-Check (periodic interrupt card) ---------- */
+.checkcard{
+  min-height:190px;border-radius:16px;border:1px solid var(--accent-2);background:var(--surface);
+  box-shadow:var(--shadow);padding:22px 22px;position:relative;text-align:center;
+}
+.checkcard[hidden]{display:none}
+.check-label{
+  position:absolute;top:12px;left:16px;font-size:10.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--accent-2);
+}
+.check-q{font-size:16px;font-weight:600;margin:18px 0 18px}
+.check-bool{display:flex;justify-content:center;gap:10px}
+.check-bool[hidden]{display:none}
+.check-text{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.check-text[hidden]{display:none}
+.check-text input{
+  flex:1 1 220px;padding:9px 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;
+}
+.check-feedback{margin-top:14px;font-size:13.5px;text-align:left;border-radius:0 8px 8px 0;padding:9px 13px;border-left:3px solid var(--border)}
+.check-feedback[hidden]{display:none}
+.check-feedback.correct{color:var(--accent);border-left-color:var(--accent);background:var(--accent-tint)}
+.check-feedback.wrong{color:var(--incorrect);border-left-color:var(--incorrect);background:var(--incorrect-tint)}
+.check-controls{display:flex;justify-content:center;margin-top:14px}
+.check-controls[hidden]{display:none}
+
+/* ---------- Quiz ---------- */
+.quiz-score{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:16px;
+}
+.quiz-score strong{color:var(--accent);font-family:var(--font-mono)}
+.q-item{margin-bottom:18px}
+.q-item p.q-text{font-weight:600;margin:0 0 9px;white-space:pre-line}
+.q-opts{display:grid;gap:7px}
+.opt{
+  text-align:left;border:1px solid var(--border);background:var(--surface);border-radius:9px;
+  padding:9px 12px;font-family:var(--font-body);font-size:13.5px;cursor:pointer;color:var(--fg);
+}
+.opt:hover{background:var(--surface-2)}
+.opt.correct{background:var(--accent-tint);border-color:var(--accent)}
+.opt.incorrect{background:var(--incorrect-tint);border-color:var(--incorrect)}
+.opt[disabled]{cursor:default}
+.q-explain{
+  margin-top:7px;font-size:12.5px;color:var(--fg-muted);border-left:3px solid var(--accent);
+  padding:5px 10px;background:var(--surface-2);border-radius:0 8px 8px 0;display:none;
+}
+.q-explain.shown{display:block}
+
+/* ---------- Tasks ---------- */
+details.task{
+  background:var(--surface);border:1px solid var(--border);border-radius:11px;
+  padding:13px 16px;margin-bottom:10px;box-shadow:var(--shadow);
+}
+details.task summary{cursor:pointer;font-weight:600;font-size:14px;list-style:none;display:flex;gap:10px;align-items:baseline}
+details.task summary::-webkit-details-marker{display:none}
+details.task summary .tnum{
+  font-family:var(--font-mono);color:var(--accent-ink);background:var(--accent);
+  border-radius:6px;padding:1px 7px;font-size:12px;flex:0 0 auto;
+}
+details.task .body{margin-top:10px;font-size:13.5px}
+details.task .tip{
+  margin-top:9px;font-size:12.5px;border-left:3px solid var(--accent-2);padding:6px 10px;
+  background:var(--accent-2-tint);border-radius:0 8px 8px 0;
+}
+details.task .sol summary{font-size:12.5px;font-weight:600;color:var(--fg-muted);margin-top:8px}
+.task-footnote{color:var(--fg-muted);font-size:12.5px;margin-top:14px}
+
+footer.credit{color:var(--fg-muted);font-size:12px;text-align:center;padding:10px 0 30px}
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <div class="deco" aria-hidden="true"><i></i><i></i><i>?</i><i></i><i></i></div>
+    <div class="head-text">
+      <p class="eyebrow">Programmiertechnik I · Vorlesung 14 von 30 · HTWG Konstanz</p>
+      <h1>Lazy Lists</h1>
+      <p class="subtitle">Dein Lernset zu eager und lazy Evaluation, zu Scalas LazyList und Memoization, zu unendlichen Datenstrukturen wie Fibonacci und Primzahlen, zu lazy und forcing Operationen bei Views und Iteratoren – und zur ISS als Live-Datenstrom aus dem Web.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Lernbereiche">
+    <button class="tab-btn active" data-tab="cards" role="tab" aria-selected="true" id="tabbtn-cards">Karteikarten</button>
+    <button class="tab-btn" data-tab="quiz" role="tab" aria-selected="false" id="tabbtn-quiz">Verständnisfragen</button>
+    <button class="tab-btn" data-tab="tasks" role="tab" aria-selected="false" id="tabbtn-tasks">Übungsaufgaben</button>
+  </nav>
+
+  <main>
+    <!-- ============ FLASHCARDS ============ -->
+    <div class="panel" id="panel-cards" role="tabpanel" aria-labelledby="tabbtn-cards">
+      <section>
+        <h2><span class="n">◆</span>Karteikarten</h2>
+        <p class="lead">Karte anklicken, um die Antwort zu sehen — ehrlich einschätzen, das bringt mehr als nur lesen. Nach dem Umdrehen gibt „🔎 Mehr erklären" bei Bedarf noch mehr Hintergrund. Alle 6–8 Karten kommt ein kurzer Verständnis-Check zwischendurch (Ja/Nein oder kurze Texteingabe). Über „➕ Eigene Karte" kannst du jederzeit eigene Karten ergänzen.</p>
+
+        <div class="cat-filters" id="catFilters"></div>
+        <label class="card-toggle"><input type="checkbox" id="onlyUnsure"> Nur Karten üben, die ich noch nicht sicher weiß</label>
+
+        <div class="flash-wrap" id="flashWrap">
+          <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Karte umdrehen">
+            <span class="flash-cat" id="flashCat"></span>
+            <div class="flash-side" id="flashFront"></div>
+            <div class="flash-side flash-a" id="flashBack" hidden></div>
+            <span class="flash-hint" id="flashHint">Antippen zum Umdrehen</span>
+          </div>
+
+          <div class="checkcard" id="checkCard" hidden>
+            <span class="check-label">Verständnis-Check</span>
+            <p class="check-q" id="checkQ"></p>
+            <div class="check-bool" id="checkBool">
+              <button class="btn" id="checkYes" type="button">Ja</button>
+              <button class="btn" id="checkNo" type="button">Nein</button>
+            </div>
+            <div class="check-text" id="checkTextWrap">
+              <input type="text" id="checkInput" placeholder="Deine Antwort …" autocomplete="off">
+              <button class="btn primary" id="checkSubmit" type="button">Prüfen</button>
+            </div>
+            <div class="check-feedback" id="checkFeedback" hidden></div>
+            <div class="check-controls" id="checkControls" hidden>
+              <button class="btn primary" id="btnCheckDone" type="button">Weiter mit Karteikarten ▶</button>
+            </div>
+          </div>
+
+          <div class="flash-explain-row" id="flashExplainRow" hidden>
+            <button class="btn" id="btnExplain" type="button">🔎 Mehr erklären</button>
+          </div>
+          <div class="flash-explain" id="flashExplain" hidden></div>
+
+          <div class="flash-controls" id="flashControlsMain">
+            <button class="btn" id="btnPrev" type="button">◀ Zurück</button>
+            <button class="btn warn" id="btnUnknown" type="button">↻ Nochmal üben</button>
+            <button class="btn primary" id="btnKnown" type="button">✓ Weiß ich</button>
+            <button class="btn" id="btnNext" type="button">Weiter ▶</button>
+          </div>
+          <div class="flash-controls" id="flashControlsShuffle">
+            <button class="btn" id="btnShuffle" type="button">⤨ Mischen</button>
+            <button class="btn" id="btnAddCard" type="button">➕ Eigene Karte</button>
+          </div>
+          <div class="flash-controls" id="flashControlsManage">
+            <button class="btn" id="btnEditCard" type="button">✏️ Karte bearbeiten</button>
+            <button class="btn" id="btnDeleteCard" type="button" style="border-color:var(--incorrect);color:var(--incorrect)">🗑 Karte entfernen</button>
+            <button class="btn" id="btnRestoreRemoved" type="button" hidden>↺ Entfernte Karten wiederherstellen (<span id="removedCount">0</span>)</button>
+            <button class="btn" id="btnResetProgress" type="button" hidden>🔁 Fortschritt zurücksetzen (<span id="knownCount">0</span>)</button>
+          </div>
+          <p class="flash-meta" id="flashMeta"></p>
+
+          <form class="addcard-form" id="addCardForm" hidden>
+            <h3 id="addCardFormTitle">Eigene Karteikarte hinzufügen</h3>
+            <p class="lead" id="addCardFormLead" style="margin-bottom:0">Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.</p>
+
+            <label for="addCardCat">Kategorie</label>
+            <select id="addCardCat"></select>
+            <input type="text" id="addCardCatNew" placeholder="Neue Kategorie…" hidden>
+
+            <label for="addCardQ">Frage (Vorderseite)</label>
+            <textarea id="addCardQ" rows="2" placeholder="Was soll abgefragt werden?"></textarea>
+
+            <label for="addCardA">Antwort (Rückseite)</label>
+            <textarea id="addCardA" rows="3" placeholder="Die vollständige, gute Antwort"></textarea>
+
+            <p class="hint">Frage und Antwort sind Pflicht.</p>
+
+            <div class="row">
+              <button class="btn primary" id="btnSaveCard" type="submit">Karte speichern</button>
+              <button class="btn" id="btnCancelCard" type="button">Abbrechen</button>
+              <button class="btn" id="btnResetCard" type="button" hidden style="border-color:var(--incorrect);color:var(--incorrect)">↺ Original wiederherstellen</button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============ QUIZ ============ -->
+    <div class="panel" id="panel-quiz" role="tabpanel" aria-labelledby="tabbtn-quiz" hidden>
+      <section>
+        <h2><span class="n">?</span>Verständnisfragen</h2>
+        <p class="lead" id="quizIntro">15 Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.</p>
+        <div class="quiz-score">
+          <span>Ergebnis: <strong id="quizScore">0</strong> / 15 richtig</span>
+          <button class="btn" id="btnQuizReset" type="button">Zurücksetzen</button>
+        </div>
+        <div id="quizList"></div>
+      </section>
+    </div>
+
+    <!-- ============ TASKS ============ -->
+    <div class="panel" id="panel-tasks" role="tabpanel" aria-labelledby="tabbtn-tasks" hidden>
+      <section>
+        <h2><span class="n">▸</span>Übungsaufgaben</h2>
+        <p class="lead">Die erste Aufgabe ist die Original-Vorlesungsaufgabe, danach ergänzende Übungen im selben Schwierigkeitsgrad — zum echten Programmieren, nicht zum schnellen Abrufen. Erst selbst in Scala probieren, dann Tipp bzw. Lösungsidee zum Gegenchecken aufklappen.</p>
+        <div id="taskList"></div>
+        <p class="task-footnote">Rate-Limit der ISS-API: etwa eine Anfrage pro Sekunde — immer Thread.sleep(1000) behalten und niemals toList oder sum direkt auf der unendlichen Liste aufrufen; erst begrenzen (take, sliding), dann erst forcen.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="credit">Lernset zu Prof. Dr. Boger / Prof. Dr. Laube, Programmiertechnik I — Vorlesung 14: Lazy Lists</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Tabs ----------
+  var tabBtns = Array.prototype.slice.call(document.querySelectorAll(".tab-btn"));
+  var panels = {
+    cards: document.getElementById("panel-cards"),
+    quiz: document.getElementById("panel-quiz"),
+    tasks: document.getElementById("panel-tasks")
+  };
+  tabBtns.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabBtns.forEach(function(b){ b.classList.remove("active"); b.setAttribute("aria-selected","false"); });
+      btn.classList.add("active"); btn.setAttribute("aria-selected","true");
+      Object.keys(panels).forEach(function(k){ panels[k].hidden = (k !== btn.dataset.tab); });
+    });
+  });
+
+  // ---------- Storage helpers ----------
+  function loadJSON(key, fallback){
+    try{ var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+    catch(e){ return fallback; }
+  }
+  function saveJSON(key, val){
+    try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+  }
+
+  // ======================================================
+  // FLASHCARDS — Frage vorne, vollständige gute Antwort hinten.
+  // ======================================================
+  var CARDS = [
+    // ===== Eager vs. Lazy =====
+    {cat:"Eager vs. Lazy", q:"Was bedeutet eager evaluation?", a:"Ein Ausdruck wird berechnet, sobald er erreicht wird – unabhängig davon, ob sein Wert je gebraucht wird."},
+    {cat:"Eager vs. Lazy", q:"Wann genau wird bei val x = e der Ausdruck e berechnet?", a:"Sofort, bei der Definition von x."},
+    {cat:"Eager vs. Lazy", q:"In welcher Reihenfolge und wie oft werden Funktionsargumente bei call-by-value ausgewertet?", a:"Vor dem Aufruf, von links nach rechts, jedes genau einmal."},
+    {cat:"Eager vs. Lazy", q:"Was zeigt das Beispiel first(1, 10 / zero), bei dem def first(a, b) nur a zurückgibt?", a:"Es wirft trotzdem eine ArithmeticException, obwohl b (also 10/zero) im Rumpf von first gar nicht benutzt wird – call-by-value berechnet b unabhängig davon vorab.", qc:"def first(a: Int, b: Int): Int = a\nval zero = 0\nfirst(1, 10 / zero)   // ArithmeticException"},
+    {cat:"Eager vs. Lazy", q:"Welche zwei Vorteile und welche zwei Nachteile hat eager evaluation laut Vorlesung?", a:"Vorteile: vorhersagbare Reihenfolge und Kosten, leicht zu debuggen. Nachteile: verschwendete Arbeit an Werten, die niemand braucht, und keine unendlichen Datenstrukturen – ein eager List aller natürlichen Zahlen würde nie fertig."},
+    {cat:"Eager vs. Lazy", q:"Was ist ein lazy val, und wann wird er berechnet?", a:"Ein Wert, der erst beim ersten Zugriff berechnet und danach zwischengespeichert (gecacht) wird – jeder weitere Zugriff liefert den gecachten Wert, ohne erneut zu rechnen."},
+    {cat:"Eager vs. Lazy", q:"Vergleiche, wie oft val, lazy val und def bzw. => A jeweils ausgewertet werden.", a:"val: einmal, bei der Definition. lazy val: einmal, beim ersten Zugriff, dann gecacht. def bzw. => A: bei jedem Zugriff neu, also jedes Mal."},
+    {cat:"Eager vs. Lazy", q:"Nenne vier Gründe für Laziness aus der Vorlesung.", a:"Performance (nie berechnen, was niemand braucht), unendliche Strukturen (alle natürlichen Zahlen oder Primzahlen beschreiben, aber nur nehmen was man braucht), Separation of Concerns (der Erzeuger beschreibt die Werte, der Verbraucher entscheidet wie viele er braucht) und teure Initialisierung (eine Ressource nur bei Bedarf laden)."},
+    {cat:"Eager vs. Lazy", q:"Was bedeutet call-by-name für einen Parameter vom Typ => A?", a:"Der Ausdruck wird nicht vor dem Aufruf berechnet, sondern bei jeder Nutzung im Funktionsrumpf einzeln ausgewertet."},
+    {cat:"Eager vs. Lazy", q:"Wie oft wird ein by-name-Argument ausgewertet, wenn es im Funktionsrumpf gar nicht benutzt wird – und wie oft, wenn es zweimal benutzt wird?", a:"Gar nicht benutzt: nie. Zweimal benutzt: zweimal – bei jeder Nutzung erneut, nicht einmal vorberechnet und wiederverwendet."},
+    {cat:"Eager vs. Lazy", q:"Was ist die Pitfall, wenn ein by-name-Argument teuer zu berechnen ist und mehrfach benutzt wird – und wie behebt man sie?", a:"Es wird bei jeder Nutzung neu und damit mehrfach teuer berechnet. Fix: den Wert einmal in einem lazy val zwischenspeichern, bevor man ihn mehrfach nutzt.", qc:"def byName(use: Boolean, x: => Int): Int =\n  lazy val v = x        // jetzt nur einmal berechnet\n  if use then v + v else 0"},
+    {cat:"Eager vs. Lazy", q:"Nenne drei typische Anwendungen von call-by-name-Parametern.", a:"Unnötige Arbeit vermeiden (z. B. getOrElse, das den Default-Wert nur bei Bedarf berechnet), eigene Kontrollstrukturen wie unless oder repeat, und unendliche Daten – der Tail einer LazyList wird mit #:: by-name übergeben."},
+    {cat:"Eager vs. Lazy", q:"Warum ist der Tail-Parameter von #:: zwingend by-name?", a:"Damit die rekursive Konstruktion einer LazyList nicht sofort unendlich weiterläuft – der nächste Schritt wird erst berechnet, wenn jemand tatsächlich darauf zugreift."},
+
+    // ===== LazyList in Scala =====
+    {cat:"LazyList in Scala", q:"Wie ist eine lazy list grundsätzlich definiert?", a:"Eine Liste, deren Tail erst auf Abruf ausgewertet wird – er wird by-name übergeben und nur berechnet, wenn jemand tatsächlich darauf zugreift. Einmal berechnet, wird ein Element gecacht."},
+    {cat:"LazyList in Scala", q:"Was bedeutet es, dass bei einer LazyList Elemente nur so weit wie nötig berechnet werden?", a:"Die Liste kann potentiell unendlich sein: sie beschreibt alle Elemente, berechnet aber tatsächlich nur die wenigen, auf die zugegriffen wird."},
+    {cat:"LazyList in Scala", q:"Wie sieht die rekursive Definition von from(n), das alle natürlichen Zahlen ab n liefert, aus?", a:"Der aktuelle Wert n wird mit dem rekursiven Aufruf für n+1 per Cons-Operator verknüpft – der Tail wird dabei by-name übergeben, also noch nicht berechnet.", ac:"def from(n: Int): LazyList[Int] =\n  println(s\"computing $n\")\n  n #:: from(n + 1)        // tail: by name, noch nicht berechnet"},
+    {cat:"LazyList in Scala", q:"Bei nats = from(1): wie oft wird „computing 2“ ausgegeben, wenn man nats(2) zweimal aufruft?", a:"Nur einmal – beim ersten Zugriff wird berechnet und gecacht, der zweite Zugriff auf nats(2) liefert den gecachten Wert ohne erneute Ausgabe."},
+    {cat:"LazyList in Scala", q:"Was ist eine LazyList in Scala, kurz gesagt?", a:"Eine immutable, verlinkte Liste wie List – aber ihre Elemente werden erst berechnet, wenn sie gebraucht werden. head und tail sind lazy, und einmal berechnete Elemente werden memoisiert."},
+    {cat:"LazyList in Scala", q:"Welche Collection-Operationen funktionieren auf einer LazyList genauso wie auf anderen Seq-Typen?", a:"map, filter, take, zip und weitere – eine LazyList ist eine ganz normale Seq, nur mit lazy ausgewerteten Elementen."},
+    {cat:"LazyList in Scala", q:"Was gibt println(ll) direkt nach val ll = 1 #:: 2 #:: 3 #:: LazyList.empty aus – und warum?", a:"LazyList(<not computed>) – selbst das erste Element ist noch nicht berechnet, denn auch head ist lazy."},
+    {cat:"LazyList in Scala", q:"Was ist der Unterschied zwischen Scalas altem Stream und der heutigen LazyList?", a:"Stream hatte nur einen lazy Tail, der head war eager. Stream ist seit Scala 2.13 deprecated – man nutzt stattdessen LazyList, bei der head und tail beide lazy sind.", expl:"Genau diese Inkonsistenz bei Stream führte in der Praxis oft zu Verwirrung darüber, was eigentlich schon berechnet ist. Weil bei LazyList konsequent beides lazy ist, ist das Verhalten vorhersagbarer."},
+    {cat:"LazyList in Scala", q:"Nenne vier Wege, eine LazyList zu erzeugen.", a:"Mit dem Cons-Operator #:: wie bei List, mit LazyList.from(n) (alle Zahlen ab n), mit LazyList.iterate(start)(f) (Rekurrenz) und mit LazyList.continually(x) (immer derselbe Ausdruck, unendlich oft)."},
+    {cat:"LazyList in Scala", q:"Wie konstruiert man countdown(n) rekursiv mit LazyList.cons und LazyList.empty?", a:"Der Basisfall n<0 liefert LazyList.empty, sonst wird n mit dem rekursiven Aufruf für n-1 per cons verknüpft.", ac:"def countdown(n: Int): LazyList[Int] =\n  if n < 0 then LazyList.empty\n  else LazyList.cons(n, countdown(n - 1))\ncountdown(3).toList   // List(3, 2, 1, 0)"},
+    {cat:"LazyList in Scala", q:"Warum läuft countdown nicht sofort unendlich tief in die Rekursion, obwohl sie sich selbst aufruft?", a:"Weil LazyList.cons seinen zweiten Parameter, den Tail, by-name nimmt – der rekursive Aufruf countdown(n-1) wird nicht sofort ausgeführt, sondern erst wenn der Tail tatsächlich gebraucht wird."},
+    {cat:"LazyList in Scala", q:"Was ist ein thunk?", a:"Eine noch nicht ausgewertete Berechnung – in Diagrammen oft mit einem Fragezeichen dargestellt. Einmal ausgewertete Zellen bleiben dagegen im Speicher."},
+    {cat:"LazyList in Scala", q:"Nach squares.take(3).toList bei squares = LazyList.from(1).map(n => n*n): welche Zellen sind ausgewertet und welche noch ein thunk?", a:"Die ersten drei Zellen (1, 4, 9) sind ausgewertet, die vierte Zelle ist weiterhin ein unausgewerteter thunk – erst ein späteres take(4) würde sie berechnen."},
+    {cat:"LazyList in Scala", q:"Was ist Memoization?", a:"Das Ergebnis einer Berechnung merken und wiederverwenden, statt es neu zu berechnen – der gespeicherte Wert ist der Cache. Memoization tauscht Speicher gegen Zeit."},
+    {cat:"LazyList in Scala", q:"Wie unterscheidet sich die Memoization einer LazyList von der eines einzelnen lazy val?", a:"Bei einem lazy val wird genau ein Wert beim ersten Zugriff gecacht. Bei einer LazyList passiert dasselbe für jedes einzelne Element: jede Zelle wird beim ersten Zugriff wie ein eigener lazy val gecacht."},
+    {cat:"LazyList in Scala", q:"Warum braucht eine LazyList unbedingt Memoization?", a:"Ohne sie würde jeder Durchlauf durch die Liste alle vorherigen Elemente erneut berechnen – bei langen oder unendlichen Listen wäre das inakzeptabel teuer."},
+    {cat:"LazyList in Scala", q:"sqDef wird mit def, sqVal mit val definiert, beide als identische LazyList-Map-Pipeline. Was passiert bei sqDef(2); sqDef(2) im Vergleich zu sqVal(2); sqVal(2)?", a:"sqDef erzeugt bei jedem Zugriff eine neue LazyList, also wird beide Male komplett neu gerechnet. sqVal referenziert dieselbe LazyList, also wird beim zweiten Aufruf gar nichts mehr neu berechnet – alles ist schon gecacht."},
+    {cat:"LazyList in Scala", q:"Fibonacci mit fib(30): was zeigt der Vergleich zwischen naiver Rekursion und einer gecachten LazyList-Version bezüglich der Anzahl Berechnungsschritte?", a:"Die naive Rekursion braucht über 2,6 Millionen Aufrufe für fib(30); die gecachte LazyList-Version braucht nur 31 Schritte – jedes Element wird dort genau einmal berechnet, statt exponentiell oft.", expl:"Die naive Rekursion berechnet denselben Teilbaum immer wieder neu – fib(28) etwa wird innerhalb der Berechnung von fib(30) mehrfach komplett neu ausgerechnet. Die LazyList-Version berechnet jedes fibs(k) dagegen nur genau einmal und liest es danach aus dem Cache."},
+    {cat:"LazyList in Scala", q:"Was kostet Memoization in einer LazyList, als Kehrseite ihres Vorteils?", a:"Gecachte Elemente bleiben im Speicher, solange jemand die Liste referenziert – das ist der Ausgangspunkt für Pitfall 2, Holding the Head."},
+
+    // ===== Folgen & Reihen =====
+    {cat:"Folgen & Reihen", q:"Was ist eine Folge (Sequence) im mathematischen Sinn dieser Vorlesung?", a:"Eine Zuordnung eines Wertes zu jeder natürlichen Zahl – eine Folge ist per Definition unendlich."},
+    {cat:"Folgen & Reihen", q:"Warum schreibt niemand eine Folge vollständig auf, und was macht man statt dessen?", a:"Man schreibt die Bildungsregel auf und betrachtet nur so viele Elemente, wie man gerade braucht – genau das leistet eine LazyList."},
+    {cat:"Folgen & Reihen", q:"Wie erzeugt man die Folge der geraden Zahlen 2, 4, 6, … als LazyList?", a:"Man nimmt alle natürlichen Zahlen ab 1 und multipliziert jede mit 2.", qc:"val a = LazyList.from(1).map(n => 2 * n)\na.take(6).toList   // List(2, 4, 6, 8, 10, 12)"},
+    {cat:"Folgen & Reihen", q:"Was macht LazyList.iterate(start)(f), und welcher mathematischen Rekurrenz entspricht das?", a:"Es erzeugt die Folge start, f(start), f(f(start)), … – also genau eine Folge, die rekursiv über einen Startwert und eine Vorschrift definiert ist.", ac:"val c = LazyList.iterate(100.0)(x => x / 2 + 1)\nc.take(6).toList   // List(100.0, 51.0, 26.5, 14.25, 8.125, 5.0625)"},
+    {cat:"Folgen & Reihen", q:"Wogegen konvergiert die Folge c = LazyList.iterate(100.0)(x => x/2 + 1), und wie kann man das mit einer LazyList beobachten, ohne „alle“ Elemente zu berechnen?", a:"Sie konvergiert gegen 2 – man kann die Konvergenz einfach beobachten, indem man mit take() immer mehr Elemente ansieht, ohne je eine vollständige, unendliche Liste berechnen zu müssen."},
+    {cat:"Folgen & Reihen", q:"Was ist eine Reihe (Series), und wie hängt sie mit einer Folge zusammen?", a:"Eine Reihe ist die Folge der Partialsummen einer Folge – also die Folge, deren n-tes Element die Summe der ersten n Folgenglieder ist."},
+    {cat:"Folgen & Reihen", q:"Welche Methode wandelt eine Folge lazily in ihre Partialsummen um?", a:"scanLeft – sie liefert schrittweise die laufende Summe, als eigene LazyList.", ac:"val geo = LazyList.from(0).map(k => math.pow(0.5, k)).scanLeft(0.0)(_ + _)\ngeo.take(6).toList   // List(0.0, 1.0, 1.5, 1.75, 1.875, 1.9375)"},
+    {cat:"Folgen & Reihen", q:"Konvergiert die geometrische Reihe aus 0.5^k, und konvergiert die harmonische Reihe aus 1/n?", a:"Die geometrische Reihe konvergiert gegen 2. Die harmonische Reihe divergiert – allerdings nur sehr langsam, man merkt es erst nach sehr vielen Gliedern."},
+    {cat:"Folgen & Reihen", q:"Wie lässt sich die Eulersche Zahl e mit LazyList und scanLeft approximieren?", a:"Man baut die Fakultäten als LazyList, bildet daraus die Kehrwerte 1/n! und summiert sie mit scanLeft auf – schon nach wenigen Gliedern ist die Approximation sehr nah an e.", ac:"val facts = LazyList.iterate((0, BigInt(1))) { case (n, f) => (n + 1, f * (n + 1)) }.map(_._2)\nval e = facts.map(f => 1.0 / f.toDouble).scanLeft(0.0)(_ + _)"},
+    {cat:"Folgen & Reihen", q:"Wie approximiert man π mit einer alternierenden Reihe als LazyList, und wie schnell konvergiert sie im Vergleich zur e-Approximation?", a:"Mit der Leibniz-Reihe, abwechselnd +4/(2k+1) und -4/(2k+1), aufsummiert mit scanLeft. Sie konvergiert viel langsamer als die e-Reihe – noch bei 1000 Gliedern ist pi(1000) erst auf etwa zwei Nachkommastellen genau."},
+
+    // ===== Unendliche Datenstrukturen =====
+    {cat:"Unendliche Datenstrukturen", q:"Wie definiert man die Fibonacci-Folge als selbstreferenzielle LazyList mit zip?", a:"Man startet mit 0 und 1, und der Rest ergibt sich, indem man die Liste mit ihrem eigenen Tail zippt und die Paare addiert – jedes weitere Element ist die Summe seiner zwei Vorgänger.", ac:"val fibs: LazyList[BigInt] =\n  BigInt(0) #:: BigInt(1) #:: fibs.zip(fibs.tail).map((a, b) => a + b)\nfibs.take(12).toList   // List(0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89)"},
+    {cat:"Unendliche Datenstrukturen", q:"fibs ist in ihrer eigenen Definition enthalten (self-referential). Warum funktioniert das überhaupt, und wie schnell ist fibs(100) dadurch?", a:"Weil fibs eine LazyList ist, sind frühere Elemente beim Zugriff auf ein späteres schon gecacht – dank Memoization läuft fibs(100) in linearer Zeit, ganz anders als die naive rekursive fib-Funktion."},
+    {cat:"Unendliche Datenstrukturen", q:"Was ist die Grundidee des Sieb des Eratosthenes zum Erzeugen von Primzahlen?", a:"Man nimmt die erste Zahl der Liste – sie ist prim –, entfernt dann aus dem Rest alle ihre Vielfachen, und wiederholt das Verfahren auf der verbleibenden Liste.", ac:"def sieve(s: LazyList[Int]): LazyList[Int] =\n  s.head #:: sieve(s.tail.filter(_ % s.head != 0))\nval primes = sieve(LazyList.from(2))\nprimes.take(10).toList   // List(2, 3, 5, 7, 11, 13, 17, 19, 23, 29)"},
+    {cat:"Unendliche Datenstrukturen", q:"sieve hat keinen klassischen Basisfall – wieso läuft der Aufruf trotzdem nicht sofort in eine Endlosschleife?", a:"Weil #:: den Tail by-name übergibt: der rekursive Aufruf sieve(...) wird erst ausgeführt, wenn jemand tatsächlich auf den nächsten Tail der Liste zugreift, also die nächste Primzahl verlangt."},
+    {cat:"Unendliche Datenstrukturen", q:"Ist das Sieb des Eratosthenes aus der Vorlesung der schnellste Algorithmus für Primzahlen?", a:"Nein – didaktisch sehr schön, weil es Lazy Lists elegant zeigt, aber nicht der performanteste Primzahlalgorithmus."},
+
+    // ===== Lazy vs. Forcing =====
+    {cat:"Lazy vs. Forcing", q:"Was ist der grundsätzliche Unterschied zwischen einer lazy und einer forcing Operation auf einer LazyList?", a:"Eine lazy Operation liefert eine neue LazyList, ohne irgendetwas davon zu berechnen. Eine forcing Operation wertet Elemente tatsächlich aus – manche nur ein paar, manche alle."},
+    {cat:"Lazy vs. Forcing", q:"Welche Operationen sind lazy, und was passiert bei println(m.take(3)) für m = LazyList.from(1).map(_*10)?", a:"map, filter, take, drop, takeWhile, dropWhile und zip sind lazy. Selbst m.take(3) gibt noch LazyList(<not computed>) aus – erst .toList würde tatsächlich rechnen.", qc:"val m = LazyList.from(1).map(_ * 10)\nprintln(m.take(3))         // LazyList(<not computed>)\nprintln(m.take(3).toList)  // List(10, 20, 30)"},
+    {cat:"Lazy vs. Forcing", q:"Welche Elemente wertet head bzw. tail aus – und welche apply(n), find oder exists?", a:"head und tail werten nur die erste Zelle aus. apply(n), find und exists werten nur so viele Elemente aus, bis die Antwort feststeht – nicht notwendigerweise alles."},
+    {cat:"Lazy vs. Forcing", q:"Welche Operationen werten immer die komplette Liste aus?", a:"toList, length, sum, max sowie foldLeft, foreach und mkString – sie alle brauchen „alles“, was bei einer unendlichen Liste nie fertig wird."},
+    {cat:"Lazy vs. Forcing", q:"Was ist die Faustregel beim Arbeiten mit LazyLists, bezogen auf lazy und forcing Operationen?", a:"Erst begrenzen, zum Beispiel mit take oder takeWhile, dann erst forcen, etwa mit toList oder sum."},
+    {cat:"Lazy vs. Forcing", q:"Was passiert bei LazyList.from(1).length oder .toList – und warum?", a:"length läuft nie fertig, toList wirft irgendwann einen OutOfMemoryError – beide sind forcing Operationen, die „alles“ brauchen, aber die Liste ist unendlich."},
+    {cat:"Lazy vs. Forcing", q:"Warum kann sogar LazyList.from(1).filter(_ < 0).head für immer suchen?", a:"filter macht die Liste effektiv leer, denn keine natürliche Zahl ist negativ – aber head sucht trotzdem unbeirrt weiter nach einem ersten passenden Element, das es nie gibt."},
+    {cat:"Lazy vs. Forcing", q:"Wie behebt man das Problem, dass forcing Operationen auf einer unendlichen Liste nie fertig werden?", a:"Immer zuerst begrenzen – zum Beispiel mit take(100), bevor man mit sum oder einer anderen forcing Operation tatsächlich rechnet.", qc:"LazyList.from(1).take(100).sum   // 5050"},
+    {cat:"Lazy vs. Forcing", q:"Was ist Pitfall 2, „Holding the Head“?", a:"Solange ein val eine LazyList referenziert, bleiben alle bereits berechneten Zellen im Speicher – Memoization hält also fest, was einmal berechnet wurde, solange noch jemand den Kopf der Liste referenziert."},
+    {cat:"Lazy vs. Forcing", q:"Was ist der Unterschied zwischen nats.drop(100_000_000).head bei nats = LazyList.from(1) als val, und LazyList.from(1).drop(100_000_000).head direkt ohne val?", a:"Mit dem val nats bleiben alle 100 Millionen durchlaufenen Zellen im Speicher, weil nats weiterhin den Kopf referenziert. Ohne gespeicherte Referenz können die Zellen dagegen vom Garbage Collector wieder freigegeben werden."},
+    {cat:"Lazy vs. Forcing", q:"Wie vermeidet man Pitfall 2 bei großen oder unendlichen LazyLists?", a:"Statt eines val lieber ein def oder einen lokalen Ausdruck verwenden – und wenn man nur einen einzigen Durchlauf braucht, einen Iterator oder eine view nutzen."},
+    {cat:"Lazy vs. Forcing", q:"Was macht .view, und was ist der entscheidende Unterschied zu einer LazyList?", a:".view macht aus einer beliebigen Collection eine lazy Pipeline – aber ohne Memoization: wird dieselbe view zweimal forced, wird komplett neu gerechnet, nichts wird gecacht.", qc:"val v = (1 to 1_000_000).view.map(_ * 2).filter(_ % 3 == 0)\nv.take(3).toList     // List(6, 12, 18)"},
+    {cat:"Lazy vs. Forcing", q:"Warum ist eine view bei (1 to 1_000_000).view.map(...).filter(...).take(3) effizient, obwohl die Ausgangs-Range eine Million Elemente hat?", a:"Es entstehen keine Million-Elemente-Zwischencollections – jedes Element fließt einzeln durch die ganze Pipeline, und für die ersten drei Ergebnisse müssen insgesamt nur neun Elemente überhaupt angefasst werden."},
+    {cat:"Lazy vs. Forcing", q:"Wofür sollte man views bevorzugt einsetzen?", a:"Für Ketten von Transformationen auf großen eager Collections, wenn man die Zwischenergebnisse nicht vollständig materialisieren möchte."},
+    {cat:"Lazy vs. Forcing", q:"Was ist ein Iterator, und wie oft lässt er sich durchlaufen?", a:"Ein Iterator liefert Elemente einzeln, eines nach dem anderen – und lässt sich nur genau einmal durchlaufen; danach ist er verbraucht."},
+    {cat:"Lazy vs. Forcing", q:"it2 = Iterator(1,2,3): was gibt println(it2.sum) beim ersten und beim zweiten Aufruf aus?", a:"Beim ersten Aufruf 6 – danach ist der Iterator verbraucht, der zweite Aufruf von sum gibt 0 aus, weil nichts mehr übrig ist."},
+    {cat:"Lazy vs. Forcing", q:"Vergleiche List, LazyList, view und Iterator jeweils in den drei Eigenschaften lazy, memoized und reusable.", a:"List: nicht lazy, aber reusable (Memoization nicht nötig, weil ohnehin schon alles berechnet ist). LazyList: lazy, memoized und reusable. view: lazy, nicht memoized, aber reusable. Iterator: lazy, nicht memoized, nicht reusable – nur einmal durchlaufbar.", expl:"List ist von vornherein vollständig im Speicher – es muss nichts nachträglich gecacht werden, weil beim Erzeugen schon alles berechnet wurde. Deshalb zählt List trotzdem als reusable, obwohl memoized hier gar nicht zutrifft."},
+
+    // ===== Live-Daten aus dem Web =====
+    {cat:"Live-Daten aus dem Web", q:"Aus welchen drei Teilen besteht eine URL wie https://api.wheretheiss.at/v1/satellites/25544?", a:"scheme (https), host (api.wheretheiss.at) und path (/v1/satellites/25544)."},
+    {cat:"Live-Daten aus dem Web", q:"Wie funktioniert HTTP grundsätzlich?", a:"Der Client schickt eine Anfrage an den Server, zum Beispiel ein GET auf einen bestimmten Pfad, und der Server antwortet mit einem Statuscode und einem Body."},
+    {cat:"Live-Daten aus dem Web", q:"Was bedeuten die Statuscodes 200, 404, 429 und 500?", a:"200 OK (erfolgreich), 404 Not Found (Ressource existiert nicht), 429 Too Many Requests (Rate-Limit überschritten) und 500 Server Error (Fehler auf Serverseite)."},
+    {cat:"Live-Daten aus dem Web", q:"Was ist der Unterschied zwischen HTTP und HTTPS?", a:"HTTPS ist HTTP über eine verschlüsselte TLS-Verbindung – niemand dazwischen kann die Daten mitlesen oder verändern."},
+    {cat:"Live-Daten aus dem Web", q:"In welchem Format antworten Web-APIs typischerweise, im Unterschied zu normalen Webseiten?", a:"Meist JSON statt HTML – also Daten für Programme, nicht zum Lesen für Menschen."},
+    {cat:"Live-Daten aus dem Web", q:"Wie liest man in Scala den Inhalt einer URL, und wie viele Anfragen löst ein Aufruf aus?", a:"Mit scala.io.Source.fromURL(url).mkString, genau wie beim Lesen einer Datei – ein Aufruf löst genau eine GET-Anfrage aus und liefert den Body als String.", qc:"import scala.io.Source\nval json = Source.fromURL(url).mkString"},
+    {cat:"Live-Daten aus dem Web", q:"Warum nutzt man Using(Source.fromURL(url))(_.mkString) statt den direkten Aufruf, und was liefert es zurück?", a:"Weil das Netzwerk fehlschlagen kann – Using schließt die Verbindung sauber und liefert das Ergebnis als Try, also Success(json) oder Failure(exception), statt im Fehlerfall direkt eine Exception zu werfen.", expl:"Using ist ein allgemeines Scala-Muster für Ressourcen, die geschlossen werden müssen (Dateien, Verbindungen, …) – es schließt die Ressource garantiert, auch wenn innerhalb eine Exception auftritt, nicht nur bei Netzwerk-Code."},
+    {cat:"Live-Daten aus dem Web", q:"Warum liefert jeder Aufruf von fetch() eine andere IssReading, obwohl der Code jedes Mal derselbe ist?", a:"fetch() hat einen Seiteneffekt – jeder Aufruf löst eine neue HTTP-Anfrage an einen Server aus, der die aktuelle Position der ISS zurückgibt, und die ändert sich ständig."},
+    {cat:"Live-Daten aus dem Web", q:"Wie wird die ISS als unendliche LazyList modelliert, und was passiert direkt bei ihrer Definition?", a:"Mit LazyList.continually { Thread.sleep(1000); counted() } – bei der reinen Definition wird noch gar nichts abgerufen, der Zähler requests bleibt bei 0.", ac:"val iss: LazyList[IssReading] = LazyList.continually { Thread.sleep(1000); counted() }\nrequests          // 0 – defining the list fetches nothing"},
+    {cat:"Live-Daten aus dem Web", q:"Was passiert bei iss(2).altitude, und was danach bei iss(1).velocity?", a:"iss(2) fordert die Elemente 0, 1 und 2 an, also drei echte HTTP-Anfragen. iss(1) greift danach nur noch auf eine bereits gecachte Zelle zu – keine neue Anfrage."},
+    {cat:"Live-Daten aus dem Web", q:"Welche zwei Prinzipien zeigt die ISS-LazyList gleichzeitig?", a:"Lazy Evaluation – ein endloser Sensor-Feed wird zu einer Liste, von der man nur abruft was man braucht – und Memoization: jede Messung wird nur einmal tatsächlich abgerufen, wiederholter Zugriff nutzt die gecachte Messung."},
+    {cat:"Live-Daten aus dem Web", q:"Was macht sliding(n) auf einer Sequenz, und wofür wird es im ISS-Beispiel genutzt?", a:"Es gruppiert die Sequenz in überlappende Fenster aus jeweils n aufeinanderfolgenden Elementen – im Beispiel bilden 60 Messwerte, also eine Minute, jeweils ein Fenster, aus dem die Durchschnittsgeschwindigkeit berechnet wird."},
+    {cat:"Live-Daten aus dem Web", q:"Warum sollte readings in der sliding-window-Aufgabe eine def und kein val sein?", a:"Ein val würde jede abgerufene Messung dauerhaft gecacht im Speicher halten – Pitfall 2, Holding the Head. Als def wird bei jedem Zugriff eine frische LazyList erzeugt, die nicht unnötig wächst."}
+  ].map(function(c, i){ c.id = i; return c; });
+
+  var BASE_CATS = ["Eager vs. Lazy","LazyList in Scala","Folgen & Reihen","Unendliche Datenstrukturen","Lazy vs. Forcing","Live-Daten aus dem Web"];
+  var STORE_KEY = "prog1-lazylists";
+  var knownIds = new Set(loadJSON(STORE_KEY + "-known", []));
+  var removedIds = new Set(loadJSON(STORE_KEY + "-removed", []));
+  var customCards = loadJSON(STORE_KEY + "-custom", []);
+  var overrides = loadJSON(STORE_KEY + "-overrides", {});
+  var ALL = [];
+  function refreshAll(){
+    customCards.forEach(function(c, i){ c.id = CARDS.length + i; });
+    ALL = CARDS.concat(customCards).map(function(c){
+      var o = overrides[c.id];
+      if(!o) return c;
+      return {id:c.id, cat:o.cat, q:o.q, a:o.a, expl:(o.expl !== undefined ? o.expl : c.expl), qc:c.qc, ac:c.ac};
+    });
+  }
+  refreshAll();
+
+  function activeTotal(){ return ALL.length - removedIds.size; }
+  var activeCat = "Alle";
+  var onlyUnsure = false;
+  var order = [];
+  var pos = 0;
+  var flipped = false;
+
+  var catFiltersEl = document.getElementById("catFilters");
+  function currentCats(){
+    var extra = [];
+    ALL.forEach(function(c){ if(BASE_CATS.indexOf(c.cat) === -1 && extra.indexOf(c.cat) === -1) extra.push(c.cat); });
+    return ["Alle"].concat(BASE_CATS, extra);
+  }
+  function renderCatFilters(){
+    catFiltersEl.innerHTML = "";
+    currentCats().forEach(function(cat){
+      var b = document.createElement("button");
+      b.className = "chip" + (cat === activeCat ? " active" : "");
+      b.type = "button"; b.textContent = cat; b.dataset.cat = cat;
+      b.addEventListener("click", function(){
+        activeCat = cat;
+        Array.prototype.forEach.call(catFiltersEl.children, function(c){ c.classList.toggle("active", c.dataset.cat === cat); });
+        rebuildOrder();
+      });
+      catFiltersEl.appendChild(b);
+    });
+  }
+  renderCatFilters();
+  document.getElementById("onlyUnsure").addEventListener("change", function(e){
+    onlyUnsure = e.target.checked; rebuildOrder();
+  });
+
+  function shuffle(arr){
+    for(var i = arr.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function rebuildOrder(){
+    var pool = ALL.filter(function(c){
+      if(removedIds.has(c.id)) return false;
+      if(activeCat !== "Alle" && c.cat !== activeCat) return false;
+      if(onlyUnsure && knownIds.has(c.id)) return false;
+      return true;
+    });
+    order = pool.map(function(c){ return c.id; });
+    pos = 0; flipped = false;
+    renderCard();
+  }
+
+  var flashcardEl = document.getElementById("flashcard");
+  var flashWrapEl = document.getElementById("flashWrap");
+  var flashCat = document.getElementById("flashCat");
+  var flashFront = document.getElementById("flashFront");
+  var flashBack = document.getElementById("flashBack");
+  var flashHint = document.getElementById("flashHint");
+  var flashMeta = document.getElementById("flashMeta");
+  var flashExplainRow = document.getElementById("flashExplainRow");
+  var flashExplain = document.getElementById("flashExplain");
+  var btnExplain = document.getElementById("btnExplain");
+
+  function cardAt(id){
+    for(var i = 0; i < ALL.length; i++){ if(ALL[i].id === id) return ALL[i]; }
+    return null;
+  }
+
+  function resetExplain(){
+    flashExplain.hidden = true;
+    btnExplain.textContent = "🔎 Mehr erklären";
+  }
+
+  function renderCard(){
+    resetExplain();
+    if(order.length === 0){
+      flashCat.textContent = "";
+      flashFront.textContent = onlyUnsure ? "Alles in dieser Kategorie sitzt schon. 🎉" : "Keine Karten in dieser Auswahl.";
+      flashBack.hidden = true; flashFront.hidden = false;
+      flashWrapEl.classList.remove("wide");
+      flashExplainRow.hidden = true;
+      flashHint.textContent = "";
+      flashMeta.textContent = "Gewusst: " + knownIds.size + " / " + activeTotal();
+      return;
+    }
+    var card = cardAt(order[pos]);
+    flashCat.textContent = card.cat;
+    flashFront.textContent = card.q;
+    flashBack.textContent = card.a;
+    if(card.qc){ var pq = document.createElement("pre"); pq.className = "code cq"; pq.textContent = card.qc; flashFront.appendChild(pq); }
+    if(card.ac){ var pa = document.createElement("pre"); pa.className = "code ac"; pa.textContent = card.ac; flashBack.appendChild(pa); }
+    flashWrapEl.classList.toggle("wide", !!(card.qc || card.ac));
+    flashFront.hidden = flipped;
+    flashBack.hidden = !flipped;
+    flashExplainRow.hidden = !(flipped && card.expl);
+    flashHint.textContent = flipped ? "Antippen für die Frage" : "Antippen zum Umdrehen";
+    flashMeta.textContent = "Karte " + (pos+1) + " / " + order.length + " · Gewusst gesamt: " + knownIds.size + " / " + activeTotal();
+  }
+
+  btnExplain.addEventListener("click", function(){
+    var card = order.length ? cardAt(order[pos]) : null;
+    if(!card) return;
+    flashExplain.textContent = card.expl || "";
+    flashExplain.hidden = !flashExplain.hidden;
+    btnExplain.textContent = flashExplain.hidden ? "🔎 Mehr erklären" : "🔽 Erklärung ausblenden";
+  });
+
+  flashcardEl.addEventListener("click", function(){
+    if(order.length === 0) return;
+    flipped = !flipped; renderCard();
+  });
+  flashcardEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); flashcardEl.click(); }
+  });
+
+  function advance(delta){
+    if(order.length === 0) return;
+    pos = (pos + delta + order.length) % order.length;
+    flipped = false; renderCard();
+  }
+  document.getElementById("btnPrev").addEventListener("click", function(){ advance(-1); });
+  document.getElementById("btnNext").addEventListener("click", function(){ advance(1); });
+  document.getElementById("btnShuffle").addEventListener("click", function(){ shuffle(order); pos = 0; flipped = false; renderCard(); });
+  document.getElementById("btnKnown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.add(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateResetBtn();
+    if(onlyUnsure){ rebuildOrder(); } else { advance(1); }
+    maybeShowCheck();
+  });
+  document.getElementById("btnUnknown").addEventListener("click", function(){
+    if(order.length === 0) return;
+    knownIds.delete(cardAt(order[pos]).id);
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateResetBtn();
+    advance(1);
+    maybeShowCheck();
+  });
+
+  function updateRestoreBtn(){
+    var btn = document.getElementById("btnRestoreRemoved");
+    var countEl = document.getElementById("removedCount");
+    if(countEl) countEl.textContent = removedIds.size;
+    btn.hidden = removedIds.size === 0;
+  }
+  document.getElementById("btnDeleteCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    if(!confirm("Diese Karte wirklich dauerhaft aus dem Lernset entfernen?\n\n„" + card.q + "“")) return;
+    removedIds.add(card.id);
+    knownIds.delete(card.id);
+    saveJSON(STORE_KEY + "-removed", Array.from(removedIds));
+    saveJSON(STORE_KEY + "-known", Array.from(knownIds));
+    updateResetBtn();
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  document.getElementById("btnRestoreRemoved").addEventListener("click", function(){
+    if(removedIds.size === 0) return;
+    if(!confirm("Alle " + removedIds.size + " entfernten Karten wiederherstellen?")) return;
+    removedIds.clear();
+    saveJSON(STORE_KEY + "-removed", []);
+    updateRestoreBtn();
+    rebuildOrder();
+  });
+  updateRestoreBtn();
+
+  function updateResetBtn(){
+    var btn = document.getElementById("btnResetProgress");
+    var countEl = document.getElementById("knownCount");
+    if(countEl) countEl.textContent = knownIds.size;
+    if(btn) btn.hidden = knownIds.size === 0;
+  }
+  document.getElementById("btnResetProgress").addEventListener("click", function(){
+    if(knownIds.size === 0) return;
+    if(!confirm("Fortschritt für dieses Lernset wirklich zurücksetzen? Alle " + knownIds.size + " als „gewusst“ markierten Karten gelten danach wieder als neu.")) return;
+    knownIds.clear();
+    saveJSON(STORE_KEY + "-known", []);
+    updateResetBtn();
+    rebuildOrder();
+  });
+  updateResetBtn();
+
+  // ---------- Add / edit own card ----------
+  var addCardForm = document.getElementById("addCardForm");
+  var addCardCat = document.getElementById("addCardCat");
+  var addCardCatNew = document.getElementById("addCardCatNew");
+  var addCardFormTitle = document.getElementById("addCardFormTitle");
+  var addCardFormLead = document.getElementById("addCardFormLead");
+  var btnSaveCard = document.getElementById("btnSaveCard");
+  var btnResetCard = document.getElementById("btnResetCard");
+  var NEW_CAT_VALUE = "__new__";
+  var editingId = null;
+
+  function populateAddCardCats(){
+    addCardCat.innerHTML = "";
+    BASE_CATS.concat(currentCats().filter(function(c){ return c !== "Alle" && BASE_CATS.indexOf(c) === -1; })).forEach(function(cat){
+      var o = document.createElement("option"); o.value = cat; o.textContent = cat;
+      addCardCat.appendChild(o);
+    });
+    var o2 = document.createElement("option"); o2.value = NEW_CAT_VALUE; o2.textContent = "Neue Kategorie…";
+    addCardCat.appendChild(o2);
+  }
+  addCardCat.addEventListener("change", function(){
+    addCardCatNew.hidden = addCardCat.value !== NEW_CAT_VALUE;
+  });
+
+  function closeAddCardForm(){
+    addCardForm.reset(); addCardCatNew.hidden = true; addCardForm.hidden = true;
+    editingId = null;
+  }
+
+  document.getElementById("btnAddCard").addEventListener("click", function(){
+    if(!addCardForm.hidden && editingId === null){ closeAddCardForm(); return; }
+    editingId = null;
+    populateAddCardCats();
+    document.getElementById("addCardQ").value = "";
+    document.getElementById("addCardA").value = "";
+    addCardFormTitle.textContent = "Eigene Karteikarte hinzufügen";
+    addCardFormLead.textContent = "Landet dauerhaft in diesem Lernset (im Browser gespeichert) und wird in die Übung mit aufgenommen.";
+    btnSaveCard.textContent = "Karte speichern";
+    btnResetCard.hidden = true;
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnEditCard").addEventListener("click", function(){
+    if(order.length === 0) return;
+    var card = cardAt(order[pos]);
+    editingId = card.id;
+    populateAddCardCats();
+    addCardCat.value = card.cat;
+    addCardCatNew.hidden = true;
+    document.getElementById("addCardQ").value = card.q;
+    document.getElementById("addCardA").value = card.a;
+    addCardFormTitle.textContent = "Karte bearbeiten";
+    addCardFormLead.textContent = "Änderungen werden dauerhaft in diesem Lernset gespeichert (im Browser).";
+    btnSaveCard.textContent = "Änderungen speichern";
+    btnResetCard.hidden = !overrides[card.id];
+    addCardForm.hidden = false;
+  });
+
+  document.getElementById("btnCancelCard").addEventListener("click", closeAddCardForm);
+
+  btnResetCard.addEventListener("click", function(){
+    if(editingId === null) return;
+    if(!confirm("Diese Karte wirklich auf die ursprüngliche Version zurücksetzen?")) return;
+    delete overrides[editingId];
+    saveJSON(STORE_KEY + "-overrides", overrides);
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  addCardForm.addEventListener("submit", function(e){
+    e.preventDefault();
+    var q = document.getElementById("addCardQ").value.trim();
+    var a = document.getElementById("addCardA").value.trim();
+    var cat = addCardCat.value === NEW_CAT_VALUE ? addCardCatNew.value.trim() : addCardCat.value;
+    if(!q || !a || !cat){ alert("Bitte Kategorie, Frage und Antwort ausfüllen."); return; }
+    if(editingId !== null){
+      overrides[editingId] = {cat:cat, q:q, a:a};
+      saveJSON(STORE_KEY + "-overrides", overrides);
+    } else {
+      customCards.push({cat:cat, q:q, a:a, expl:""});
+      saveJSON(STORE_KEY + "-custom", customCards);
+    }
+    refreshAll();
+    renderCatFilters();
+    closeAddCardForm();
+    rebuildOrder();
+  });
+
+  rebuildOrder();
+
+  // ======================================================
+  // VERSTÄNDNIS-CHECK — alle 6-8 Karten ein kurzer, geprüfter
+  // Ja/Nein- oder Kurztext-Check zu einem Thema, das gerade geübt wurde.
+  // ======================================================
+  var ABFRAGE = [
+    {type:"bool", q:"Ja oder Nein: Ein lazy val wird bei jedem Zugriff neu berechnet.", correct:false,
+     explain:"Falsch — er wird nur beim ersten Zugriff berechnet und danach gecacht; jeder weitere Zugriff liefert den gecachten Wert."},
+    {type:"text", q:"Wie oft wird ein by-name-Parameter ausgewertet, der im Funktionsrumpf nie benutzt wird? (eine Zahl)", answer:"0", accept:["null","nie","gar nicht"],
+     explain:"Nie — ein by-name-Argument wird nur ausgewertet, wenn es im Rumpf tatsächlich benutzt wird."},
+    {type:"bool", q:"Ja oder Nein: LazyList.from(1).toList terminiert irgendwann.", correct:false,
+     explain:"Falsch — toList ist eine forcing Operation, die alle Elemente braucht; bei einer unendlichen Liste läuft das nie fertig, bzw. endet in einem OutOfMemoryError."},
+    {type:"text", q:"Welche Methode wandelt eine Folge lazily in ihre Partialsummen um? (ein Wort)", answer:"scanLeft",
+     explain:"scanLeft liefert schrittweise die laufende Summe als eigene LazyList, zum Beispiel für die geometrische oder die e-Reihe."},
+    {type:"bool", q:"Ja oder Nein: Scalas altes Stream ist seit Version 2.13 deprecated.", correct:true,
+     explain:"Richtig — seitdem nutzt man LazyList, bei der zusätzlich auch der head lazy ist."},
+    {type:"text", q:"Wie heißt der Cons-Operator, mit dem man Elemente vorne an eine LazyList anhängt? (Symbol)", answer:"#::",
+     explain:"n #:: from(n + 1) hängt n vorne an, der Tail wird dabei by-name übergeben."},
+    {type:"bool", q:"Ja oder Nein: Einmal berechnete Elemente einer LazyList werden gespeichert (memoisiert).", correct:true,
+     explain:"Richtig — das ist genau der Memoization-Teil von LazyList, der sie von einer reinen view unterscheidet."},
+    {type:"text", q:"Welcher Collection-Typ liefert Elemente einzeln und lässt sich nur genau einmal durchlaufen? (ein Wort)", answer:"Iterator",
+     explain:"Ein Iterator ist lazy und nicht memoisiert — nach einem vollständigen Durchlauf ist er verbraucht."},
+    {type:"bool", q:"Ja oder Nein: .view memoisiert die einmal berechneten Werte, genau wie LazyList.", correct:false,
+     explain:"Falsch — eine view memoisiert nichts; wird sie zweimal forced, wird komplett neu gerechnet."},
+    {type:"text", q:"Wie viele HTTP-Anfragen löst allein das Definieren einer ISS-LazyList mit LazyList.continually aus, bevor irgendjemand zugreift? (eine Zahl)", answer:"0",
+     explain:"Null — die Definition selbst fetcht nichts, erst ein tatsächlicher Zugriff löst Anfragen aus."},
+    {type:"bool", q:"Ja oder Nein: head auf einer so gefilterten unendlichen Liste, dass eigentlich nichts mehr übrig bleibt, kann für immer weitersuchen.", correct:true,
+     explain:"Richtig — filter kann eine Liste effektiv leer machen, aber head sucht trotzdem unbeirrt weiter, ohne je ein Ergebnis zu finden."},
+    {type:"text", q:"Welche Methode gruppiert eine Sequenz in überlappende Fenster aus n aufeinanderfolgenden Elementen? (ein Wort)", answer:"sliding",
+     explain:"sliding(n) wurde im ISS-Beispiel genutzt, um aus 60 Messwerten jeweils ein Fenster für die Durchschnittsgeschwindigkeit zu bilden."},
+    {type:"bool", q:"Ja oder Nein: Ein val, der eine große LazyList referenziert, verhindert, dass bereits berechnete Zellen wieder freigegeben werden können.", correct:true,
+     explain:"Richtig — das ist Pitfall 2, Holding the Head: solange der Kopf referenziert wird, bleiben alle gecachten Zellen im Speicher."},
+    {type:"bool", q:"Ja oder Nein: LazyList.continually erzeugt immer eine endliche Liste.", correct:false,
+     explain:"Falsch — continually erzeugt eine unendliche Liste, die denselben Ausdruck immer wieder, und bei jedem Zugriff neu, auswertet."}
+  ];
+
+  var checkCardEl = document.getElementById("checkCard");
+  var checkQEl = document.getElementById("checkQ");
+  var checkBoolEl = document.getElementById("checkBool");
+  var checkTextWrapEl = document.getElementById("checkTextWrap");
+  var checkInputEl = document.getElementById("checkInput");
+  var checkFeedbackEl = document.getElementById("checkFeedback");
+  var checkControlsEl = document.getElementById("checkControls");
+  var checkYesEl = document.getElementById("checkYes");
+  var checkNoEl = document.getElementById("checkNo");
+  var checkSubmitEl = document.getElementById("checkSubmit");
+  var flashControlsMain = document.getElementById("flashControlsMain");
+  var flashControlsShuffle = document.getElementById("flashControlsShuffle");
+  var flashControlsManage = document.getElementById("flashControlsManage");
+  var abfrageBag = [];
+  var currentCheckItem = null;
+
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  var cardsUntilCheck = randInt(6, 8);
+
+  function drawAbfrage(){
+    if(ABFRAGE.length === 0) return null;
+    if(abfrageBag.length === 0){ abfrageBag = shuffle(ABFRAGE.map(function(_, i){ return i; })); }
+    return ABFRAGE[abfrageBag.pop()];
+  }
+  function normalize(s){ return (s || "").toString().trim().toLowerCase().replace(/\s+/g, " "); }
+
+  function maybeShowCheck(){
+    cardsUntilCheck--;
+    if(cardsUntilCheck > 0) return;
+    cardsUntilCheck = randInt(6, 8);
+    var item = drawAbfrage();
+    if(!item) return;
+    currentCheckItem = item;
+    checkQEl.textContent = item.q;
+    checkBoolEl.hidden = item.type !== "bool";
+    checkTextWrapEl.hidden = item.type !== "text";
+    checkInputEl.value = "";
+    checkYesEl.disabled = checkNoEl.disabled = false;
+    checkSubmitEl.disabled = false;
+    checkFeedbackEl.hidden = true;
+    checkFeedbackEl.className = "check-feedback";
+    checkControlsEl.hidden = true;
+
+    flashcardEl.hidden = true;
+    flashControlsMain.hidden = true;
+    flashControlsShuffle.hidden = true;
+    flashControlsManage.hidden = true;
+    flashExplainRow.hidden = true;
+    flashExplain.hidden = true;
+    checkCardEl.hidden = false;
+  }
+
+  function finishCheck(isCorrect){
+    checkFeedbackEl.textContent = (isCorrect ? "✓ Richtig. " : "✗ Nicht ganz. ") + (currentCheckItem.explain || "");
+    checkFeedbackEl.className = "check-feedback " + (isCorrect ? "correct" : "wrong");
+    checkFeedbackEl.hidden = false;
+    checkYesEl.disabled = checkNoEl.disabled = true;
+    checkSubmitEl.disabled = true;
+    checkControlsEl.hidden = false;
+  }
+  checkYesEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === true); });
+  checkNoEl.addEventListener("click", function(){ finishCheck(currentCheckItem.correct === false); });
+  checkSubmitEl.addEventListener("click", function(){
+    var val = normalize(checkInputEl.value);
+    var candidates = [currentCheckItem.answer].concat(currentCheckItem.accept || []).map(normalize);
+    finishCheck(candidates.indexOf(val) !== -1);
+  });
+  checkInputEl.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); checkSubmitEl.click(); }
+  });
+  document.getElementById("btnCheckDone").addEventListener("click", function(){
+    checkCardEl.hidden = true;
+    flashcardEl.hidden = false;
+    flashControlsMain.hidden = false;
+    flashControlsShuffle.hidden = false;
+    flashControlsManage.hidden = false;
+    renderCard();
+  });
+
+  // ======================================================
+  // QUIZ
+  // ======================================================
+  var QUIZ = [
+    {q:"Was bedeutet eager evaluation?",
+     opts:["Ein Ausdruck wird berechnet, sobald er erreicht wird, egal ob er gebraucht wird","Ein Ausdruck wird nur berechnet, wenn sein Ergebnis tatsächlich gebraucht wird","Ein Ausdruck wird nie berechnet, sondern nur symbolisch gespeichert","Ein Ausdruck wird genau einmal berechnet und danach für immer gecacht"],
+     correct:0, explain:"Eager heißt: sofort berechnen, sobald der Ausdruck erreicht wird — unabhängig davon, ob der Wert gebraucht wird."},
+    {q:"Welche Aussage über lazy val ist richtig?",
+     opts:["Es wird bei jedem Zugriff neu berechnet","Es wird beim ersten Zugriff berechnet und danach gecacht","Es wird sofort bei der Definition berechnet, wie ein normales val","Es kann nie einen Wert zurückgeben"],
+     correct:1, explain:"lazy val wird erst beim ersten Zugriff berechnet — danach liefert jeder weitere Zugriff den gecachten Wert."},
+    {q:"def first(a: Int, b: Int): Int = a — was passiert bei first(1, 10 / zero) mit val zero = 0?",
+     opts:["Es gibt einfach 1 zurück, ohne Fehler","Es wirft eine ArithmeticException, obwohl b nie benutzt wird","Es wirft einen Compile-Fehler","Es gibt 0 zurück"],
+     correct:1, explain:"Call-by-value berechnet alle Argumente vor dem Aufruf, auch ungenutzte — deshalb wird 10/zero trotzdem ausgewertet und wirft die Exception."},
+    {q:"Wofür steht ein Parameter vom Typ => A?",
+     opts:["Für einen by-value-Parameter, der sofort berechnet wird","Für einen by-name-Parameter, der bei jeder Nutzung neu berechnet wird","Für einen generischen Rückgabetyp ohne Bedeutung","Für ein implizites Parameterfeld"],
+     correct:1, explain:"=> A markiert einen by-name-Parameter — der Ausdruck wird bei jeder Nutzung im Rumpf ausgewertet, nicht vorab."},
+    {q:"Was passiert direkt nach der Definition von 1 #:: { println(\"tail\"); LazyList(2) }?",
+     opts:["„tail“ wird sofort ausgegeben","Nichts von alledem wird ausgeführt, der Tail bleibt unberechnet bis er gebraucht wird","Es wirft einen Laufzeitfehler","Beide Listenelemente werden sofort berechnet"],
+     correct:1, explain:"Der Tail wird von #:: by-name übergeben — println(\"tail\") läuft erst, wenn jemand tatsächlich auf den Tail zugreift."},
+    {q:"Was ist eine LazyList?",
+     opts:["Eine mutable Liste mit sofortiger Auswertung","Eine immutable Liste, deren Elemente erst auf Abruf berechnet und dann memoisiert werden","Eine Liste, die nur Zahlen enthalten darf","Ein Synonym für Array in Scala"],
+     correct:1, explain:"LazyList ist immutable wie List, aber head und tail sind lazy und werden nach Berechnung memoisiert."},
+    {q:"def countdown(n) = if n<0 then LazyList.empty else LazyList.cons(n, countdown(n-1)) — was liefert countdown(3).toList?",
+     opts:["List(0, 1, 2, 3)","List(3, 2, 1, 0)","Eine Endlosschleife","LazyList(<not computed>), für immer"],
+     correct:1, explain:"Jeder Schritt hängt n vorne an den rekursiven Aufruf für n-1 — das Ergebnis ist List(3, 2, 1, 0)."},
+    {q:"Warum läuft sieve(s) = s.head #:: sieve(s.tail.filter(_ % s.head != 0)) trotz fehlendem klassischen Basisfall nicht sofort unendlich?",
+     opts:["Weil filter die Rekursion automatisch abbricht","Weil #:: den Tail by-name übergibt — der rekursive Aufruf läuft erst, wenn der nächste Tail wirklich verlangt wird","Weil sieve intern einen Zähler mitführt, der nach 100 Aufrufen abbricht","Weil s.head den Wert vorab komplett cacht"],
+     correct:1, explain:"#:: übergibt den Tail by-name — die Rekursion schreitet nur so weit fort, wie tatsächlich Elemente angefragt werden."},
+    {q:"Welche der folgenden Operationen gehört zu den forcing Operationen auf einer LazyList?",
+     opts:["map","filter","take","toList"],
+     correct:3, explain:"toList braucht alle Elemente und forced damit die gesamte, bei einer unendlichen Liste nie endende Berechnung. map, filter und take bleiben lazy."},
+    {q:"Was ist Pitfall 2, „Holding the Head“?",
+     opts:["Man darf auf einer LazyList nie head aufrufen","Ein val, der eine LazyList referenziert, hält alle bereits berechneten Zellen im Speicher","head liefert auf einer LazyList immer einen falschen Wert","Jeder Zugriff auf head löst eine neue Netzwerk-Anfrage aus"],
+     correct:1, explain:"Solange ein val den Kopf referenziert, bleiben alle durchlaufenen, gecachten Zellen im Speicher — auch wenn man sie längst nicht mehr braucht."},
+    {q:"Was unterscheidet .view grundlegend von einer LazyList?",
+     opts:["view ist nicht lazy, LazyList schon","view memoisiert nicht; wird sie zweimal forced, wird neu gerechnet","view kann nur auf Arrays angewendet werden","Es gibt keinen Unterschied, beide sind identisch"],
+     correct:1, explain:"Eine view ist lazy, aber nicht memoisiert — anders als eine LazyList, die jedes Element nach der ersten Berechnung cached."},
+    {q:"it2 = Iterator(1,2,3); it2.sum wird zweimal aufgerufen. Was liefert der zweite Aufruf?",
+     opts:["6, wie beim ersten Mal","0, weil der Iterator nach dem ersten sum bereits verbraucht ist","Einen Laufzeitfehler","3, die Anzahl der Elemente"],
+     correct:1, explain:"Ein Iterator lässt sich nur einmal durchlaufen — nach dem ersten sum ist nichts mehr übrig, der zweite Aufruf liefert 0."},
+    {q:"fibs = BigInt(0) #:: BigInt(1) #:: fibs.zip(fibs.tail).map((a,b) => a+b) — was stellt der dritte Teil dar?",
+     opts:["Eine komplett neue, unabhängige Zahlenfolge","Den Rest der Fibonacci-Folge, aus den jeweils zwei Vorgängern berechnet","Nur eine Kopie von fibs selbst","Eine Fehlermeldung, da sich fibs nicht selbst referenzieren darf"],
+     correct:1, explain:"Jedes weitere Element ist die Summe der zwei vorangehenden — durch das Zippen von fibs mit ihrem eigenen Tail entsteht genau dieser Rest der Folge."},
+    {q:"Was liefert Using(Source.fromURL(url))(_.mkString) zurück, im Unterschied zum direkten Aufruf Source.fromURL(url).mkString?",
+     opts:["Exakt dasselbe, nur umständlicher geschrieben","Ein Try, das Erfolg oder einen Fehler, z. B. bei einem 404, sauber abbildet, und schließt die Verbindung automatisch","Einen rohen Byte-Stream ohne jede Fehlerbehandlung","Einen Future, der asynchron ausgewertet wird"],
+     correct:1, explain:"Using schließt die Ressource garantiert und liefert einen Try — Success(json) bei Erfolg, Failure(exception) etwa bei einem 404 oder einem unbekannten Host."},
+    {q:"Warum sollte readings in der ISS-sliding-window-Aufgabe eine def und kein val sein?",
+     opts:["Weil val in Scala für Funktionen nicht erlaubt ist","Weil ein val jede abgerufene Messung dauerhaft im Speicher halten würde (Holding the Head)","Weil def schneller compiliert","Es macht keinen Unterschied, beides ist gleich gut"],
+     correct:1, explain:"Ein val würde den Kopf der unendlichen Messreihe referenzieren und so jede jemals abgerufene Messung dauerhaft im Speicher behalten."}
+  ];
+
+  var quizListEl = document.getElementById("quizList");
+  var quizScoreEl = document.getElementById("quizScore");
+  document.getElementById("quizIntro").textContent = QUIZ.length + " Fragen zum Selbsttest — direktes Feedback mit kurzer Begründung.";
+  var score = 0;
+
+  function renderQuiz(){
+    quizListEl.innerHTML = "";
+    score = 0; quizScoreEl.textContent = "0";
+    QUIZ.forEach(function(item, qi){
+      var wrap = document.createElement("div");
+      wrap.className = "q-item card";
+      var qText = document.createElement("p");
+      qText.className = "q-text";
+      qText.textContent = (qi+1) + ". " + item.q;
+      wrap.appendChild(qText);
+
+      var optsWrap = document.createElement("div");
+      optsWrap.className = "q-opts";
+      var explainEl = document.createElement("div");
+      explainEl.className = "q-explain";
+      explainEl.textContent = item.explain;
+
+      item.opts.forEach(function(optText, oi){
+        var b = document.createElement("button");
+        b.className = "opt"; b.type = "button"; b.textContent = optText;
+        b.addEventListener("click", function(){
+          if(wrap.dataset.answered) return;
+          wrap.dataset.answered = "1";
+          Array.prototype.forEach.call(optsWrap.children, function(o, idx){
+            o.disabled = true;
+            if(idx === item.correct) o.classList.add("correct");
+            else if(idx === oi) o.classList.add("incorrect");
+          });
+          explainEl.classList.add("shown");
+          if(oi === item.correct){ score++; quizScoreEl.textContent = String(score); }
+        });
+        optsWrap.appendChild(b);
+      });
+
+      wrap.appendChild(optsWrap);
+      wrap.appendChild(explainEl);
+      quizListEl.appendChild(wrap);
+    });
+  }
+  document.getElementById("btnQuizReset").addEventListener("click", renderQuiz);
+  renderQuiz();
+
+  // ======================================================
+  // TASKS (Vorlesungsaufgabe + ergänzende Übungen im selben Schwierigkeitsgrad)
+  // ======================================================
+  var TASKS = [
+    {t:"Deine eigene ISS-Pipeline — die Original-Vorlesungsaufgabe",
+     d:"Baue dir aus den Folien deine eigene ISS-Pipeline: (1) Schreibe fetch() und eine unendliche LazyList[IssReading] mit LazyList.continually. (2) Teste zuerst mit kleinen Zahlen — take(5) und sliding(3), nicht sliding(60). (3) Berechne die durchschnittliche Geschwindigkeit und Höhe pro Fenster. (4) Erweiterung: schätze die geflogene Distanz zwischen zwei Messungen aus lat/lon ab und vergleiche sie mit der velocity.",
+     tip:"Rate-Limit beachten: etwa eine Anfrage pro Sekunde — immer Thread.sleep(1000) behalten und niemals toList oder sum direkt auf der unendlichen Liste aufrufen, erst limitieren (take/sliding), dann forcen. readings sollte eine def sein, kein val (Pitfall 2).",
+     sol:"// fetch(): IssReading wie auf Folie 34 (inkl. der kleinen field()-Hilfsfunktion)\n\ndef readings: LazyList[IssReading] =             // def, nicht val -- vermeidet Holding the Head\n  LazyList.continually { Thread.sleep(1000); fetch() }\n\nval velocities = readings.map(_.velocity)\nval windows = velocities.sliding(3).map(w =&gt; w.sum / w.size)\nwindows.take(3).foreach(println)   // kurzer Test, noch nicht sliding(60)\n\ndef haversineKm(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double =\n  val r = 6371.0\n  val dLat = math.toRadians(lat2 - lat1)\n  val dLon = math.toRadians(lon2 - lon1)\n  val a = math.pow(math.sin(dLat / 2), 2) +\n          math.cos(math.toRadians(lat1)) * math.cos(math.toRadians(lat2)) * math.pow(math.sin(dLon / 2), 2)\n  r * 2 * math.asin(math.sqrt(a))\n\nval r1 = fetch(); Thread.sleep(1000); val r2 = fetch()\nval distanceKm = haversineKm(r1.lat, r1.lon, r2.lat, r2.lon)\nval expectedKm = r1.velocity / 3600.0   // velocity ist km/h, eine Sekunde dazwischen\nprintln((distanceKm, expectedKm))"},
+    {t:"Lazy Evaluation live sehen: ein eigener nats mit Zähler",
+     d:"Schreibe eine rekursive Funktion from(n), die wie auf der Folie bei jedem tatsächlich berechneten Element eine Nachricht ausgibt (z. B. mit println). Lege val nats = from(1) an und rufe nacheinander nats(2), dann noch einmal nats(2), und schließlich nats.take(5).toList auf. Notiere dir vorher, welche Ausgaben du bei welchem Aufruf erwartest.",
+     tip:"Nur neu berechnete Elemente lösen eine Ausgabe aus — ein zweiter Zugriff auf eine bereits berechnete Zelle gibt nichts mehr aus.",
+     sol:"def from(n: Int): LazyList[Int] =\n  println(s\"computing $n\")\n  n #:: from(n + 1)\n\nval nats = from(1)\nnats(2)              // computing 1, computing 2, computing 3\nnats(2)              // keine Ausgabe mehr, schon gecacht\nnats.take(5).toList  // computing 4, computing 5 -- der Rest war schon da"},
+    {t:"Fibonacci mit zip selbst bauen und Aufrufe zählen",
+     d:"Implementiere fibs als selbstreferenzielle LazyList mit zip wie in der Vorlesung. Vergleiche danach die Anzahl der Rechenschritte mit einer naiven rekursiven fib-Funktion für n=30 — zähle bei beiden mit einem var-Zähler mit, wie oft tatsächlich eine Fibonacci-Zahl berechnet wird.",
+     tip:"Bei der naiven Version zählst du am einfachsten in der Funktion selbst hoch (calls += 1 bei jedem Aufruf). Bei der LazyList-Version zählst du innerhalb der map-Funktion, die die Summe bildet.",
+     sol:"var steps = 0\nlazy val fibs: LazyList[BigInt] =\n  LazyList.from(0).map { n =&gt;\n    steps += 1\n    if n &lt; 2 then n else fibs(n - 1) + fibs(n - 2)\n  }\nfibs(30)    // 832040, steps == 31\n\nvar calls = 0\ndef fibNaive(n: Int): BigInt =\n  calls += 1\n  if n &lt; 2 then n else fibNaive(n - 1) + fibNaive(n - 2)\nfibNaive(30)   // 832040, calls == 2692537"},
+    {t:"Sieb des Eratosthenes: eigene Primzahlen und die 20. Primzahl finden",
+     d:"Implementiere sieve wie in der Vorlesung und erzeuge primes = sieve(LazyList.from(2)). Gib die ersten 10 Primzahlen aus und finde zusätzlich mit einer forcing Operation die 20. Primzahl, ohne die Liste vorher in eine endliche Liste umzuwandeln.",
+     tip:"primes ist unendlich — für die 20. Primzahl reicht primes(19), 0-indiziert, das forced genau so viele Elemente, wie nötig sind, nicht mehr.",
+     sol:"def sieve(s: LazyList[Int]): LazyList[Int] =\n  s.head #:: sieve(s.tail.filter(_ % s.head != 0))\n\nval primes = sieve(LazyList.from(2))\nprimes.take(10).toList   // List(2, 3, 5, 7, 11, 13, 17, 19, 23, 29)\nprimes(19)                // 71, die 20. Primzahl"},
+    {t:"Wie viele Glieder braucht die π-Reihe für zwei Nachkommastellen?",
+     d:"Baue die Leibniz-Reihe für π als LazyList mit scanLeft wie in der Vorlesung. Finde mit find() die kleinste Anzahl an Gliedern, ab der zwei aufeinanderfolgende Partialsummen sich um weniger als 0.005 unterscheiden, also auf zwei Nachkommastellen stabil sind.",
+     tip:"Zippe die Reihe mit ihrem eigenen Tail wie beim e-Beispiel, und suche mit find nach dem ersten Paar, dessen Differenz klein genug ist — die Position in der Liste verrät dir die Anzahl der Glieder.",
+     sol:"val pi = LazyList.from(0).map(k =&gt; (if k % 2 == 0 then 4.0 else -4.0) / (2 * k + 1)).scanLeft(0.0)(_ + _)\nval stable = pi.zipWithIndex.zip(pi.tail).find((prevIdx, next) =&gt; (next - prevIdx._1).abs &lt; 0.005)\nstable.map((prevIdx, _) =&gt; prevIdx._2)   // Index, ab dem die Reihe auf 2 Nachkommastellen stabil ist"},
+    {t:"Einen Config-Loader nur einmal laden",
+     d:"Schreibe ein Objekt AppConfig mit einem lazy val config, das beim ersten Zugriff eine println-Nachricht ausgibt, simuliert das Laden einer Datei, und einen festen String zurückgibt. Rufe config danach dreimal auf und überprüfe, dass die Lade-Nachricht wirklich nur einmal erscheint.",
+     tip:"Ein normales val würde beim Erzeugen des Objekts sofort laden; ein def würde bei jedem der drei Aufrufe neu laden. Nur lazy val lädt genau einmal, beim ersten Zugriff.",
+     sol:"object AppConfig:\n  lazy val config: String =\n    println(\"loading config\")\n    \"ok\"\n\nAppConfig.config   // loading config\nAppConfig.config   // keine Ausgabe mehr\nAppConfig.config   // immer noch keine Ausgabe"},
+    {t:"Eine eigene unless-Kontrollstruktur mit call-by-name",
+     d:"Implementiere def unless(cond: Boolean)(body: =&gt; Unit): Unit, die body nur ausführt, wenn cond falsch ist. Zeige an einem Beispiel mit einer leeren Liste, dass body sicher list.head aufrufen darf, ohne dass es zu einem Fehler kommt, solange cond die Liste als leer erkennt.",
+     tip:"Der body-Parameter ist by-name — er wird nur evaluiert, wenn er im Rumpf von unless tatsächlich ausgeführt wird, also nur im else-Zweig.",
+     sol:"def unless(cond: Boolean)(body: =&gt; Unit): Unit =\n  if !cond then body\n\nval list = List.empty[Int]\nunless(list.isEmpty) { println(list.head) }   // sicher: body läuft nur, wenn list nicht leer ist"},
+    {t:"Pitfall 2 reparieren: Holding the Head vermeiden",
+     d:"Der folgende Code hält unnötig den Kopf einer riesigen LazyList im Speicher: val nats = LazyList.from(1); val x = nats.drop(50_000_000).head. Schreibe ihn so um, dass die 50 Millionen durchlaufenen Zellen nach der Berechnung wieder freigegeben werden können.",
+     tip:"Entferne die Referenz auf den Kopf, indem du die LazyList nicht in einem val zwischenspeicherst, sondern direkt in einem Ausdruck erzeugst und sofort konsumierst.",
+     sol:"val x = LazyList.from(1).drop(50_000_000).head   // keine gespeicherte Referenz auf den Kopf, die Zellen koennen danach freigegeben werden"},
+    {t:"Views: warum sind Zwischenschritte hier (fast) kostenlos?",
+     d:"Nimm (1 to 1_000_000).view.map(_ * 3).filter(_ % 5 == 0).take(4).toList und überlege, wie viele Elemente der ursprünglichen Range dafür tatsächlich angefasst werden müssen. Schreibe eine Version ohne .view direkt auf der Range und vergleiche beide gedanklich: welche erzeugt riesige Zwischen-Collections, welche nicht?",
+     tip:"Ohne .view erzeugt map sofort eine vollständige Ein-Millionen-Elemente-Collection, bevor filter überhaupt anfangen kann. Mit .view fließt jedes Element einzeln durch die ganze Pipeline, bis genug Ergebnisse für take(4) gefunden sind.",
+     sol:"val withView = (1 to 1_000_000).view.map(_ * 3).filter(_ % 5 == 0)\nwithView.take(4).toList   // List(15, 30, 45, 60) -- nur die ersten paar Range-Elemente wurden angefasst\n\nval withoutView = (1 to 1_000_000).map(_ * 3).filter(_ % 5 == 0)\nwithoutView.take(4).toList   // dieselbe Antwort, aber zwei komplette Ein-Millionen-Collections wurden zwischendurch aufgebaut"},
+    {t:"Den Iterator-Verbrauchs-Bug selbst erleben und reparieren",
+     d:"Schreibe val it = Iterator(3, 1, 4, 1, 5) und berechne zuerst it.max, danach it.sum. Beobachte, was beim zweiten Aufruf passiert, und erkläre warum. Schreibe die Berechnung anschließend so um, dass beide Werte korrekt berechnet werden.",
+     tip:"Ein Iterator ist nach dem ersten vollständigen Durchlauf verbraucht — für zwei unabhängige Durchläufe brauchst du entweder zwei frische Iteratoren oder wandelst einmal in eine List um, die wiederverwendbar ist.",
+     sol:"val it = Iterator(3, 1, 4, 1, 5)\nit.max   // 5\nit.sum   // 0 -- der Iterator ist bereits verbraucht!\n\n// Reparatur: einmal in eine wiederverwendbare List umwandeln\nval xs = Iterator(3, 1, 4, 1, 5).toList\nxs.max   // 5\nxs.sum   // 14"},
+    {t:"Memoization nachzählen: def vs. val bei derselben Pipeline",
+     d:"Definiere zweimal dieselbe Pipeline squares = LazyList.from(1).map { n =&gt; evals += 1; n * n } — einmal als def, einmal als val, jeweils mit eigenem Zähler. Rufe bei beiden zweimal squares(2) auf und vergleiche die Zählerstände danach.",
+     tip:"Bei def wird bei jedem Zugriff auf squares eine komplett neue LazyList erzeugt — nichts wird zwischen den beiden Aufrufen wiederverwendet. Bei val bleibt es dieselbe LazyList, also wird beim zweiten Zugriff gar nichts mehr neu berechnet.",
+     sol:"var evalsDef = 0\ndef squaresDef: LazyList[Int] = LazyList.from(1).map { n =&gt; evalsDef += 1; n * n }\nsquaresDef(2); squaresDef(2)\nevalsDef   // 6 -- jedes Mal 3 neue Elemente berechnet (Index 0,1,2)\n\nvar evalsVal = 0\nval squaresVal: LazyList[Int] = LazyList.from(1).map { n =&gt; evalsVal += 1; n * n }\nsquaresVal(2); squaresVal(2)\nevalsVal   // 3 -- beim zweiten Zugriff schon alles gecacht"},
+    {t:"LazyList und view im direkten Vergleich: wer cached, wer nicht?",
+     d:"Baue dieselbe Pipeline für Quadratzahlen einmal als LazyList (LazyList.from(1).map { n =&gt; evals += 1; n * n }) und einmal als view ((1 to 1000).view.map { n =&gt; evals += 1; n * n }), jeweils mit eigenem Zähler evals. Rufe bei beiden zweimal take(4).toList auf und vergleiche die Zählerstände.",
+     tip:"Bei der LazyList bleibt der Zählerstand nach dem zweiten Aufruf gleich, weil gecacht wird; bei der view verdoppelt er sich, weil jeder Forcing-Aufruf komplett neu rechnet.",
+     sol:"var evalsLL = 0\nval ll = LazyList.from(1).map { n =&gt; evalsLL += 1; n * n }\nll.take(4).toList; ll.take(4).toList\nevalsLL   // 4 -- zweiter Aufruf nutzt den Cache\n\nvar evalsView = 0\nval vw = (1 to 1000).view.map { n =&gt; evalsView += 1; n * n }\nvw.take(4).toList; vw.take(4).toList\nevalsView   // 8 -- jeder Aufruf rechnet komplett neu, nichts wird gecacht"},
+    {t:"Erweiterung: ein eigener, rekursiver firstN für LazyLists",
+     d:"Schreibe, ohne die eingebaute take-Methode zu benutzen, eine eigene rekursive Funktion firstN(xs: LazyList[Int], n: Int): List[Int], die die ersten n Elemente einer LazyList in eine normale List umwandelt. Teste sie an primes aus der Sieb-Aufgabe mit n=10.",
+     tip:"Der Basisfall ist n == 0 (leere List). Sonst: xs.head vorne an das Ergebnis von firstN(xs.tail, n - 1) anhängen — xs.tail wird dabei ganz normal lazy weiterverarbeitet, nicht anders als bei take selbst.",
+     sol:"def firstN(xs: LazyList[Int], n: Int): List[Int] =\n  if n == 0 then Nil\n  else xs.head :: firstN(xs.tail, n - 1)\n\nval primes = sieve(LazyList.from(2))\nfirstN(primes, 10)   // List(2, 3, 5, 7, 11, 13, 17, 19, 23, 29)"}
+  ];
+  function taskBodyHtml(task){
+    return "<p>" + task.d + "</p>" +
+      '<div class="tip">💡 Tipp: ' + task.tip + "</div>" +
+      '<details class="sol"><summary>✅ Lösungsidee zum Gegenchecken</summary><pre class="code">' + task.sol + "</pre></details>";
+  }
+  var taskListEl = document.getElementById("taskList");
+  TASKS.forEach(function(task, i){
+    var det = document.createElement("details");
+    det.className = "task";
+    var summary = document.createElement("summary");
+    summary.innerHTML = '<span class="tnum">' + (i+1) + '</span> ' + task.t;
+    det.appendChild(summary);
+    var body = document.createElement("div");
+    body.className = "body";
+    body.innerHTML = taskBodyHtml(task);
+    det.appendChild(body);
+    taskListEl.appendChild(det);
+  });
+
+})();
+</script>
