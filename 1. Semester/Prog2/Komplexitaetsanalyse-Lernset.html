@@ -645,6 +645,11 @@ for (i = 0; i < n; i++)
     {cat:"Bild: Diagramme", q:"Bild: Analyse für Fall B (Folie 32) — ergänze (①–⑥).", a:"① c₁· n\n② 2· c₁·(n/2) = c₁· n\n③ 4· c₁·(n/4) = c₁· n\n④ c₀· n (Basisfälle)\n⑤ T(n) = c₁·n·log(n) + c₀·n\n⑥ = O(n·log(n)).", img:"k32", set:"FB1"},
     {cat:"Teile und Herrsche", q:"Wie rechnet man die Fälle C und D (nur ein Teilproblem) aus?", a:"Die Aufrufstruktur ist eine Kette mit log(n) Ebenen.\nFall C (konstanter Aufwand pro Ebene): T(n) = c₁·log(n) + c₀ = O(log(n)).\nFall D (linearer Aufwand): die Ebenen kosten c₁·n, c₁·(n/2), c₁·(n/4), … Also\nT(n) = c₁·(1 + ½ + ¼ + …)·n + c₀ = O(n), denn die geometrische Reihe ist kleiner als 2.", expl:"Fall D ist die Überraschung: obwohl jede Ebene linear arbeitet, bleibt die Gesamtlaufzeit linear, weil die Problemgröße halbiert wird."},
     {cat:"Bild: Diagramme", q:"Bild: Analyse für Fall C und D (Folie 33) — ergänze die Fall-D-Spalte und die beiden Summen (①–⑤).", a:"① c₁· n\n② c₁· (n/2)\n③ c₁· (n/4)\n④ T(n) = c₁· log(n) + c₀   (Fall C)\n⑤ T(n) = c₁· (1 + ½ + ¼ + …)· n + c₀   (Fall D)", img:"k33", set:"FC1"},
+    {cat:"Teile und Herrsche", q:"Mit welchen zwei Fragen bestimmst du schnell, welcher der vier Fälle vorliegt?", a:"1) Wie viele rekursive Aufrufe macht die Funktion – einer (Kette) oder zwei (Baum)?\n2) Ist der Teile-/Herrscheschritt außerhalb der Aufrufe konstant oder linear in n?\nEiner + konstant ⇒ C, O(log n). Einer + linear ⇒ D, O(n). Zwei + konstant ⇒ A, O(n). Zwei + linear ⇒ B, O(n log n).", expl:"Alle vier Fälle setzen voraus, dass sich die Größe pro Aufruf halbiert (n/2) – sonst gilt die Tabelle nicht, siehe nächste Karte."},
+    {cat:"Teile und Herrsche", q:"Fall A und Fall C haben beide konstanten Teile-/Herrscheschritt – warum ist A (O(n)) trotzdem viel langsamer als C (O(log n))?", a:"Weil A verzweigt (zwei Aufrufe) und C nicht. Bei A entstehen insgesamt ≈ n Aufrufe (n Blätter im Baum), bei C nur log₂n Aufrufe (eine Kette). Gleich billiger Schritt, aber völlig unterschiedlich viele Schritte insgesamt.", expl:"Die Verzweigung entscheidet, ob am Ende n oder nur log n Aufrufe anfallen – nicht die Kosten des einzelnen Schritts."},
+    {cat:"Teile und Herrsche", q:"Fall B und Fall D haben beide linearen Teile-/Herrscheschritt – warum ist B (O(n log n)) langsamer als D (O(n))?", a:"Bei B kostet jede der log n Ebenen insgesamt wieder c₁·n (die zwei halb so großen Teilprobleme summieren sich zur vollen Breite n) ⇒ n·log n. Bei D gibt es nur einen Zweig: die Kosten schrumpfen geometrisch (n + n/2 + n/4 + …) und bleiben unter 2·c₁·n.", expl:"Die geometrische Reihe konvergiert bei D; bei B bleibt dagegen jede der log n Ebenen bei voller Breite n – das macht den Unterschied."},
+    {cat:"Teile und Herrsche", q:"Gilt Fall A immer, wenn eine Funktion zwei rekursive Aufrufe mit konstantem Zusatzaufwand macht?", a:"Nein – nur wenn sich die Problemgröße dabei halbiert (n/2). Verringert sie sich stattdessen nur um 1 (zwei Aufrufe mit n−1, wie bei naiver Fibonacci), gibt es n Rekursionstiefen statt log n, und die Aufrufzahl verdoppelt sich n-mal: T(n) = O(2ⁿ) statt O(n).", expl:"Genau das macht die naive rekursive Fibonacci-Funktion exponentiell langsam – zwei Aufrufe allein reichen nicht, entscheidend ist die Verkleinerung pro Schritt."},
+    {cat:"Teile und Herrsche", q:"Eine Funktion halbiert ihre Eingabe, durchläuft vorher aber einmal das ganze verbleibende Feld (z. B. um die Mitte nach einem Kriterium zu finden) und ruft sich danach nur einmal auf der halben Größe auf. Welcher Fall, welche Laufzeit?", a:"Fall D: ein Aufruf (Kette) + linearer Teile-/Herrscheschritt. T(n) = O(n) – die Kosten pro Ebene schrumpfen geometrisch (n, n/2, n/4, …), bleiben in Summe aber linear."},
     {cat:"Teile und Herrsche", q:"Lässt die Teile-und-Herrsche-Variante von max eine bessere Laufzeit erwarten als eine iterative Schleife? (Aufgabe 8.7)", qc:`static int max(int[] a, int li, int re) {
     if (li == re)
         return a[li];
@@ -1058,6 +1063,8 @@ for (i = 0; i < n; i++)
      explain:"Richtig — die Ebenen kosten c₁·n, c₁·n/2, c₁·n/4, …; die geometrische Reihe (1 + ½ + ¼ + …) ist kleiner als 2, also bleibt es O(n)."},
     {type:"bool", q:"Ja oder Nein: Die rekursive max-Funktion nach Teile und Herrsche ist schneller als die iterative Variante.", correct:false,
      explain:"Falsch — beide sind O(n) (Fall A). Die rekursive Variante hat sogar zusätzlichen Aufruf-Overhead."},
+    {type:"bool", q:"Ja oder Nein: Jede Funktion mit zwei rekursiven Aufrufen und konstantem Zusatzaufwand hat automatisch die Laufzeit O(n) (Fall A).", correct:false,
+     explain:"Falsch — das gilt nur, wenn sich die Eingabegröße dabei halbiert. Verringert sie sich stattdessen nur um 1 (zwei Aufrufe mit n−1, wie bei naiver Fibonacci), ist die Laufzeit O(2ⁿ)."},
     {type:"text", q:"Welche Größenordnung hat T(n) = 4n + 3? (Form: O(…))", answer:"O(n)", accept:["o(n)","n"],
      explain:"4n + 3 ≤ 5n für n ≥ 3, also O(n) — linear."},
     {type:"text", q:"Welche Größenordnung hat T(n) = 7n³ − 2n? (Form: O(…))", answer:"O(n^3)", accept:["o(n³)","o(n3)","n^3","n³","o(n hoch 3)"],
@@ -1212,6 +1219,9 @@ for (i = 0; i < n; i++)
     {q:"Welche Laufzeit hat Fall C (nur ein Teilproblem der Größe n/2, konstanter Aufwand)?",
      opts:["O(1)", "O(log n)", "O(n)", "O(n log n)"],
      correct:1, explain:"Die Aufrufstruktur ist eine lineare Kette der Tiefe log₂n — das ist die binäre Suche."},
+    {q:"Ein Problem wird in nur ein Teilproblem der Größe n/2 reduziert (lineare Kette), der Teile- und Herrscheschritt ist linear in n. Welche Laufzeit (Fall D)?",
+     opts:["O(log n)", "O(n)", "O(n log n)", "O(n²)"],
+     correct:1, explain:"Die Kosten pro Ebene (n, n/2, n/4, …) summieren sich zu einer geometrischen Reihe unter 2·c₁·n — trotz n linearer Ebenen bleibt es O(n)."},
     {q:"Welche Laufzeit hat f, wenn für jedes der n Elemente von a eine binäre Suche in b (Größe n) gemacht wird?",
      opts:["O(n)", "O(log n)", "O(n log n)", "O(n²)"],
      correct:2, explain:"n-mal O(log n) ergibt O(n log n) — dasselbe Muster wie n-mal TreeSet.add."}
